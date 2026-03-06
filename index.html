@@ -311,6 +311,21 @@ body.viewer-mode [data-admin-only]{display:none!important}
 </head>
 <body>
 
+<!-- ── LOGIN MODAL ── -->
+<div id="modal-login" class="login-overlay">
+  <div class="login-box">
+    <div class="login-logo"><div class="login-cross">+</div></div>
+    <h2 class="login-title">FDA License Manager</h2>
+    <p class="login-sub">ระบบจัดการใบอนุญาตเครื่องมือแพทย์</p>
+    <div class="login-form">
+      <input type="password" id="login-pw" class="login-inp" placeholder="รหัสผ่าน" autocomplete="current-password">
+      <button id="login-btn" class="login-submit">🔐 เข้าสู่ระบบ</button>
+      <div id="login-err" class="login-err" style="display:none">❌ รหัสผ่านไม่ถูกต้อง</div>
+      <div id="login-loading" class="login-loading" style="display:none">⏳ กำลังตรวจสอบ...</div>
+    </div>
+  </div>
+</div>
+
 <div id="wizard">
 <div class="wbox">
   <div class="whdr"><h2>⚙️ ตั้งค่า Google Drive Sync (ทำครั้งเดียว ~3 นาที)</h2><p>ใช้ Google Apps Script เป็น Backend ฟรี ไม่ต้องตั้ง Server</p></div>
@@ -500,7 +515,7 @@ function extractKey(filename) {
   <button class="rbact" id="btn-restore-yes">✅ โหลด URL กลับมา</button>
   <button class="rbact" style="background:rgba(255,255,255,.2);color:#fff" id="btn-restore-no">✕</button>
 </div>
-<div class="sbar hidden" id="sbar">
+<div class="sbar hidden" id="sbar" style="visibility:hidden">
   <div style="flex:1"><div class="sbar-txt" id="sbar-txt"></div><div class="sbar-sub" id="sbar-sub"></div></div>
   <div id="sbar-pills" style="display:flex;gap:6px"></div>
   <div id="sbar-acts" style="display:flex;gap:6px"></div>
@@ -1395,7 +1410,11 @@ function extractKey(filename) {
   // ── LOGIN & SESSION LOGIC ──
   function showLogin() {
     ge('modal-login').classList.remove('hidden');
-    ge('app').style.visibility = 'hidden';
+    // ซ่อน UI ทั้งหมด
+    ['sbar','main-content','dash-section','lic-section'].forEach(function(id){
+      var el = ge(id); if (el) el.style.visibility = 'hidden';
+    });
+    document.querySelectorAll('.modal-bg,.flash').forEach(function(el){ el.style.visibility='hidden'; });
     ge('login-pw').value = '';
     ge('login-err').style.display = 'none';
     ge('login-loading').style.display = 'none';
@@ -1405,7 +1424,10 @@ function extractKey(filename) {
 
   function hideLogin() {
     ge('modal-login').classList.add('hidden');
-    ge('app').style.visibility = 'visible';
+    ['sbar','main-content','dash-section','lic-section'].forEach(function(id){
+      var el = ge(id); if (el) el.style.visibility = 'visible';
+    });
+    document.querySelectorAll('.modal-bg,.flash').forEach(function(el){ el.style.visibility=''; });
   }
 
   async function doLogin() {
