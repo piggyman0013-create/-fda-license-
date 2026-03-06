@@ -528,7 +528,8 @@ function extractKey(filename) {
   var LICENSES = ls(LK) || JSON.parse(JSON.stringify(BASE_DATA));
   var urlMap = ls(UK) || {};
   var checks = ls(CK) || {};
-  var gasUrl = localStorage.getItem(GK) || '';
+  var BUILTIN_GAS_URL = 'https://script.google.com/macros/s/AKfycbyyEtfryFo6bnnkZWXo__DO_SkYsd_KZa5rHuOod4vxw1jXoLtK0t3PhZN7hrCVKKlr/exec';
+  var gasUrl = localStorage.getItem(GK) || BUILTIN_GAS_URL;
   var pendingMerge = null;
 
   // ── UTILS ──
@@ -596,7 +597,7 @@ function extractKey(filename) {
       res.textContent='❌ เชื่อมต่อไม่ได้: ' + e.message;
     }
   };
-  if (gasUrl) { ge('wizard').classList.add('gone'); }
+  ge('wizard').classList.add('gone');  // ซ่อน wizard เสมอตอนเริ่ม
 
   // ── SYNC ──
   ge('btn-sync').onclick = function() {
@@ -1312,6 +1313,11 @@ function extractKey(filename) {
   buildDash();
   renderLic();
   checkUrlBackup();
+  // Auto-sync เมื่อเปิดหน้าครั้งแรก (มี URL ฝังไว้แล้ว)
+  setTimeout(function() {
+    var hasLinks = Object.keys(urlMap).filter(function(k){ return urlMap[k]&&urlMap[k].url; }).length;
+    if (!hasLinks) { runSync(); }  // sync อัตโนมัติถ้ายังไม่มี link
+  }, 800);
 
 })();
 </script>
