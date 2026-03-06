@@ -253,7 +253,7 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--txt);font
 body.viewer-mode [data-admin-only]{display:none!important}
 
 /* ── LOGIN OVERLAY ── */
-.login-overlay{position:fixed;inset:0;background:linear-gradient(135deg,#0F2342 0%,#0c1e3a 50%,#071528 100%);display:flex;align-items:center;justify-content:center;z-index:9999;transition:opacity .4s}
+.login-overlay{position:fixed;inset:0;background:linear-gradient(135deg,#0F2342 0%,#0c1e3a 50%,#071528 100%);display:flex;align-items:center;justify-content:center;z-index:99999;transition:opacity .4s}
 .login-overlay.hidden{display:none}
 .login-box{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:48px 40px;width:100%;max-width:380px;text-align:center;backdrop-filter:blur(20px);box-shadow:0 24px 80px rgba(0,0,0,.5)}
 .login-logo{width:80px;height:80px;background:linear-gradient(135deg,#0891B2,#06B6D4);border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 24px;box-shadow:0 8px 32px rgba(8,145,178,.4)}
@@ -1395,14 +1395,17 @@ function extractKey(filename) {
   // ── LOGIN & SESSION LOGIC ──
   function showLogin() {
     ge('modal-login').classList.remove('hidden');
-    ge('app').style.display = 'none';
+    ge('app').style.visibility = 'hidden';
     ge('login-pw').value = '';
     ge('login-err').style.display = 'none';
+    ge('login-loading').style.display = 'none';
+    ge('login-btn').disabled = false;
+    setTimeout(function(){ ge('login-pw').focus(); }, 100);
   }
 
   function hideLogin() {
     ge('modal-login').classList.add('hidden');
-    ge('app').style.display = '';
+    ge('app').style.visibility = 'visible';
   }
 
   async function doLogin() {
@@ -1487,22 +1490,24 @@ function extractKey(filename) {
   ge('btn-role-logout').onclick = function() { doLogout(); };
 
   // ── Startup: ตรวจ session ──
-  if (SESSION_TOKEN && Date.now() < SESSION_EXP) {
+  if (SESSION_TOKEN && SESSION_EXP && Date.now() < SESSION_EXP) {
+    // session ยังใช้ได้
     setRole(SESSION_ROLE === 'admin');
     hideLogin();
     loadLicensesFromSheets();
   } else {
+    // clear session เก่า
+    localStorage.removeItem('fda_token');
+    localStorage.removeItem('fda_role');
+    localStorage.removeItem('fda_token_exp');
+    SESSION_TOKEN = ''; SESSION_ROLE = ''; SESSION_EXP = 0;
     showLogin();
   }
 
   buildDash();
   renderLic();
   checkUrlBackup();
-  // Auto-sync เมื่อเปิดหน้าครั้งแรก (มี URL ฝังไว้แล้ว)
-  setTimeout(function() {
-    var hasLinks = Object.keys(urlMap).filter(function(k){ return urlMap[k]&&urlMap[k].url; }).length;
-    if (!hasLinks) { runSync(); }  // sync อัตโนมัติถ้ายังไม่มี link
-  }, 800);
+  // Auto-sync ถูกปิด — ต้อง Login ก่อน
 
 })();
 </script>
