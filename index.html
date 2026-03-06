@@ -761,7 +761,11 @@ function extractKey(filename) {
     ge('mp-d').textContent = dels.length;
     ge('mp-k').textContent = Object.keys(urlMap).filter(function(k) { return nm[k]; }).length;
     var items = adds.map(function(l) { return '<div class="mi"><span class="mit a">+ ใหม่</span><span class="mono">'+l.k+'</span> — '+l.m+'</div>'; })
-      .concat(upds.map(function(l) { return '<div class="mi"><span class="mit u">↻ อัพเดท</span><span class="mono">'+l.k+'</span> — '+l.m+'</div>'; }))
+      .concat(upds.map(function(l) {
+          var old = om[l.k];
+          var dateChange = (old && old.e !== l.e) ? ' <span style="color:#64748b;font-size:11px">'+thD(old.e)+' → '+thD(l.e)+'</span>' : '';
+          return '<div class="mi"><span class="mit u">↻ อัพเดท</span><span class="mono">'+l.k+'</span> — '+l.m+dateChange+'</div>';
+        }))
       .concat(dels.map(function(l) { return '<div class="mi"><span class="mit d">✕ ลบ</span><span class="mono">'+l.k+'</span> — '+l.m+'</div>'; }));
     ge('mlist').innerHTML = items.length ? items.join('') : '<div class="mi" style="color:var(--mut)">ข้อมูลเหมือนเดิม ✓</div>';
     ge('ex-drop').style.display = 'none';
@@ -771,9 +775,35 @@ function extractKey(filename) {
   }
   function applyMerge() {
     if (!isAdmin) { ge('btn-role-switch').click(); return; }
-    LICENSES = pendingMerge; lss(LK, LICENSES);
+    // Smart merge: อัพเดทเฉพาะที่เปลี่ยน ไม่ลบใบเดิม ไม่ทับทั้งหมด
+    var om = {}; LICENSES.forEach(function(l) { om[l.k] = l; });
+    var added = 0, updated = 0, skipped = 0;
+    pendingMerge.forEach(function(newL) {
+      var old = om[newL.k];
+      if (!old) {
+        // ใหม่ — เพิ่มเลย
+        LICENSES.push(newL); added++;
+      } else {
+        // ซ้ำ — อัพเดทเฉพาะ field ที่เปลี่ยน ไม่แตะ field ที่เหมือนกัน
+        var changed = false;
+        if (newL.e && newL.e !== old.e) { old.e = newL.e; changed = true; }  // วันหมดอายุ
+        if (newL.m && newL.m !== old.m) { old.m = newL.m; changed = true; }  // ผู้ผลิต
+        if (newL.c && newL.c !== old.c) { old.c = newL.c; changed = true; }  // ประเทศ
+        if (newL.n && newL.n !== old.n) { old.n = newL.n; changed = true; }  // จำนวนสินค้า
+        if (newL.cat && newL.cat !== old.cat) { old.cat = newL.cat; changed = true; }
+        if (changed) updated++; else skipped++;
+      }
+    });
+    lss(LK, LICENSES);
     closeEx(); buildDash(); renderLic();
-    flashMsg('✅ Merge สำเร็จ! '+LICENSES.length+' ใบ');
+    flashMsg('✅ Merge สำเร็จ! +'+added+' ใหม่  ↻'+updated+' อัพเดท  ='+skipped+' เหมือนเดิม');
+    // Sync ข้อมูลไป Apps Script เพื่อ auto email check
+    if (gasUrl) {
+      fetch(gasUrl, {
+        method: 'POST', headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ action: 'saveData', licenses: LICENSES })
+      }).catch(function(){});  // fire-and-forget ไม่รอผล
+    }
   }
 
   // ── DASHBOARD ──
