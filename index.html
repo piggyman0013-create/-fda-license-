@@ -526,7 +526,7 @@ function extractKey(filename) {
       <button class="nbtn green" id="btn-open-ex" data-admin-only>📊 Import Excel</button>
       <button class="nbtn" id="btn-open-upload" style="background:#7c3aed;border-color:#7c3aed" data-admin-only>📤 Upload PDF</button>
       <button class="nbtn orange" id="btn-sync">🔗 Sync Drive PDF</button>
-      <a class="nbtn" style="background:#1565c0;border-color:#1565c0" href="https://drive.google.com/drive/u/0/folders/1pZN6e7oH-kMGOs8lNwWX2fCTf_RTQBvc" target="_blank" data-admin-only>📂 Drive</a>
+      <button class="nbtn" onclick="window.open(DRIVE_URL,'_blank')" data-admin-only style="background:#1565c0;border-color:#1565c0">📂 Drive</button>
       <button class="nbtn" id="btn-darkmode" onclick="toggleDark()" title="สลับ Dark/Light Mode">🌙 Dark</button>
       <button class="nbtn" id="btn-import-url" style="background:#0f766e;border-color:#0f766e;opacity:.7" title="โหลด URL จาก backup" data-admin-only>📥 Import URLs</button>
       <button class="nbtn" id="btn-settings" style="background:#475569;border-color:#475569" data-admin-only>⚙️ ตั้งค่า</button>
@@ -753,12 +753,7 @@ function extractKey(filename) {
     if (e.key === 'Escape') closePDF();
   });
 
-  window.toggleDark = function() {
-    var isDark = document.body.classList.toggle('dark');
-    localStorage.setItem('fda_dark', isDark ? '1' : '0');
-    var btn = ge('btn-darkmode');
-    if (btn) btn.textContent = isDark ? '☀️ Light' : '🌙 Dark';
-  };
+  // toggleDark moved to global scope
   // โหลด Dark Mode preference
   if (localStorage.getItem('fda_dark') === '1') {
     document.body.classList.add('dark');
@@ -1744,6 +1739,25 @@ function extractKey(filename) {
   // Auto-sync ถูกปิด — ต้อง Login ก่อน
 
 })();
+</script>
+
+<script>
+// Global dark mode functions (outside IIFE for onclick access)
+window.toggleDark = function() {
+    var isDark = document.body.classList.toggle('dark');
+    localStorage.setItem('fda_dark', isDark ? '1' : '0');
+    var btn = ge('btn-darkmode');
+    if (btn) btn.textContent = isDark ? '☀️ Light' : '🌙 Dark';
+  };
+
+// Init dark mode from localStorage
+if (localStorage.getItem('fda_dark') === '1') {
+  document.body.classList.add('dark');
+  document.addEventListener('DOMContentLoaded', function() {
+    var b = document.getElementById('btn-darkmode');
+    if (b) b.textContent = '☀️ Light';
+  });
+}
 </script>
 </body>
 </html>
