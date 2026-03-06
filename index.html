@@ -179,7 +179,7 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--txt);font
 .ok .dpill{background:var(--grnbg);color:var(--grn);border:1px solid var(--grnbr)}
 .expired .dpill{background:var(--grybg);color:var(--gry);border:1px solid var(--grybr)}
 .ppill{background:#f1f5f9;border:1px solid var(--brd);border-radius:20px;padding:3px 10px;font-size:11px;color:var(--mut)}
-.pdfbtn{display:inline-flex;align-items:center;gap:5px;border-radius:5px;padding:5px 11px;font-size:11px;font-weight:700;text-decoration:none;white-space:nowrap;flex-shrink:0}
+.pdfbtn{display:inline-flex;align-items:center;gap:5px;border-radius:5px;padding:5px 11px;font-size:11px;font-weight:700;text-decoration:none;white-space:nowrap;flex-shrink:0;cursor:pointer;border:none}
 .pdfbtn.has{background:#1b5e20;color:#fff}
 .pdfbtn.none{background:#94a3b8;color:#fff}
 .editbtn{display:inline-flex;align-items:center;gap:4px;border-radius:5px;padding:5px 10px;font-size:11px;font-weight:700;border:1px solid #bae6fd;background:#f0f9ff;color:#0891b2;cursor:pointer;font-family:'Sarabun',sans-serif;white-space:nowrap;flex-shrink:0}
@@ -323,6 +323,22 @@ body.viewer-mode [data-admin-only]{display:none!important}
       <div id="login-err" class="login-err" style="display:none">❌ รหัสผ่านไม่ถูกต้อง</div>
       <div id="login-loading" class="login-loading" style="display:none">⏳ กำลังตรวจสอบ...</div>
     </div>
+  </div>
+</div>
+
+<!-- ── PDF VIEWER MODAL ── -->
+<div class="modal-bg hidden" id="modal-pdf">
+  <div class="modal" style="max-width:900px;width:95vw;height:90vh;display:flex;flex-direction:column;padding:0;overflow:hidden">
+    <div class="mhdr" style="padding:14px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0">
+      <div style="flex:1">
+        <div class="mhdr-t">📄 ดู PDF</div>
+        <div class="mhdr-s" id="pdf-filename" style="font-size:12px;color:#94a3b8"></div>
+      </div>
+      <button onclick="ge('modal-pdf').classList.add('hidden')" style="background:rgba(255,255,255,.1);border:none;color:#fff;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px">✕</button>
+    </div>
+    <iframe id="pdf-iframe" src="" style="flex:1;border:none;width:100%;background:#1e293b"
+      sandbox="allow-scripts allow-same-origin"
+      allow="fullscreen"></iframe>
   </div>
 </div>
 
@@ -597,6 +613,15 @@ function extractKey(filename) {
   function fmtD(iso) { return iso ? new Date(iso).toLocaleDateString('th-TH',{year:'numeric',month:'short',day:'numeric'}) : '-'; }
   function addD(iso,n) { if (!iso) return null; var d = new Date(iso); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); }
   function getLic(r) { var ov = urlMap[r.k] || {}; return Object.assign({}, r, {url: ov.url||'', d: dL(r.e), u: urg(r.e)}); }
+  function openPDF(url, filename) {
+    if (!url) return;
+    var embedUrl = url.indexOf('/preview') >= 0 ? url : url.replace('/view','') + '/preview';
+    ge('pdf-filename').textContent = filename || '';
+    ge('pdf-iframe').src = '';
+    setTimeout(function(){ ge('pdf-iframe').src = embedUrl; }, 50);
+    ge('modal-pdf').classList.remove('hidden');
+  }
+
   function flashMsg(msg) {
     var el = document.getElementById('flash-msg');
     el.textContent = msg || '✅ บันทึกแล้ว';
@@ -865,7 +890,11 @@ function extractKey(filename) {
     ge('tab-cnt').textContent = all.length;
     var ul = u.concat(w).sort(function(a,b) { return (a.d||0)-(b.d||0); }).slice(0,10);
     ge('d-urg').innerHTML = ul.length ? ul.map(function(l) {
-      var pdf = l.url ? '<a class="pdfbtn has" href="'+(l.url.replace('/view','/preview'))+'" target="_blank">📄 PDF</a>'
+      var pdf = l.url ? (function(){
+          var safeUrl = l.url.replace(/"/g,'&quot;');
+          var safeName = ((l.m||'')+' - '+l.k).replace(/"/g,'&quot;');
+          return '<button class="pdfbtn has" onclick="openPDF(this.dataset.url,this.dataset.name)" data-url="'+safeUrl+'" data-name="'+safeName+'">📄 PDF</button>';
+        })()
         : '<a class="pdfbtn none" href="'+DRIVE_URL+'" target="_blank">📂</a>';
       return '<div class="tli"><div class="tdot '+l.u+'"></div>'
         +'<div class="tinfo"><div class="tlic">'+l.k+'</div><div class="tmfr">'+l.m+'</div></div>'
