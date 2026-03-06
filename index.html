@@ -548,7 +548,7 @@ function extractKey(filename) {
   var LICENSES = ls(LK) || JSON.parse(JSON.stringify(BASE_DATA));
   var urlMap = ls(UK) || {};
   var checks = ls(CK) || {};
-  var BUILTIN_GAS_URL = 'https://script.google.com/macros/s/AKfycbyyEtfryFo6bnnkZWXo__DO_SkYsd_KZa5rHuOod4vxw1jXoLtK0t3PhZN7hrCVKKlr/exec';
+  var BUILTIN_GAS_URL = 'https://script.google.com/macros/s/AKfycbxO6826mADWxNWvcA5g5lclG1oupgqyaF_6_Azfk0H0dnOn9WaoqfkyMqXjqVW1y3NX/exec';
   var gasUrl = localStorage.getItem(GK) || BUILTIN_GAS_URL;
   var pendingMerge = null;
 
@@ -862,9 +862,11 @@ function extractKey(filename) {
   function rowHTML(l) {
     var sid = l.k.replace(/[^a-z0-9]/gi,'_'), isOpen = (openId===l.k);
     var dTxt = !l.e ? '-' : (l.d < 0 ? 'หมดอายุแล้ว' : 'เหลือ '+l.d+' วัน');
-    var pdfBtn = l.url
-      ? '<a class="pdfbtn has" href="'+l.url+'" target="_blank">📄 PDF</a>'
-      : '<a class="pdfbtn none" href="'+DRIVE_URL+'" target="_blank">📂</a>';
+    var pdfBtn = (daysLeft <= 0)
+      ? ''  // หมดอายุแล้ว — ไม่แสดงปุ่ม PDF
+      : l.url
+        ? '<a class="pdfbtn has" href="'+l.url+'" target="_blank">📄 PDF</a>'
+        : '<a class="pdfbtn none" href="'+DRIVE_URL+'" target="_blank">📂</a>';
     return '<div class="row '+l.u+(isOpen?' open':'')+'" id="row_'+sid+'" data-key="'+l.k.replace(/"/g,'&quot;')+'">'
       +'<div class="rhdr">'
       +'<div class="udot"></div><div class="rno">'+l.k+'</div>'
