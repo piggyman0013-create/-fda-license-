@@ -253,22 +253,66 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--txt);font
 body.viewer-mode [data-admin-only]{display:none!important}
 
 /* ── DARK MODE ── */
-body.dark{--bg:#0f172a;--card:#1e293b;--border:#334155;--txt:#e2e8f0;--mut:#94a3b8;--inp:#1e293b}
-body.dark .sbar{background:linear-gradient(135deg,#0c1e3a,#0f2342)!important}
+body.dark{background:#0f172a;color:#e2e8f0}
+body.dark .sbar{background:linear-gradient(135deg,#0a1628,#0f2342)!important}
+body.dark .ntab{color:#94a3b8}
+body.dark .ntab.active{color:#38bdf8;border-color:#38bdf8}
+body.dark .nbtn{background:#1e293b;border-color:#334155;color:#cbd5e1}
+body.dark .nbtn:hover{background:#334155}
+body.dark #btn-darkmode{background:#f59e0b;border-color:#d97706;color:#1c1917;font-weight:700}
+body.dark .role-bar{background:#0f172a;border-color:#1e293b}
+body.dark .role-bar.viewer{background:linear-gradient(135deg,#1e293b,#0f172a)}
+body.dark .role-bar.admin{background:linear-gradient(135deg,#1e3a5f,#1565c0)}
+body.dark .page{background:#0f172a}
+body.dark .ctrl{background:#0f172a;border-color:#1e293b}
+body.dark .lsrch{background:#1e293b;border-color:#334155;color:#e2e8f0}
+body.dark .lsrch::placeholder{color:#64748b}
+body.dark .lsort{background:#1e293b;border-color:#334155;color:#e2e8f0}
+body.dark .swbtn{background:#1e293b;color:#94a3b8;border-color:#334155}
+body.dark .swbtn.on{background:#0f4c81;color:#fff;border-color:#1565c0}
 body.dark .card{background:#1e293b;border-color:#334155;color:#e2e8f0}
-body.dark .row{background:#1e293b;border-color:#334155}
+body.dark .cnum{color:#38bdf8}
+body.dark .clbl{color:#94a3b8}
+body.dark .row{background:#1e293b;border-color:#334155;color:#e2e8f0}
 body.dark .row:hover{background:#263148}
-body.dark .rpanel{background:#162032;border-color:#334155}
-body.dark .ctrl,body.dark .page{background:#0f172a}
-body.dark .lsrch,body.dark .lsort{background:#1e293b;border-color:#334155;color:#e2e8f0}
+body.dark .row.open{background:#162032;border-color:#334155}
+body.dark .rpanel{background:#162032;border-color:#1e3a5f}
+body.dark .rhdr{color:#e2e8f0}
+body.dark .rmfr{color:#94a3b8}
+body.dark .edate .d{color:#e2e8f0}
+body.dark .ic{background:#1e3a5f;border-color:#334155}
+body.dark .icl{color:#94a3b8}
+body.dark .icv{color:#e2e8f0}
+body.dark .istrip{background:#1e293b;border-color:#334155}
+body.dark .chkbox,.dark .tlbox{background:#1e3a5f;border-color:#334155}
+body.dark .tlbox{background:#1e293b;border-color:#334155}
+body.dark .chktit{color:#94a3b8}
+body.dark .chki label{color:#cbd5e1}
+body.dark .chki.done label{color:#64748b}
+body.dark .tlsl{color:#94a3b8}
+body.dark .tlsv{color:#e2e8f0}
+body.dark .url-box{background:#1e3a5f;border-color:#334155}
+body.dark .url-lbl{color:#94a3b8}
+body.dark .url-inp{background:#0f172a;border-color:#334155;color:#e2e8f0}
+body.dark .ubtn{background:#1e293b;border-color:#334155;color:#cbd5e1}
+body.dark .psi{background:#1e293b;border-color:#334155;color:#e2e8f0}
+body.dark .ptbl{color:#e2e8f0}
+body.dark .ptbl thead{background:#1e3a5f}
+body.dark .ptbl tbody tr:hover{background:#263148}
+body.dark .ptbl td{border-color:#334155;color:#e2e8f0}
+body.dark .btn{background:#1e293b;border-color:#334155;color:#cbd5e1}
+body.dark .btn:hover{background:#334155}
 body.dark .modal{background:#1e293b;border-color:#334155}
 body.dark .mhdr{background:linear-gradient(135deg,#0c1e3a,#1565c0)}
-body.dark .ic,.dark .istrip{background:#263148;border-color:#334155}
-body.dark .chkbox,.dark .tlbox{background:#263148;border-color:#334155}
-body.dark .url-box{background:#263148;border-color:#334155}
-body.dark .url-inp{background:#1e293b;border-color:#475569;color:#e2e8f0}
-body.dark input,body.dark select{background:#1e293b;color:#e2e8f0;border-color:#475569}
-body.dark #btn-darkmode{background:#f59e0b;border-color:#d97706;color:#1c1917}
+body.dark .mbdy{background:#1e293b;color:#e2e8f0}
+body.dark .dropzone{background:#0f172a;border-color:#334155;color:#94a3b8}
+body.dark input:not([type=checkbox]),body.dark select,body.dark textarea{background:#0f172a;color:#e2e8f0;border-color:#334155}
+body.dark .barchart .blbl{color:#94a3b8}
+body.dark .barchart .bval{color:#e2e8f0}
+body.dark .barchart .btrk{background:#1e293b}
+body.dark .wi{background:#1e293b;border-color:#334155;color:#e2e8f0}
+body.dark .restore-bar{background:#1e293b;border-color:#334155;color:#e2e8f0}
+body.dark #flash-msg{background:#1e3a5f;color:#e2e8f0}
 /* ── LOGIN OVERLAY ── */
 .login-overlay{position:fixed;inset:0;background:linear-gradient(135deg,#0F2342 0%,#0c1e3a 50%,#071528 100%);display:flex;align-items:center;justify-content:center;z-index:99999;transition:opacity .4s}
 .login-overlay.hidden{display:none}
@@ -365,19 +409,22 @@ body.dark .login-overlay { background:linear-gradient(135deg,#020617 0%,#0f172a 
 </div>
 
 <!-- ── PDF VIEWER MODAL ── -->
-<div class="modal-bg hidden" id="modal-pdf" onclick="if(event.target===this){ge('modal-pdf').classList.add('hidden');ge('pdf-iframe').src=''}">
+<div class="modal-bg hidden" id="modal-pdf" onclick="if(event.target===this) closePDF()">
   <div class="modal" style="max-width:900px;width:95vw;height:90vh;display:flex;flex-direction:column;padding:0;overflow:hidden">
     <div class="mhdr" style="padding:14px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0">
       <div style="flex:1">
         <div class="mhdr-t">📄 ดู PDF</div>
         <div class="mhdr-s" id="pdf-filename" style="font-size:12px;color:#94a3b8"></div>
       </div>
-      <button onclick="ge('modal-pdf').classList.add('hidden');ge('pdf-iframe').src=''" style="background:rgba(255,255,255,.1);border:none;color:#fff;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px">✕</button>
+      <button onclick="closePDF()" style="background:rgba(255,255,255,.1);border:none;color:#fff;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px">✕</button>
     </div>
     <iframe id="pdf-iframe" src="" style="flex:1;border:none;width:100%;background:#1e293b"
       sandbox="allow-scripts allow-same-origin allow-popups"
       allow="fullscreen"
       referrerpolicy="no-referrer"></iframe>
+    <div style="padding:10px;text-align:center;flex-shrink:0;background:#1e293b">
+      <button onclick="closePDF()" style="background:#ef4444;color:#fff;border:none;padding:8px 24px;border-radius:8px;cursor:pointer;font-size:14px;font-family:Sarabun,sans-serif">✕ ปิด</button>
+    </div>
   </div>
 </div>
 
@@ -490,7 +537,7 @@ function extractKey(filename) {
       <button class="nbtn" id="btn-open-upload" style="background:#7c3aed;border-color:#7c3aed" data-admin-only>📤 Upload PDF</button>
       <button class="nbtn orange" id="btn-sync">🔗 Sync Drive PDF</button>
       <a class="nbtn" style="background:#1565c0;border-color:#1565c0" href="https://drive.google.com/drive/u/0/folders/1pZN6e7oH-kMGOs8lNwWX2fCTf_RTQBvc" target="_blank" data-admin-only>📂 Drive</a>
-      <button class="nbtn" id="btn-darkmode" onclick="toggleDark()" title="สลับ Dark/Light Mode">🌙</button>
+      <button class="nbtn" id="btn-darkmode" onclick="toggleDark()" title="สลับ Dark/Light Mode">🌙 Dark</button>
       <button class="nbtn" id="btn-import-url" style="background:#0f766e;border-color:#0f766e;opacity:.7" title="โหลด URL จาก backup" data-admin-only>📥 Import URLs</button>
       <button class="nbtn" id="btn-settings" style="background:#475569;border-color:#475569" data-admin-only>⚙️ ตั้งค่า</button>
     </div>
@@ -635,7 +682,7 @@ function extractKey(filename) {
   var LICENSES = [];
   var urlMap = ls(UK) || {};
   var checks = ls(CK) || {};
-  var BUILTIN_GAS_URL = 'https://script.google.com/macros/s/AKfycbzoL7CImCshCsSZU8_1WoPlh0w3rBre5UVhQWLSX9LV7MPRrl0SmhKCNWLz_rFOvPX2/exec';
+  var BUILTIN_GAS_URL = 'https://script.google.com/macros/s/AKfycbz7a7OgA3YSKXn0O_eyReDhD-_OJI3cvBpwDMgH_WunnXX6q-vW4AE4r86VZjM3T-03/exec';
   var SESSION_TOKEN = localStorage.getItem('fda_token') || '';
   var SESSION_ROLE  = localStorage.getItem('fda_role')  || '';
   var SESSION_EXP   = parseInt(localStorage.getItem('fda_token_exp') || '0');
@@ -678,12 +725,20 @@ function extractKey(filename) {
     setTimeout(function(){ ge('pdf-iframe').src = embedUrl; }, 50);
     ge('modal-pdf').classList.remove('hidden');
   }
+  function closePDF() {
+    ge('modal-pdf').classList.add('hidden');
+    ge('pdf-iframe').src = '';
+  }
+  // ESC key ปิด modal
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closePDF();
+  });
 
   function toggleDark() {
     var isDark = document.body.classList.toggle('dark');
     localStorage.setItem('fda_dark', isDark ? '1' : '0');
     var btn = ge('btn-darkmode');
-    if (btn) btn.textContent = isDark ? '☀️ Light Mode' : '🌙 Dark Mode';
+    if (btn) btn.textContent = isDark ? '☀️ Light' : '🌙 Dark';
   }
   // โหลด Dark Mode preference
   if (localStorage.getItem('fda_dark') === '1') {
@@ -702,7 +757,7 @@ function extractKey(filename) {
   // โหลด dark mode preference
   if (localStorage.getItem('fda_dark') === '1') {
     document.body.classList.add('dark');
-    setTimeout(function(){ var b = ge('btn-darkmode'); if(b) b.textContent='☀️'; }, 100);
+    setTimeout(function(){ var b = ge('btn-darkmode'); if(b) b.textContent='☀️ Light'; }, 100);
   }
 
   function flashMsg(msg) {
