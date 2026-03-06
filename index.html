@@ -369,6 +369,8 @@ body.dark #flash-msg{background:#1e3a5f;color:#e2e8f0}
 @media(max-width:900px){.sgrid{grid-template-columns:1fr 1fr}.p2c{grid-template-columns:1fr}.drow{grid-template-columns:1fr}}
 @media(max-width:600px){.page{padding:10px 12px}.rno{display:none}.dpill{display:none}}
 
+
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -389,16 +391,20 @@ body.dark #flash-msg{background:#1e3a5f;color:#e2e8f0}
 </div>
 
 <!-- ── PDF VIEWER MODAL ── -->
-<div class="modal-bg hidden" id="modal-pdf" onclick="if(event.target===this) closePDF()">
+<div class="modal-bg hidden" id="modal-pdf" onclick="if(event.target===this && window.closePDF) window.closePDF()">
   <div class="modal" style="max-width:900px;width:95vw;height:90vh;display:flex;flex-direction:column;padding:0;overflow:hidden">
     <div class="mhdr" style="padding:14px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0">
       <div style="flex:1">
         <div class="mhdr-t">📄 ดู PDF</div>
         <div class="mhdr-s" id="pdf-filename" style="font-size:12px;color:#94a3b8"></div>
       </div>
-      <button onclick="closePDF()" style="background:rgba(255,255,255,.1);border:none;color:#fff;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px">✕</button>
+      <button onclick="window.closePDF && window.closePDF()" style="background:rgba(255,255,255,.1);border:none;color:#fff;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px">✕</button>
     </div>
     <div style="flex:1;position:relative;overflow:hidden">
+      <div id="pdf-loading" style="display:none;position:absolute;inset:0;background:#0f172a;z-index:5;align-items:center;justify-content:center;flex-direction:column;gap:12px">
+        <div style="width:48px;height:48px;border:4px solid #334155;border-top-color:#38bdf8;border-radius:50%;animation:spin 1s linear infinite"></div>
+        <div style="color:#94a3b8;font-family:Sarabun,sans-serif">กำลังโหลด PDF...</div>
+      </div>
       <iframe id="pdf-iframe" src="" style="width:100%;height:100%;border:none;background:#1e293b;display:block"
         sandbox="allow-scripts allow-same-origin"
         allow="fullscreen"></iframe>
@@ -407,7 +413,7 @@ body.dark #flash-msg{background:#1e3a5f;color:#e2e8f0}
            onclick="return false;" title=""></div>
     </div>
     <div style="padding:10px;text-align:center;flex-shrink:0;background:#1e293b">
-      <button onclick="closePDF()" style="background:#ef4444;color:#fff;border:none;padding:8px 24px;border-radius:8px;cursor:pointer;font-size:14px;font-family:Sarabun,sans-serif">✕ ปิด</button>
+      <button onclick="window.closePDF && window.closePDF()" style="background:#ef4444;color:#fff;border:none;padding:8px 24px;border-radius:8px;cursor:pointer;font-size:14px;font-family:Sarabun,sans-serif">✕ ปิด</button>
     </div>
   </div>
 </div>
@@ -666,7 +672,7 @@ function extractKey(filename) {
   var LICENSES = [];
   var urlMap = ls(UK) || {};
   var checks = ls(CK) || {};
-  var BUILTIN_GAS_URL = 'https://script.google.com/macros/s/AKfycbz7a7OgA3YSKXn0O_eyReDhD-_OJI3cvBpwDMgH_WunnXX6q-vW4AE4r86VZjM3T-03/exec';
+  var BUILTIN_GAS_URL = 'https://script.google.com/macros/s/AKfycby7zheCP9-8fCZrX1raLnAlFgn8ga6SGgC0V06zpMjbI0EAIJCo5QpxGh_570XB8zOg/exec';
   var SESSION_TOKEN = localStorage.getItem('fda_token') || '';
   var SESSION_ROLE  = localStorage.getItem('fda_role')  || '';
   var SESSION_EXP   = parseInt(localStorage.getItem('fda_token_exp') || '0');
@@ -701,15 +707,44 @@ function extractKey(filename) {
   function fmtD(iso) { return iso ? new Date(iso).toLocaleDateString('th-TH',{year:'numeric',month:'short',day:'numeric'}) : '-'; }
   function addD(iso,n) { if (!iso) return null; var d = new Date(iso); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); }
   function getLic(r) { var ov = urlMap[r.k] || {}; var url = r.url || ov.url || ''; var prods = r.prods || []; return Object.assign({}, r, {url: url, d: dL(r.e), u: urg(r.e), prods: prods}); }
-  function openPDF(url, filename) {
+  window.openPDF = function(url, filename) {
     if (!url) return;
-    var embedUrl = url.indexOf('/preview') >= 0 ? url : url.replace('/view','') + '/preview';
+    var tok = SESSION_TOKEN || localStorage.getItem('fda_token') || '';
+    var m = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+    if (!m) return;
+    var fileId = m[1];
     ge('pdf-filename').textContent = filename || '';
-    ge('pdf-iframe').src = '';
-    setTimeout(function(){ ge('pdf-iframe').src = embedUrl; }, 50);
     ge('modal-pdf').classList.remove('hidden');
+    var iframe = ge('pdf-iframe');
+    iframe.src = '';
+    var loadDiv = ge('pdf-loading');
+    if (loadDiv) loadDiv.style.display = 'flex';
+    var proxyUrl = gasUrl + '?action=viewPdf&fileId=' + fileId + '&token=' + encodeURIComponent(tok);
+    fetch(proxyUrl)
+      .then(function(r) { return r.text(); })
+      .then(function(b64) {
+        if (loadDiv) loadDiv.style.display = 'none';
+        if (!b64 || b64.trim().startsWith('<')) {
+          iframe.srcdoc = b64 || '<p>ไม่พบข้อมูล</p>';
+          return;
+        }
+        try {
+          var binary = atob(b64.trim());
+          var bytes = new Uint8Array(binary.length);
+          for (var i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+          var blob = new Blob([bytes], { type: 'application/pdf' });
+          var objUrl = URL.createObjectURL(blob);
+          iframe.src = objUrl + '#toolbar=0&navpanes=0';
+        } catch(ex) {
+          iframe.srcdoc = '<h3 style="font-family:sans-serif;color:#dc2626;padding:30px">❌ โหลด PDF ไม่ได้</h3>';
+        }
+      })
+      .catch(function(err) {
+        if (loadDiv) loadDiv.style.display = 'none';
+        iframe.srcdoc = '<h3 style="font-family:sans-serif;color:#dc2626;padding:30px">❌ ' + err.message + '</h3>';
+      });
   }
-  function closePDF() {
+  window.closePDF = function() {
     ge('modal-pdf').classList.add('hidden');
     ge('pdf-iframe').src = '';
   }
@@ -718,12 +753,12 @@ function extractKey(filename) {
     if (e.key === 'Escape') closePDF();
   });
 
-  function toggleDark() {
+  window.toggleDark = function() {
     var isDark = document.body.classList.toggle('dark');
     localStorage.setItem('fda_dark', isDark ? '1' : '0');
     var btn = ge('btn-darkmode');
     if (btn) btn.textContent = isDark ? '☀️ Light' : '🌙 Dark';
-  }
+  };
   // โหลด Dark Mode preference
   if (localStorage.getItem('fda_dark') === '1') {
     document.body.classList.add('dark');
@@ -1679,7 +1714,7 @@ function extractKey(filename) {
     if (!btn) return;
     var url = btn.getAttribute('data-url');
     var name = btn.getAttribute('data-name');
-    if (url) openPDF(url, name);
+    if (url && window.openPDF) window.openPDF(url, name);
   });
 
   ge('login-btn').onclick = doLogin;
