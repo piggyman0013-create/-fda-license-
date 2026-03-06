@@ -890,11 +890,7 @@ function extractKey(filename) {
     ge('tab-cnt').textContent = all.length;
     var ul = u.concat(w).sort(function(a,b) { return (a.d||0)-(b.d||0); }).slice(0,10);
     ge('d-urg').innerHTML = ul.length ? ul.map(function(l) {
-      var pdf = l.url ? (function(){
-          var safeUrl = l.url.replace(/"/g,'&quot;');
-          var safeName = ((l.m||'')+' - '+l.k).replace(/"/g,'&quot;');
-          return '<button class="pdfbtn has" onclick="openPDF(this.dataset.url,this.dataset.name)" data-url="'+safeUrl+'" data-name="'+safeName+'">📄 PDF</button>';
-        })()
+      var pdf = l.url ? '<button class="pdfbtn has pdf-open-btn" data-url="' + l.url + '" data-name="' + (l.m||'').replace(/"/g,'') + ' - ' + l.k + '">📄 PDF</button>'
         : '<a class="pdfbtn none" href="'+DRIVE_URL+'" target="_blank">📂</a>';
       return '<div class="tli"><div class="tdot '+l.u+'"></div>'
         +'<div class="tinfo"><div class="tlic">'+l.k+'</div><div class="tmfr">'+l.m+'</div></div>'
@@ -908,7 +904,13 @@ function extractKey(filename) {
         +'<div class="btrk"><div class="bfil" style="width:'+Math.round(e[1]/maxM*100)+'%"></div></div>'
         +'<div class="bval">'+e[1]+'</div></div>';
     }).join('');
-    var yM = {}; LICENSES.forEach(function(l) { var y=l.e?String(+l.e.slice(0,4)+543):'N/A'; if(!yM[y])yM[y]=0; yM[y]++; });
+    var yM = {}; LICENSES.forEach(function(l) {
+      if (!l.e || l.e === '' || l.e === 'undefined') return;  // ข้ามถ้าไม่มีวันหมดอายุ
+      var yr = parseInt(l.e.slice(0,4));
+      if (isNaN(yr)) return;  // ข้าม NaN
+      var y = String(yr + 543);
+      if (!yM[y]) yM[y] = 0; yM[y]++;
+    });
     var yA = Object.entries(yM).sort(function(a,b) { return a[0].localeCompare(b[0]); });
     var maxY = Math.max.apply(null, yA.map(function(e) { return e[1]; }));
     var nowY = String(new Date().getFullYear()+543);
@@ -1537,6 +1539,15 @@ function extractKey(filename) {
   }
 
   // ── Login button events ──
+  // ── PDF open via event delegation (ทำงานได้แน่นอน) ──
+  document.addEventListener('click', function(e) {
+    var btn = e.target.closest('.pdf-open-btn');
+    if (!btn) return;
+    var url = btn.getAttribute('data-url');
+    var name = btn.getAttribute('data-name');
+    if (url) openPDF(url, name);
+  });
+
   ge('login-btn').onclick = doLogin;
   ge('login-pw').onkeydown = function(e) { if (e.key === 'Enter') doLogin(); };
 
