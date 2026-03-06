@@ -580,7 +580,7 @@ function extractKey(filename) {
   var LICENSES = [];
   var urlMap = ls(UK) || {};
   var checks = ls(CK) || {};
-  var BUILTIN_GAS_URL = 'https://script.google.com/macros/s/AKfycbzbwtcCNPS70-q0rXoM9oo6fdFZ27NJOERe3SvJqnay8rmnLFXfEl8XIShviyvrjiNg/exec';
+  var BUILTIN_GAS_URL = 'https://script.google.com/macros/s/AKfycbx5ZGtBY_qUTpagmLbFHi-z8pPKRPxdOWYc56q1pBMyIz_t8_27y5M_A420vqoqYiDB/exec';
   var SESSION_TOKEN = localStorage.getItem('fda_token') || '';
   var SESSION_ROLE  = localStorage.getItem('fda_role')  || '';
   var SESSION_EXP   = parseInt(localStorage.getItem('fda_token_exp') || '0');
@@ -834,17 +834,20 @@ function extractKey(filename) {
       }
     });
     // บันทึกลง Sheets (Secure)
-    if (SESSION_TOKEN) {
+    var tok = SESSION_TOKEN || localStorage.getItem('fda_token') || '';
+    if (tok) {
+      flashMsg('⏳ กำลังบันทึกลง Sheets...');
       fetch(gasUrl, {
-        method: 'POST', headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify({ action: 'importLicenses', token: SESSION_TOKEN, licenses: LICENSES })
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ action: 'importLicenses', token: tok, licenses: LICENSES })
       }).then(function(r){ return r.json(); })
-        .then(function(d){ 
-          if (d.success) flashMsg('✅ Merge + บันทึกลง Sheets! +'+added+' ใหม่  ↻'+updated+' อัพเดท');
-          else flashMsg('⚠️ Merge สำเร็จแต่บันทึก Sheets ไม่ได้: ' + (d.error||''));
-        }).catch(function(){ flashMsg('⚠️ Merge สำเร็จ แต่ offline'); });
+        .then(function(d){
+          if (d.success) flashMsg('✅ บันทึกลง Sheets สำเร็จ! ' + d.saved + ' ใบ');
+          else flashMsg('❌ บันทึกไม่ได้: ' + (d.error||'unknown') + ' (code:' + (d.code||'?') + ')');
+        }).catch(function(e){ flashMsg('❌ Network error: ' + e.message); });
     } else {
-      flashMsg('✅ Merge สำเร็จ! +'+added+' ใหม่  ↻'+updated+' อัพเดท  ='+skipped+' เหมือนเดิม');
+      flashMsg('⚠️ Merge สำเร็จ แต่ไม่พบ token — กรุณา Login ใหม่');
     }
     closeEx(); buildDash(); renderLic();
   }
