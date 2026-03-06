@@ -252,6 +252,23 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--txt);font
 [data-admin-only]{transition:opacity .2s}
 body.viewer-mode [data-admin-only]{display:none!important}
 
+/* ── DARK MODE ── */
+body.dark{--bg:#0f172a;--card:#1e293b;--border:#334155;--txt:#e2e8f0;--mut:#94a3b8;--inp:#1e293b}
+body.dark .sbar{background:linear-gradient(135deg,#0c1e3a,#0f2342)!important}
+body.dark .card{background:#1e293b;border-color:#334155;color:#e2e8f0}
+body.dark .row{background:#1e293b;border-color:#334155}
+body.dark .row:hover{background:#263148}
+body.dark .rpanel{background:#162032;border-color:#334155}
+body.dark .ctrl,body.dark .page{background:#0f172a}
+body.dark .lsrch,body.dark .lsort{background:#1e293b;border-color:#334155;color:#e2e8f0}
+body.dark .modal{background:#1e293b;border-color:#334155}
+body.dark .mhdr{background:linear-gradient(135deg,#0c1e3a,#1565c0)}
+body.dark .ic,.dark .istrip{background:#263148;border-color:#334155}
+body.dark .chkbox,.dark .tlbox{background:#263148;border-color:#334155}
+body.dark .url-box{background:#263148;border-color:#334155}
+body.dark .url-inp{background:#1e293b;border-color:#475569;color:#e2e8f0}
+body.dark input,body.dark select{background:#1e293b;color:#e2e8f0;border-color:#475569}
+body.dark #btn-darkmode{background:#f59e0b;border-color:#d97706;color:#1c1917}
 /* ── LOGIN OVERLAY ── */
 .login-overlay{position:fixed;inset:0;background:linear-gradient(135deg,#0F2342 0%,#0c1e3a 50%,#071528 100%);display:flex;align-items:center;justify-content:center;z-index:99999;transition:opacity .4s}
 .login-overlay.hidden{display:none}
@@ -307,6 +324,27 @@ body.viewer-mode [data-admin-only]{display:none!important}
 .rbact{display:inline-flex;align-items:center;gap:5px;border-radius:6px;padding:6px 14px;font-family:'Sarabun',sans-serif;font-size:12px;font-weight:700;cursor:pointer;border:none;white-space:nowrap;background:#fff;color:#1e293b}
 @media(max-width:900px){.sgrid{grid-template-columns:1fr 1fr}.p2c{grid-template-columns:1fr}.drow{grid-template-columns:1fr}}
 @media(max-width:600px){.page{padding:10px 12px}.rno{display:none}.dpill{display:none}}
+
+/* ── DARK MODE ── */
+body.dark { background:#0f172a; color:#e2e8f0; }
+body.dark .sbar { background:linear-gradient(135deg,#1e293b,#0f172a); }
+body.dark .page { background:#0f172a; }
+body.dark .card { background:#1e293b; border-color:#334155; }
+body.dark .row { background:#1e293b; border-color:#334155; color:#e2e8f0; }
+body.dark .row:hover { background:#334155; }
+body.dark .ctrl { background:#1e293b; border-color:#334155; }
+body.dark .lsrch { background:#0f172a; border-color:#334155; color:#e2e8f0; }
+body.dark .lsrch::placeholder { color:#64748b; }
+body.dark .modal { background:#1e293b; border-color:#334155; }
+body.dark .mhdr { background:linear-gradient(135deg,#1e3a5f,#1e293b); }
+body.dark .tab { color:#94a3b8; }
+body.dark .tab.on { color:#38bdf8; border-color:#38bdf8; }
+body.dark .nbtn { background:#334155; border-color:#475569; color:#e2e8f0; }
+body.dark .cnum { color:#38bdf8; }
+body.dark .role-bar { background:#1e293b; border-color:#334155; }
+body.dark #btn-darkmode { background:#f59e0b; border-color:#d97706; color:#1e293b; }
+body.dark .barchart .br { color:#e2e8f0; }
+body.dark .login-overlay { background:linear-gradient(135deg,#020617 0%,#0f172a 100%); }
 </style>
 </head>
 <body>
@@ -327,18 +365,19 @@ body.viewer-mode [data-admin-only]{display:none!important}
 </div>
 
 <!-- ── PDF VIEWER MODAL ── -->
-<div class="modal-bg hidden" id="modal-pdf">
+<div class="modal-bg hidden" id="modal-pdf" onclick="if(event.target===this){ge('modal-pdf').classList.add('hidden');ge('pdf-iframe').src=''}">
   <div class="modal" style="max-width:900px;width:95vw;height:90vh;display:flex;flex-direction:column;padding:0;overflow:hidden">
     <div class="mhdr" style="padding:14px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0">
       <div style="flex:1">
         <div class="mhdr-t">📄 ดู PDF</div>
         <div class="mhdr-s" id="pdf-filename" style="font-size:12px;color:#94a3b8"></div>
       </div>
-      <button onclick="ge('modal-pdf').classList.add('hidden')" style="background:rgba(255,255,255,.1);border:none;color:#fff;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px">✕</button>
+      <button onclick="ge('modal-pdf').classList.add('hidden');ge('pdf-iframe').src=''" style="background:rgba(255,255,255,.1);border:none;color:#fff;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px">✕</button>
     </div>
     <iframe id="pdf-iframe" src="" style="flex:1;border:none;width:100%;background:#1e293b"
-      sandbox="allow-scripts allow-same-origin"
-      allow="fullscreen"></iframe>
+      sandbox="allow-scripts allow-same-origin allow-popups"
+      allow="fullscreen"
+      referrerpolicy="no-referrer"></iframe>
   </div>
 </div>
 
@@ -451,7 +490,7 @@ function extractKey(filename) {
       <button class="nbtn" id="btn-open-upload" style="background:#7c3aed;border-color:#7c3aed" data-admin-only>📤 Upload PDF</button>
       <button class="nbtn orange" id="btn-sync">🔗 Sync Drive PDF</button>
       <a class="nbtn" style="background:#1565c0;border-color:#1565c0" href="https://drive.google.com/drive/u/0/folders/1pZN6e7oH-kMGOs8lNwWX2fCTf_RTQBvc" target="_blank" data-admin-only>📂 Drive</a>
-      <button class="nbtn" id="btn-export-url" style="background:#0f766e;border-color:#0f766e" title="บันทึก URL backup">💾 Export URLs</button>
+      <button class="nbtn" id="btn-darkmode" onclick="toggleDark()" title="สลับ Dark/Light Mode">🌙</button>
       <button class="nbtn" id="btn-import-url" style="background:#0f766e;border-color:#0f766e;opacity:.7" title="โหลด URL จาก backup" data-admin-only>📥 Import URLs</button>
       <button class="nbtn" id="btn-settings" style="background:#475569;border-color:#475569" data-admin-only>⚙️ ตั้งค่า</button>
     </div>
@@ -596,7 +635,7 @@ function extractKey(filename) {
   var LICENSES = [];
   var urlMap = ls(UK) || {};
   var checks = ls(CK) || {};
-  var BUILTIN_GAS_URL = 'https://script.google.com/macros/s/AKfycbx5ZGtBY_qUTpagmLbFHi-z8pPKRPxdOWYc56q1pBMyIz_t8_27y5M_A420vqoqYiDB/exec';
+  var BUILTIN_GAS_URL = 'https://script.google.com/macros/s/AKfycbzoL7CImCshCsSZU8_1WoPlh0w3rBre5UVhQWLSX9LV7MPRrl0SmhKCNWLz_rFOvPX2/exec';
   var SESSION_TOKEN = localStorage.getItem('fda_token') || '';
   var SESSION_ROLE  = localStorage.getItem('fda_role')  || '';
   var SESSION_EXP   = parseInt(localStorage.getItem('fda_token_exp') || '0');
@@ -607,9 +646,27 @@ function extractKey(filename) {
   var pendingMerge = null;
 
   // ── UTILS ──
-  function dL(iso) { return iso ? Math.ceil((new Date(iso) - new Date()) / 86400000) : null; }
+  function dL(iso) {
+    if (!iso || iso === 'undefined' || iso === '') return null;
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return null;
+    return Math.ceil((d - new Date()) / 86400000);
+  }
   function urg(iso) { var d = dL(iso); if (!d && d !== 0) return 'ok'; if (d < 0) return 'expired'; if (d <= 60) return 'urgent'; if (d <= 180) return 'warn'; return 'ok'; }
-  function thD(iso) { if (!iso) return '-'; var p = iso.split('-'); return p[2]+'/'+p[1]+'/'+(+p[0]+543); }
+  function thD(iso) {
+    if (!iso || iso === 'undefined' || iso === '') return '-';
+    // รองรับ ISO format: 2025-03-01
+    if (typeof iso === 'string' && iso.includes('-')) {
+      var p = iso.split('-');
+      if (p.length === 3 && p[0].length === 4) return p[2]+'/'+p[1]+'/'+(+p[0]+543);
+    }
+    // รองรับ Date object หรือ format อื่น
+    var d = new Date(iso);
+    if (!isNaN(d.getTime())) {
+      return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+(d.getFullYear()+543);
+    }
+    return '-';
+  }
   function fmtD(iso) { return iso ? new Date(iso).toLocaleDateString('th-TH',{year:'numeric',month:'short',day:'numeric'}) : '-'; }
   function addD(iso,n) { if (!iso) return null; var d = new Date(iso); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); }
   function getLic(r) { var ov = urlMap[r.k] || {}; var url = r.url || ov.url || ''; return Object.assign({}, r, {url: url, d: dL(r.e), u: urg(r.e)}); }
@@ -620,6 +677,32 @@ function extractKey(filename) {
     ge('pdf-iframe').src = '';
     setTimeout(function(){ ge('pdf-iframe').src = embedUrl; }, 50);
     ge('modal-pdf').classList.remove('hidden');
+  }
+
+  function toggleDark() {
+    var isDark = document.body.classList.toggle('dark');
+    localStorage.setItem('fda_dark', isDark ? '1' : '0');
+    var btn = ge('btn-darkmode');
+    if (btn) btn.textContent = isDark ? '☀️ Light Mode' : '🌙 Dark Mode';
+  }
+  // โหลด Dark Mode preference
+  if (localStorage.getItem('fda_dark') === '1') {
+    document.body.classList.add('dark');
+    setTimeout(function(){
+      var btn = ge('btn-darkmode');
+      if (btn) btn.textContent = '☀️ Light Mode';
+    }, 100);
+  }
+
+  function toggleDark() {
+    var isDark = document.body.classList.toggle('dark');
+    localStorage.setItem('fda_dark', isDark ? '1' : '0');
+    ge('btn-darkmode').textContent = isDark ? '☀️' : '🌙';
+  }
+  // โหลด dark mode preference
+  if (localStorage.getItem('fda_dark') === '1') {
+    document.body.classList.add('dark');
+    setTimeout(function(){ var b = ge('btn-darkmode'); if(b) b.textContent='☀️'; }, 100);
   }
 
   function flashMsg(msg) {
@@ -904,7 +987,7 @@ function extractKey(filename) {
     var ul = u.concat(w).sort(function(a,b) { return (a.d||0)-(b.d||0); }).slice(0,10);
     ge('d-urg').innerHTML = ul.length ? ul.map(function(l) {
       var pdf = l.url ? '<button class="pdfbtn has pdf-open-btn" data-url="' + l.url + '" data-name="' + (l.m||'').replace(/"/g,'') + ' - ' + l.k + '">📄 PDF</button>'
-        : '<a class="pdfbtn none" href="'+DRIVE_URL+'" target="_blank">📂</a>';
+        : '';
       return '<div class="tli"><div class="tdot '+l.u+'"></div>'
         +'<div class="tinfo"><div class="tlic">'+l.k+'</div><div class="tmfr">'+l.m+'</div></div>'
         +'<span class="tdays '+l.u+'">'+(l.d<0?'หมดอายุ':'เหลือ '+l.d+' วัน')+'</span>'+pdf+'</div>';
@@ -983,8 +1066,8 @@ function extractKey(filename) {
     var sid = l.k.replace(/[^a-z0-9]/gi,'_'), isOpen = (openId===l.k);
     var dTxt = !l.e ? '-' : (l.d < 0 ? 'หมดอายุแล้ว' : 'เหลือ '+l.d+' วัน');
     var pdfBtn = l.url
-      ? '<a class="pdfbtn has" href="'+l.url+'" target="_blank">📄 PDF</a>'
-      : '<a class="pdfbtn none" href="'+DRIVE_URL+'" target="_blank">📂</a>';
+      ? '<button class="pdfbtn has pdf-open-btn" data-url="'+l.url+'" data-name="'+(l.m||'').replace(/"/g,'')+' - '+l.k+'">📄 PDF</button>'
+      : '';  // ไม่มี PDF — ไม่แสดงปุ่มเลย (Viewer ไม่เห็น Drive folder)
     return '<div class="row '+l.u+(isOpen?' open':'')+'" id="row_'+sid+'" data-key="'+l.k.replace(/"/g,'&quot;')+'">'
       +'<div class="rhdr">'
       +'<div class="udot"></div><div class="rno">'+l.k+'</div>'
@@ -1024,12 +1107,12 @@ function extractKey(filename) {
       +'<div class="ic"><div class="icl">กำหนดยื่น</div><div class="icv">'+fmtD(addD(l.e,-90))+'</div></div>'
       +'<div class="ic"><div class="icl">สินค้า</div><div class="icv">'+prods.length+' รายการ</div></div>'
       +'</div>'
-      +'<div class="url-box" id="ueb_'+sid+'">'
+      +'<div class="url-box" id="ueb_'+sid+'" data-admin-only>'
       +'<div class="url-lbl">🔗 ลิงก์ PDF <span class="url-badge '+(linked?'linked':'unlinked')+'">'+(linked?'✅ มีลิงก์':'⚠️ ยังไม่มีลิงก์')+'</span></div>'
       +'<input class="url-inp" id="ui_'+sid+'" value="'+(l.url||'')+'" placeholder="https://drive.google.com/file/d/.../view">'
       +'<div class="url-acts" id="uact_'+sid+'">'
       +'<button class="ubtn save" data-save="'+key.replace(/"/g,'&quot;')+'" data-admin-only>💾 บันทึก</button>'
-      +(l.url ? '<a class="ubtn open" href="'+l.url+'" target="_blank">📄 เปิด PDF</a>'
+      +(l.url ? '<button class="ubtn open pdf-open-btn" data-url="'+l.url+'" data-name="'+(l.m||'').replace(/"/g,'')+' - '+l.k+'">📄 เปิด PDF</button>'
         : '<button class="ubtn" style="background:#1565c0;color:#fff" id="sync-from-panel">🔄 Sync Drive</button>')
       +'</div></div>'
       +'<div class="p2c">'
@@ -1049,8 +1132,8 @@ function extractKey(filename) {
       +'<th>รหัส</th><th>ชื่อทางการค้า</th><th>ชื่อผลิตภัณฑ์</th><th>รายละเอียด</th><th>U-Number</th>'
       +'</tr></thead><tbody>'+prodRows+'</tbody></table></div>'
       +'<div class="pact">'
-      +(l.url?'<a class="btn btnp" style="background:#1b5e20" href="'+l.url+'" target="_blank">📄 เปิด PDF</a>'
-        :'<a class="btn btnp" href="'+DRIVE_URL+'" target="_blank" data-admin-only>📂 Drive</a>')
+      +(l.url?'<button class="btn btnp pdf-open-btn" style="background:#1b5e20" data-url="'+l.url+'" data-name="'+(l.m||'').replace(/"/g,'')+' - '+l.k+'">📄 เปิด PDF</button>'
+        :'')
       +'<button class="btn btnc" data-close="'+key.replace(/"/g,'&quot;')+'">✕ ปิด</button>'
       +'</div></div>';
   }
@@ -1211,7 +1294,6 @@ function extractKey(filename) {
     reader.readAsText(file);
   }
 
-  ge('btn-export-url').onclick = exportUrls;
   ge('btn-import-url').onclick = function() { ge('url-fi').click(); };
   ge('url-fi').onchange = function() { importUrls(this.files[0]); this.value=''; };
 
@@ -1528,6 +1610,14 @@ function extractKey(filename) {
       ls(LK, LICENSES);
       buildDash(); renderLic();
       flashMsg('✅ โหลดข้อมูล ' + LICENSES.length + ' ใบ จาก Sheets');
+      // Auto-sync PDF หลังโหลดข้อมูล — ถ้ายังไม่มี URL ครบ
+      var missingUrl = LICENSES.filter(function(l){ return !l.url; }).length;
+      if (missingUrl > 0) {
+        setTimeout(function(){
+          flashMsg('🔄 Auto-sync PDF (' + missingUrl + ' ใบยังไม่มีลิงก์)...');
+          runSync();
+        }, 1500);
+      }
     } catch(ex) {
       // fallback: ลอง localStorage
       var cached = ls(LK);
