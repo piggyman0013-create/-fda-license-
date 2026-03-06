@@ -434,7 +434,7 @@ function extractKey(filename) {
       <button class="nbtn green" id="btn-open-ex" data-admin-only>📊 Import Excel</button>
       <button class="nbtn" id="btn-open-upload" style="background:#7c3aed;border-color:#7c3aed" data-admin-only>📤 Upload PDF</button>
       <button class="nbtn orange" id="btn-sync">🔗 Sync Drive PDF</button>
-      <a class="nbtn" style="background:#1565c0;border-color:#1565c0" href="https://drive.google.com/drive/u/0/folders/1pZN6e7oH-kMGOs8lNwWX2fCTf_RTQBvc" target="_blank">📂 Drive</a>
+      <a class="nbtn" style="background:#1565c0;border-color:#1565c0" href="https://drive.google.com/drive/u/0/folders/1pZN6e7oH-kMGOs8lNwWX2fCTf_RTQBvc" target="_blank" data-admin-only>📂 Drive</a>
       <button class="nbtn" id="btn-export-url" style="background:#0f766e;border-color:#0f766e" title="บันทึก URL backup">💾 Export URLs</button>
       <button class="nbtn" id="btn-import-url" style="background:#0f766e;border-color:#0f766e;opacity:.7" title="โหลด URL จาก backup" data-admin-only>📥 Import URLs</button>
       <button class="nbtn" id="btn-settings" style="background:#475569;border-color:#475569" data-admin-only>⚙️ ตั้งค่า</button>
@@ -862,7 +862,7 @@ function extractKey(filename) {
     ge('tab-cnt').textContent = all.length;
     var ul = u.concat(w).sort(function(a,b) { return (a.d||0)-(b.d||0); }).slice(0,10);
     ge('d-urg').innerHTML = ul.length ? ul.map(function(l) {
-      var pdf = l.url ? '<a class="pdfbtn has" href="'+l.url+'" target="_blank">📄 PDF</a>'
+      var pdf = l.url ? '<a class="pdfbtn has" href="'+(l.url.replace('/view','/preview'))+'" target="_blank">📄 PDF</a>'
         : '<a class="pdfbtn none" href="'+DRIVE_URL+'" target="_blank">📂</a>';
       return '<div class="tli"><div class="tdot '+l.u+'"></div>'
         +'<div class="tinfo"><div class="tlic">'+l.k+'</div><div class="tmfr">'+l.m+'</div></div>'
@@ -1003,7 +1003,7 @@ function extractKey(filename) {
       +'</tr></thead><tbody>'+prodRows+'</tbody></table></div>'
       +'<div class="pact">'
       +(l.url?'<a class="btn btnp" style="background:#1b5e20" href="'+l.url+'" target="_blank">📄 เปิด PDF</a>'
-        :'<a class="btn btnp" href="'+DRIVE_URL+'" target="_blank">📂 เปิด Drive</a>')
+        :'<a class="btn btnp" href="'+DRIVE_URL+'" target="_blank" data-admin-only>📂 Drive</a>')
       +'<button class="btn btnc" data-close="'+key.replace(/"/g,'&quot;')+'">✕ ปิด</button>'
       +'</div></div>';
   }
