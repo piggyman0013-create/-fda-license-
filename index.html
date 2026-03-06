@@ -612,7 +612,7 @@ function extractKey(filename) {
   function thD(iso) { if (!iso) return '-'; var p = iso.split('-'); return p[2]+'/'+p[1]+'/'+(+p[0]+543); }
   function fmtD(iso) { return iso ? new Date(iso).toLocaleDateString('th-TH',{year:'numeric',month:'short',day:'numeric'}) : '-'; }
   function addD(iso,n) { if (!iso) return null; var d = new Date(iso); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); }
-  function getLic(r) { var ov = urlMap[r.k] || {}; return Object.assign({}, r, {url: ov.url||'', d: dL(r.e), u: urg(r.e)}); }
+  function getLic(r) { var ov = urlMap[r.k] || {}; var url = r.url || ov.url || ''; return Object.assign({}, r, {url: url, d: dL(r.e), u: urg(r.e)}); }
   function openPDF(url, filename) {
     if (!url) return;
     var embedUrl = url.indexOf('/preview') >= 0 ? url : url.replace('/view','') + '/preview';
@@ -725,6 +725,19 @@ function extractKey(filename) {
         else unmatched.push(f.name);
       });
       lss(UK, urlMap);
+      // sync URL กลับลง LICENSES แล้วบันทึกลง Sheets
+      LICENSES.forEach(function(l) {
+        if (urlMap[l.k] && urlMap[l.k].url) l.url = urlMap[l.k].url;
+      });
+      var tok = SESSION_TOKEN || localStorage.getItem('fda_token') || '';
+      if (tok) {
+        fetch(gasUrl, {
+          method: 'POST', headers: {'Content-Type': 'text/plain'},
+          body: JSON.stringify({ action: 'importLicenses', token: tok, licenses: LICENSES })
+        }).then(function(r){ return r.json(); })
+          .then(function(d){ if (d.success) console.log('✅ URL saved to Sheets'); })
+          .catch(function(){});
+      }
       buildDash(); renderLic();
       setBar('done', '✅ Sync สำเร็จ! ลิงก์แล้ว '+matched+'/'+LICENSES.length+' ใบ',
         unmatched.length ? (unmatched.length+' ไฟล์ไม่พบในระบบ') : 'ครบทุกใบ 🎉', null);
