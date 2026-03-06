@@ -672,7 +672,7 @@ function extractKey(filename) {
   var LICENSES = [];
   var urlMap = ls(UK) || {};
   var checks = ls(CK) || {};
-  var BUILTIN_GAS_URL = 'https://script.google.com/macros/s/AKfycby7zheCP9-8fCZrX1raLnAlFgn8ga6SGgC0V06zpMjbI0EAIJCo5QpxGh_570XB8zOg/exec';
+  var BUILTIN_GAS_URL = 'https://script.google.com/macros/s/AKfycbxj3cTb9l1TNLmdv2Ld_L3I2C8ZSD9SjJP8MQjJX2iHEC0Dr91Uem8d8BQfLLUJQQ68/exec';
   var SESSION_TOKEN = localStorage.getItem('fda_token') || '';
   var SESSION_ROLE  = localStorage.getItem('fda_role')  || '';
   var SESSION_EXP   = parseInt(localStorage.getItem('fda_token_exp') || '0');
@@ -1013,35 +1013,49 @@ function extractKey(filename) {
     // Smart merge: อัพเดทเฉพาะที่เปลี่ยน ไม่ลบใบเดิม ไม่ทับทั้งหมด
     var om = {}; LICENSES.forEach(function(l) { om[l.k] = l; });
     var added = 0, updated = 0, skipped = 0;
+    var changedLics = [];  // เก็บเฉพาะที่ added หรือ updated
     pendingMerge.forEach(function(newL) {
       var old = om[newL.k];
       if (!old) {
         // ใหม่ — เพิ่มเลย
         LICENSES.push(newL); added++;
+        changedLics.push(newL);
       } else {
-        // ซ้ำ — อัพเดทเฉพาะ field ที่เปลี่ยน ไม่แตะ field ที่เหมือนกัน
+        // ซ้ำ — อัพเดทเฉพาะ field ที่เปลี่ยน
         var changed = false;
-        if (newL.e && newL.e !== old.e) { old.e = newL.e; changed = true; }  // วันหมดอายุ
-        if (newL.m && newL.m !== old.m) { old.m = newL.m; changed = true; }  // ผู้ผลิต
-        if (newL.c && newL.c !== old.c) { old.c = newL.c; changed = true; }  // ประเทศ
-        if (newL.n && newL.n !== old.n) { old.n = newL.n; changed = true; }  // จำนวนสินค้า
+        if (newL.e && newL.e !== old.e) { old.e = newL.e; changed = true; }
+        if (newL.m && newL.m !== old.m) { old.m = newL.m; changed = true; }
+        if (newL.c && newL.c !== old.c) { old.c = newL.c; changed = true; }
+        if (newL.n && newL.n !== old.n) { old.n = newL.n; changed = true; }
         if (newL.cat && newL.cat !== old.cat) { old.cat = newL.cat; changed = true; }
-        if (changed) updated++; else skipped++;
+        if (newL.prods && newL.prods.length) { old.prods = newL.prods; changed = true; }
+        if (changed) { updated++; changedLics.push(old); } else skipped++;
       }
     });
-    // บันทึกลง Sheets (Secure)
+    // บันทึกเฉพาะใบที่เปลี่ยนแปลง (added + updated) ลง Sheets
     var tok = SESSION_TOKEN || localStorage.getItem('fda_token') || '';
-    if (tok) {
-      flashMsg('⏳ กำลังบันทึกลง Sheets...');
-      fetch(gasUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify({ action: 'importLicenses', token: tok, licenses: LICENSES })
-      }).then(function(r){ return r.json(); })
-        .then(function(d){
-          if (d.success) flashMsg('✅ บันทึกลง Sheets สำเร็จ! ' + d.saved + ' ใบ');
-          else flashMsg('❌ บันทึกไม่ได้: ' + (d.error||'unknown') + ' (code:' + (d.code||'?') + ')');
-        }).catch(function(e){ flashMsg('❌ Network error: ' + e.message); });
+    if (tok && changedLics.length > 0) {
+      flashMsg('⏳ กำลังบันทึก ' + changedLics.length + ' ใบที่เปลี่ยนแปลง...');
+      (function sendChanged(lics, batchNum) {
+        var CHUNK = 30;
+        var chunk = lics.slice(0, CHUNK);
+        var rest  = lics.slice(CHUNK);
+        fetch(gasUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({ action: 'upsertLicenses', token: tok, licenses: chunk })
+        }).then(function(r){ return r.json(); })
+          .then(function(d){
+            if (!d.success) { flashMsg('❌ บันทึกไม่ได้: ' + (d.error||'?')); return; }
+            if (rest.length > 0) {
+              setTimeout(function(){ sendChanged(rest, batchNum + 1); }, 200);
+            } else {
+              flashMsg('✅ อัพเดท ' + changedLics.length + ' ใบ (เพิ่ม: ' + added + ', แก้: ' + updated + ')');
+            }
+          }).catch(function(e){ flashMsg('❌ ' + e.message); });
+      })(changedLics, 1);
+    } else if (tok && changedLics.length === 0) {
+      flashMsg('✅ ข้อมูลเหมือนเดิมทั้งหมด ไม่มีการเปลี่ยนแปลง');
     } else {
       flashMsg('⚠️ Merge สำเร็จ แต่ไม่พบ token — กรุณา Login ใหม่');
     }
@@ -1369,8 +1383,8 @@ function extractKey(filename) {
     reader.readAsText(file);
   }
 
-  ge('btn-import-url').onclick = function() { ge('url-fi').click(); };
-  ge('url-fi').onchange = function() { importUrls(this.files[0]); this.value=''; };
+  // btn-import-url removed
+  var urlFiEl = ge('url-fi'); if (urlFiEl) urlFiEl.onchange = function() { importUrls(this.files[0]); this.value=''; };
 
   // Auto-save urlMap ทุกครั้งที่ sync
   var _origRunSync = runSync;
@@ -1732,7 +1746,7 @@ function extractKey(filename) {
   ge('login-pw').onkeydown = function(e) { if (e.key === 'Enter') doLogin(); };
 
   // ── แทนที่ logout admin ให้ logout จริง ──
-  ge('btn-role-logout').onclick = function() { doLogout(); };
+  // btn-role-logout removed
 
   // ── Startup: ตรวจ session ──
   if (SESSION_TOKEN && SESSION_EXP && Date.now() < SESSION_EXP) {
