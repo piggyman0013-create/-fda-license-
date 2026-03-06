@@ -405,9 +405,10 @@ body.dark #flash-msg{background:#1e3a5f;color:#e2e8f0}
         <div style="width:48px;height:48px;border:4px solid #334155;border-top-color:#38bdf8;border-radius:50%;animation:spin 1s linear infinite"></div>
         <div style="color:#94a3b8;font-family:Sarabun,sans-serif">กำลังโหลด PDF...</div>
       </div>
-      <iframe id="pdf-iframe" src="" style="width:100%;height:100%;border:none;background:#1e293b;display:block"
-        sandbox="allow-scripts allow-same-origin"
-        allow="fullscreen"></iframe>
+
+      <object id="pdf-iframe" data="" type="application/pdf" style="width:100%;height:100%;border:none;background:#1e293b;display:block">
+        <p style="color:#e2e8f0;padding:20px;font-family:Sarabun,sans-serif">Browser ไม่รองรับการแสดง PDF กรุณาอัพเดต Chrome</p>
+      </object>
       <!-- Overlay บน toolbar ของ Google Drive ปิด open-in-new-tab -->
       <div style="position:absolute;top:0;right:0;width:120px;height:48px;z-index:10;background:transparent;cursor:default" 
            onclick="return false;" title=""></div>
@@ -525,11 +526,10 @@ function extractKey(filename) {
       <span class="flash" id="flash-msg"></span>
       <button class="nbtn green" id="btn-open-ex" data-admin-only>📊 Import Excel</button>
       <button class="nbtn" id="btn-open-upload" style="background:#7c3aed;border-color:#7c3aed" data-admin-only>📤 Upload PDF</button>
-      <button class="nbtn orange" id="btn-sync">🔗 Sync Drive PDF</button>
+      <button class="nbtn orange" id="btn-sync" data-admin-only>🔄 Sync Drive</button>
       <button class="nbtn" onclick="window.open(DRIVE_URL,'_blank')" data-admin-only style="background:#1565c0;border-color:#1565c0">📂 Drive</button>
-      <button class="nbtn" id="btn-darkmode" onclick="toggleDark()" title="สลับ Dark/Light Mode">🌙 Dark</button>
-      <button class="nbtn" id="btn-import-url" style="background:#0f766e;border-color:#0f766e;opacity:.7" title="โหลด URL จาก backup" data-admin-only>📥 Import URLs</button>
-      <button class="nbtn" id="btn-settings" style="background:#475569;border-color:#475569" data-admin-only>⚙️ ตั้งค่า</button>
+      <button class="nbtn" id="btn-darkmode" onclick="toggleDark()" title="Dark Mode">🌙</button>
+      <button class="nbtn" id="btn-settings" style="background:#475569;border-color:#475569" data-admin-only>⚙️</button>
     </div>
   </div>
 </nav>
@@ -713,40 +713,54 @@ function extractKey(filename) {
     var m = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
     if (!m) return;
     var fileId = m[1];
+
     ge('pdf-filename').textContent = filename || '';
     ge('modal-pdf').classList.remove('hidden');
-    var iframe = ge('pdf-iframe');
-    iframe.src = '';
+
+    var obj = ge('pdf-iframe'); // object tag
+    obj.data = '';
     var loadDiv = ge('pdf-loading');
     if (loadDiv) loadDiv.style.display = 'flex';
-    var proxyUrl = gasUrl + '?action=viewPdf&fileId=' + fileId + '&token=' + encodeURIComponent(tok);
+
+    // fetch PDF blob ผ่าน Apps Script token
+    var proxyUrl = gasUrl + '?action=viewPdf&fileId=' + encodeURIComponent(fileId)
+                          + '&token=' + encodeURIComponent(tok);
     fetch(proxyUrl)
-      .then(function(r) { return r.text(); })
+      .then(function(r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.text();
+      })
       .then(function(b64) {
         if (loadDiv) loadDiv.style.display = 'none';
-        if (!b64 || b64.trim().startsWith('<')) {
-          iframe.srcdoc = b64 || '<p>ไม่พบข้อมูล</p>';
+        b64 = b64.trim();
+        if (!b64 || b64.startsWith('<') || b64.startsWith('{')) {
+          // error response
+          obj.data = '';
+          obj.innerHTML = '<p style="color:#dc2626;padding:30px;font-family:Sarabun,sans-serif">❌ ' + (b64.includes('Login') ? 'กรุณา Login ใหม่' : 'โหลดไม่ได้') + '</p>';
           return;
         }
+        // base64 → Blob → object URL
         try {
-          var binary = atob(b64.trim());
-          var bytes = new Uint8Array(binary.length);
-          for (var i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-          var blob = new Blob([bytes], { type: 'application/pdf' });
-          var objUrl = URL.createObjectURL(blob);
-          iframe.src = objUrl + '#toolbar=0&navpanes=0';
+          var bin = atob(b64);
+          var buf = new Uint8Array(bin.length);
+          for (var i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+          var blob = new Blob([buf], { type: 'application/pdf' });
+          var burl = URL.createObjectURL(blob);
+          // เก็บ URL เก่าเพื่อ revoke ตอนปิด
+          if (obj._blobUrl) URL.revokeObjectURL(obj._blobUrl);
+          obj._blobUrl = burl;
+          obj.data = burl;
         } catch(ex) {
-          iframe.srcdoc = '<h3 style="font-family:sans-serif;color:#dc2626;padding:30px">❌ โหลด PDF ไม่ได้</h3>';
+          obj.innerHTML = '<p style="color:#dc2626;padding:30px;font-family:Sarabun,sans-serif">❌ parse error: ' + ex.message + '</p>';
         }
       })
       .catch(function(err) {
         if (loadDiv) loadDiv.style.display = 'none';
-        iframe.srcdoc = '<h3 style="font-family:sans-serif;color:#dc2626;padding:30px">❌ ' + err.message + '</h3>';
+        obj.innerHTML = '<p style="color:#dc2626;padding:30px;font-family:Sarabun,sans-serif">❌ ' + err.message + '</p>';
       });
   }
   window.closePDF = function() {
-    ge('modal-pdf').classList.add('hidden');
-    ge('pdf-iframe').src = '';
+    window.closePDF ? window.closePDF() : null;
   }
   // ESC key ปิด modal
   document.addEventListener('keydown', function(e) {
@@ -1647,7 +1661,9 @@ function extractKey(filename) {
       hideLogin();
       await loadLicensesFromSheets();
     } catch(ex) {
-      ge('login-err').textContent = '❌ เชื่อมต่อไม่ได้: ' + ex.message;
+      var errMsg = ex.message || 'Unknown error';
+      if (errMsg.includes('fetch')) errMsg = 'ไม่สามารถเชื่อมต่อ Apps Script ได้ — ตรวจสอบ URL และ deployment';
+      ge('login-err').textContent = '❌ ' + errMsg;
       ge('login-err').style.display = 'block';
       ge('login-loading').style.display = 'none';
       ge('login-btn').disabled = false;
