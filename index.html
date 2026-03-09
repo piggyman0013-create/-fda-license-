@@ -625,7 +625,7 @@ body.dark .nav-flash{color:#34d399}
 // ════════════════════════════════════════════
 // CONFIG
 // ════════════════════════════════════════════
-var GAS   = 'https://script.google.com/macros/s/AKfycby5gSm6FeVlRa1JoLzaT6rURT6gO2L2u8RzrtMZ6PXH5s8zF3huvVZS1cgt2WvU5SRg/exec';
+var GAS   = 'https://script.google.com/macros/s/AKfycbz-PWZaLBDzbeZ_wt166qveGHuM_qMmucia8fvyiPLTVa1jcFooWA3VtUihuqFDzhbT/exec';
 var DRIVE = 'https://drive.google.com/drive/folders/1pZN6e7oH-kMGOs8lNwWX2fCTf_RTQBvc';
 
 // localStorage keys — ใหม่ทั้งหมด ไม่ซ้ำกับเวอร์ชันเก่า
@@ -958,8 +958,13 @@ function toggleRow(key){
   if(!l) return;
   panel.innerHTML=buildPanel(l);
 
-  // lazy load prods ถ้าไม่มี
-  if((!l.prods||!l.prods.length)&&TOK){
+  // lazy load prods — ดูจาก localStorage ก่อน ถ้าไม่มีค่อย fetch GAS
+  if(!l.prods||!l.prods.length){
+    var cached=ld('pd_'+key);
+    if(cached&&cached.length){
+      l.prods=cached;
+      if(OPEN_KEY===key) panel.innerHTML=buildPanel(l);
+    } else if(TOK){
     fetch(GAS+'?action=getProds&token='+encodeURIComponent(TOK)+'&key='+encodeURIComponent(key))
       .then(function(r){ return r.json(); })
       .then(function(d){
@@ -975,6 +980,7 @@ function toggleRow(key){
         var el=$('prod-wrap_'+sid);
         if(el) el.innerHTML='<div class="prod-loading">⚠️ โหลดสินค้าไม่ได้</div>';
       });
+    } // end else if(TOK)
   }
   card.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
@@ -1114,17 +1120,24 @@ function parseExcel(file){
         var k=String(r[0]||'').trim();
         if(!k||k==='undefined'||k.toLowerCase()==='none') continue;
         var expRaw=r[10], expIso='';
+        function toIso(yr,mo,d){
+          // ถ้าปีเป็น พ.ศ. (>2100) ให้แปลงเป็น ค.ศ.
+          if(yr>2100) yr=yr-543;
+          return yr+'-'+String(mo).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+        }
         if(expRaw instanceof Date){
-          expIso=expRaw.getFullYear()+'-'+String(expRaw.getMonth()+1).padStart(2,'0')+'-'+String(expRaw.getDate()).padStart(2,'0');
+          expIso=toIso(expRaw.getFullYear(),expRaw.getMonth()+1,expRaw.getDate());
         } else if(typeof expRaw==='string'&&expRaw.trim()){
           var pd=new Date(expRaw);
-          if(!isNaN(pd)) expIso=pd.getFullYear()+'-'+String(pd.getMonth()+1).padStart(2,'0')+'-'+String(pd.getDate()).padStart(2,'0');
+          if(!isNaN(pd)) expIso=toIso(pd.getFullYear(),pd.getMonth()+1,pd.getDate());
         }
         var mfr=String(r[6]||'').trim(), ctry=String(r[7]||'').trim(), cat=String(r[3]||'').trim();
         if(!map[k]) map[k]={k:k,m:mfr,c:ctry,e:expIso,n:0,cat:cat,url:'',prods:[]};
         map[k].e=expIso;
         map[k].prods.push([String(r[3]||''),String(r[4]||''),String(r[5]||''),String(r[8]||'')]);
         map[k].n=map[k].prods.length;
+        // บันทึก prods แต่ละใบลง localStorage แยก (ไม่ผ่าน Sheets เพื่อหลีกเลี่ยง 5000 char limit)
+        sv('pd_'+k, map[k].prods);
       }
       PENDING=Object.values(map);
       showPreview();
@@ -1191,7 +1204,9 @@ function sendBatch(all,offset,isFirst){
   var action = isFirst ? 'importBatchFirst' : 'importBatchNext';
   setStatus('loading','⏳ กำลังบันทึก '+(offset+chunk.length)+' / '+all.length+' ใบ...');
   fetch(GAS,{method:'POST',headers:{'Content-Type':'text/plain'},
-    body:JSON.stringify({action:action,token:TOK,licenses:chunk})})
+    body:JSON.stringify({action:action,token:TOK,licenses:chunk.map(function(l){
+      return {k:l.k,m:l.m,c:l.c,e:l.e,n:l.n,cat:l.cat||'',url:l.url||''};
+    })})})
     .then(function(r){ return r.json(); })
     .then(function(d){
       if(!d.success){ flash('❌ บันทึกไม่ได้: '+(d.error||'?')); return; }
