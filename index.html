@@ -672,14 +672,11 @@ function extractKey(filename) {
   var LICENSES = [];
   var urlMap = ls(UK) || {};
   var checks = ls(CK) || {};
-  var BUILTIN_GAS_URL = 'https://script.google.com/macros/s/AKfycbxj3cTb9l1TNLmdv2Ld_L3I2C8ZSD9SjJP8MQjJX2iHEC0Dr91Uem8d8BQfLLUJQQ68/exec';
+  var BUILTIN_GAS_URL = 'https://script.google.com/macros/s/AKfycbxEln9oOk5JT-Nhj4-bn_UGnjxcBfeulmBifQA-8xaq2wl_pw7XnWfAQDeS97Uy8dQd/exec';
   var SESSION_TOKEN = localStorage.getItem('fda_token') || '';
   var SESSION_ROLE  = localStorage.getItem('fda_role')  || '';
   var SESSION_EXP   = parseInt(localStorage.getItem('fda_token_exp') || '0');
-  var SESSION_TOKEN = localStorage.getItem('fda_token') || '';
-  var SESSION_ROLE  = localStorage.getItem('fda_role')  || '';
-  var SESSION_EXP   = parseInt(localStorage.getItem('fda_token_exp') || '0');
-  var gasUrl = localStorage.getItem(GK) || BUILTIN_GAS_URL;
+    var gasUrl = localStorage.getItem(GK) || BUILTIN_GAS_URL;
   var pendingMerge = null;
 
   // ── UTILS ──
@@ -1314,10 +1311,25 @@ function extractKey(filename) {
       row.classList.add('open');
       var raw = LICENSES.find(function(r) { return r.k===key; });
       if (raw) {
+        // แสดงก่อนด้วยข้อมูลที่มี
         row.querySelector('.rpanel').innerHTML = panelHTML(getLic(raw));
-        // re-attach events in newly rendered panel
-        var ueb = ge('ueb_'+sid);
-        // events handled by delegation above
+        // lazy load prods ถ้ายังไม่มี
+        if (!raw.prods || raw.prods.length === 0) {
+          var tok = SESSION_TOKEN || localStorage.getItem('fda_token') || '';
+          if (tok) {
+            fetch(gasUrl + '?action=getProds&token=' + encodeURIComponent(tok) + '&key=' + encodeURIComponent(key))
+              .then(function(r) { return r.json(); })
+              .then(function(d) {
+                if (d.prods && d.prods.length > 0) {
+                  raw.prods = d.prods;
+                  // re-render panel ถ้ายังเปิดอยู่
+                  if (openId === key) {
+                    row.querySelector('.rpanel').innerHTML = panelHTML(getLic(raw));
+                  }
+                }
+              }).catch(function() {});
+          }
+        }
       }
       setTimeout(function() { row.scrollIntoView({behavior:'smooth',block:'nearest'}); }, 50);
     }
