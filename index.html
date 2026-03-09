@@ -91,7 +91,7 @@ body{font-family:'Sarabun',sans-serif;font-size:14px;background:#f1f5f9;color:#1
   cursor:pointer;transition:.15s;white-space:nowrap;font-weight:500;
 }
 .nav-btn:hover{background:rgba(255,255,255,.14)}
-.nav-btn.admin-only{display:none}
+.nav-btn
 
 /* ─── INFO BAR ─── */
 .info-bar{
@@ -471,10 +471,10 @@ body.dark .nav-flash{color:#34d399}
     </div>
     <div class="nav-right">
       <span class="nav-flash" id="nav-flash"></span>
-      <button class="nav-btn admin-only" id="nav-import" onclick="showModal('m-import')">📊 Import</button>
-      <button class="nav-btn admin-only" id="nav-upload" onclick="showModal('m-upload')">📤 Upload</button>
-      <button class="nav-btn admin-only" id="nav-sync" onclick="doSync()">🔄 Sync</button>
-      <button class="nav-btn admin-only" id="nav-drive" onclick="openDrive()">📂 Drive</button>
+      <button class="nav-btn admin-only" id="nav-import" onclick="showModal('m-import')" style="display:none">📊 Import</button>
+      <button class="nav-btn admin-only" id="nav-upload" onclick="showModal('m-upload')" style="display:none">📤 Upload</button>
+      <button class="nav-btn admin-only" id="nav-sync" onclick="doSync()" style="display:none">🔄 Sync</button>
+      <button class="nav-btn admin-only" id="nav-drive" onclick="openDrive()" style="display:none">📂 Drive</button>
       <button class="nav-btn" id="nav-dark" onclick="toggleDark()">🌙</button>
       <button class="nav-btn" onclick="doLogout()">ออก</button>
     </div>
@@ -625,7 +625,7 @@ body.dark .nav-flash{color:#34d399}
 // ════════════════════════════════════════════
 // CONFIG
 // ════════════════════════════════════════════
-var GAS   = 'https://script.google.com/macros/s/AKfycbyikMjI3l2rmE97lyoiJ2pAmqcPvCDY3rj-fHbi6FudrvjgXieSd-oauRhN2JTSbxCG/exec';
+var GAS   = 'https://script.google.com/macros/s/AKfycby5gSm6FeVlRa1JoLzaT6rURT6gO2L2u8RzrtMZ6PXH5s8zF3huvVZS1cgt2WvU5SRg/exec';
 var DRIVE = 'https://drive.google.com/drive/folders/1pZN6e7oH-kMGOs8lNwWX2fCTf_RTQBvc';
 
 // localStorage keys — ใหม่ทั้งหมด ไม่ซ้ำกับเวอร์ชันเก่า
@@ -765,7 +765,7 @@ function setRole(isAdmin){
     pill.className='role-pill admin'; pill.textContent='⚙️ ADMIN';
     info.textContent='โหมดแก้ไข — สามารถ Import, Upload, Sync ได้';
     sw.textContent='🔓 ออกจาก Admin';
-    document.querySelectorAll('.admin-only').forEach(function(e){ e.style.display=''; });
+    document.querySelectorAll('.admin-only').forEach(function(e){ e.style.display='inline-flex'; });
   } else {
     pill.className='role-pill viewer'; pill.textContent='👁 VIEWER';
     info.textContent='โหมดดูอย่างเดียว';
@@ -1154,61 +1154,50 @@ function showPreview(){
 function applyImport(){
   if(!PENDING) return;
   var om={}; LICS.forEach(function(l){ om[l.k]=l; });
-  var changed=[];
+  var added=0, updated=0;
   PENDING.forEach(function(n){
-    if(!om[n.k]){ LICS.push(n); changed.push(n); }
+    if(!om[n.k]){ LICS.push(n); added++; }
     else{
-      var o=om[n.k],c=false;
-      if(n.e&&n.e!==o.e){o.e=n.e;c=true;}
-      if(n.m&&n.m!==o.m){o.m=n.m;c=true;}
-      if(n.c&&n.c!==o.c){o.c=n.c;c=true;}
-      if(n.n&&n.n!==o.n){o.n=n.n;c=true;}
-      if(n.prods&&n.prods.length){o.prods=n.prods;c=true;}
-      if(c) changed.push(o);
+      var o=om[n.k];
+      if(n.e&&n.e!==o.e) o.e=n.e;
+      if(n.m&&n.m!==o.m) o.m=n.m;
+      if(n.c&&n.c!==o.c) o.c=n.c;
+      if(n.n) o.n=n.n;
+      if(n.prods&&n.prods.length) o.prods=n.prods;
+      updated++;
     }
   });
   hideModal('m-import');
-  $('imp-ok').style.display='none'; $('imp-preview').style.display='none'; PENDING=null;
+  $('imp-ok').style.display='none';
+  $('imp-preview').style.display='none';
+  PENDING=null;
   sv(SK.lics,LICS); buildDash(); renderList();
-  if(!changed.length){ flash('✅ ไม่มีการเปลี่ยนแปลง'); return; }
-  var totalInSheets = LICS.length - changed.filter(function(l){ return !LICS.find(function(x){ return x===l&&x._orig; }); }).length;
-  var needFullImport = (LICS.length - changed.length) < 5; // Sheets เกือบว่าง → ส่งทั้งหมด
-  flash('⏳ กำลังบันทึก '+(needFullImport?LICS.length:changed.length)+' ใบ...');
-  if(needFullImport){
-    sendBatch(LICS,0,true); // importFull
-  } else {
-    sendBatch(changed,0,false); // upsert เฉพาะที่เปลี่ยน
-  }
+  if(!added&&!updated){ flash('✅ ไม่มีการเปลี่ยนแปลง'); return; }
+  flash('⏳ กำลังบันทึก '+LICS.length+' ใบลง Sheets...');
+  // เสมอ isFirst=true เพื่อ clear sheet แล้ว import ใหม่ทั้งหมด
+  sendBatch(LICS, 0, true);
 }
-
-function sendBatch(all,offset,useImportFull){
+function sendBatch(all,offset,isFirst){
   var CHUNK=30, chunk=all.slice(offset,offset+CHUNK);
-  if(!chunk.length){ 
-    flash('✅ บันทึก Sheets สำเร็จ '+all.length+' ใบ');
-    loadData(); // โหลดใหม่หลัง import
-    return; 
+  if(!chunk.length){
+    flash('✅ บันทึก Sheets ครบ '+all.length+' ใบ!');
+    setStatus('success','✅ Import สำเร็จ — '+all.length+' ใบ');
+    hideStatus(5000);
+    loadData();
+    return;
   }
-  // ถ้าเป็น importFull ส่งทีละ CHUNK แต่ใช้ upsertLicenses
-  // (importFull ถูกเรียกครั้งแรกเดียวที่ offset=0 เท่านั้น)
-  var action = (useImportFull && offset===0) ? 'importFull' : 'upsertLicenses';
-  var payload = (action==='importFull') ? {action:'importFull',token:TOK,licenses:all} 
-                                        : {action:'upsertLicenses',token:TOK,licenses:chunk};
-  console.log('[FDA] sendBatch action='+action+' offset='+offset+' chunk='+chunk.length);
+  // isFirst=true: GAS จะ clear sheet ก่อน แล้ว append chunk แรก
+  // isFirst=false: GAS append ต่อ
+  var action = isFirst ? 'importBatchFirst' : 'importBatchNext';
+  setStatus('loading','⏳ กำลังบันทึก '+(offset+chunk.length)+' / '+all.length+' ใบ...');
   fetch(GAS,{method:'POST',headers:{'Content-Type':'text/plain'},
-    body:JSON.stringify(payload)})
+    body:JSON.stringify({action:action,token:TOK,licenses:chunk})})
     .then(function(r){ return r.json(); })
     .then(function(d){
-      console.log('[FDA] response:', JSON.stringify(d));
       if(!d.success){ flash('❌ บันทึกไม่ได้: '+(d.error||'?')); return; }
-      if(action==='importFull'){
-        flash('✅ Import ครบ '+all.length+' ใบ สำเร็จ!');
-        loadData();
-        return;
-      }
-      setTimeout(function(){ sendBatch(all,offset+CHUNK,false); },200);
-    }).catch(function(e){ 
-      console.error('[FDA] sendBatch error:',e);
-      flash('❌ '+e.message); 
+      setTimeout(function(){ sendBatch(all,offset+CHUNK,false); },250);
+    }).catch(function(e){
+      flash('❌ '+e.message);
     });
 }
 
