@@ -3,1803 +3,1020 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="icon" type="image/x-icon" href="favicon.ico">
-<title>FDA License Manager — ระบบจัดการใบอนุญาตเครื่องมือแพทย์</title>
-
-<!-- SEO & Social Preview -->
-<meta name="description" content="ระบบจัดการใบอนุญาตนำเข้าเครื่องมือแพทย์ ตรวจสอบสถานะ วันหมดอายุ และลิงก์เอกสาร PDF ครบในที่เดียว">
-<meta name="robots" content="noindex,nofollow">
-
-<!-- Open Graph (Facebook, LINE, iMessage) -->
-<meta property="og:type" content="website">
-<meta property="og:title" content="FDA License Manager">
-<meta property="og:description" content="ระบบจัดการใบอนุญาตนำเข้าเครื่องมือแพทย์ — ดูสถานะ วันหมดอายุ และเอกสาร PDF ครบในที่เดียว">
-<meta property="og:url" content="https://piggyman0013-create.github.io/-fda-license-/">
-<meta property="og:site_name" content="FDA License Manager">
-<meta property="og:image" content="https://piggyman0013-create.github.io/-fda-license-/preview.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-
-<!-- Twitter Card -->
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="FDA License Manager">
-<meta name="twitter:description" content="ระบบจัดการใบอนุญาตนำเข้าเครื่องมือแพทย์ — ดูสถานะ วันหมดอายุ และเอกสาร PDF ครบในที่เดียว">
-<!-- ข้อมูลไม่ฝังใน HTML — ดึงจาก Google Sheets ผ่าน token -->
-<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>FDA License Manager</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--navy:#0f2342;--teal:#0891b2;--teal2:#06b6d4;--bg:#f0f4f8;--sur:#fff;--sur2:#f7f9fc;--brd:#e2e8f0;--txt:#1e293b;--mut:#64748b;--lgt:#94a3b8;--red:#dc2626;--redbg:#fef2f2;--redbr:#fecaca;--amb:#d97706;--ambbg:#fffbeb;--ambbr:#fde68a;--grn:#059669;--grnbg:#ecfdf5;--grnbr:#a7f3d0;--gry:#6b7280;--grybg:#f9fafb;--grybr:#e5e7eb;--r:10px;--rs:6px}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--txt);font-size:14px;line-height:1.5}
-#wizard{position:fixed;inset:0;background:rgba(15,35,66,.96);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}
-#wizard.gone{display:none}
-.wbox{background:#fff;border-radius:16px;width:100%;max-width:600px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.5);max-height:92vh;display:flex;flex-direction:column}
-.whdr{background:linear-gradient(135deg,#1565c0,#0891b2);padding:20px 24px;flex-shrink:0}
-.whdr h2{color:#fff;font-size:17px;font-weight:800;margin-bottom:3px}
-.whdr p{color:rgba(255,255,255,.7);font-size:12px}
-.wtabs{display:flex;background:#f8fafc;border-bottom:1px solid var(--brd);flex-shrink:0}
-.wtab{flex:1;padding:10px;text-align:center;font-size:12px;font-weight:700;cursor:pointer;color:var(--mut);border-bottom:2px solid transparent}
-.wtab.on{color:#1565c0;border-bottom-color:#1565c0;background:#fff}
-.wbody{padding:20px 24px;overflow-y:auto;flex:1}
-.wfoot{padding:14px 24px;border-top:1px solid var(--brd);display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
-.wstep{display:flex;gap:14px;align-items:flex-start;margin-bottom:16px}
-.wsn{width:26px;height:26px;border-radius:50%;background:var(--navy);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
-.wsc b{font-size:13px;display:block;margin-bottom:3px;color:var(--navy)}
-.wsc small{font-size:12px;color:var(--mut);line-height:1.6}
-.wcode{background:#1e293b;color:#86efac;border-radius:8px;padding:12px 16px 12px 16px;font-family:'IBM Plex Mono',monospace;font-size:10px;margin:8px 0;line-height:1.7;overflow-x:auto;position:relative;white-space:pre-wrap;word-break:break-all}
-.wcopy{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:5px;padding:3px 8px;font-size:10px;cursor:pointer;font-family:'Sarabun',sans-serif}
-.wlink{display:inline-flex;align-items:center;gap:5px;background:#1565c0;color:#fff;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:700;text-decoration:none;margin-top:6px}
-.winp{width:100%;padding:9px 12px;border:1.5px solid var(--brd);border-radius:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;outline:none;margin-top:6px}
-.winp:focus{border-color:#1565c0}
-.winp.ok{border-color:var(--grn);background:#f0fdf4}
-.wbtn{padding:9px 22px;border-radius:8px;font-family:'Sarabun',sans-serif;font-size:13px;font-weight:700;cursor:pointer;border:none;display:inline-flex;align-items:center;gap:6px}
-.wbtn.pri{background:#1565c0;color:#fff}
-.wbtn.suc{background:#1b5e20;color:#fff}
-.wbtn.gho{background:#f8fafc;color:var(--mut);border:1px solid var(--brd)}
-.wresult{border-radius:8px;padding:10px 14px;margin-top:10px;font-size:12px;display:none}
-.wresult.ok{background:var(--grnbg);border:1px solid var(--grnbr);color:#14532d}
-.wresult.err{background:var(--redbg);border:1px solid var(--redbr);color:#7f1d1d}
-.snote{background:#f1f5f9;border:1px solid var(--brd);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--mut);margin:6px 0}
-.nav{background:var(--navy);position:sticky;top:0;z-index:200;box-shadow:0 2px 20px rgba(0,0,0,.3)}
-.ni{display:flex;align-items:center;max-width:1600px;margin:0 auto}
-.brand{display:flex;align-items:center;gap:10px;padding:12px 18px;border-right:1px solid rgba(255,255,255,.1);flex-shrink:0}
-.bico{width:34px;height:34px;background:linear-gradient(135deg,var(--teal),var(--teal2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px}
-.bt1{font-size:15px;font-weight:700;color:#fff}.bt2{font-size:10px;opacity:.5;color:#fff}
-.ntabs{display:flex;flex:1;overflow-x:auto}
-.ntab{padding:16px;font-size:13px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;color:rgba(255,255,255,.55);white-space:nowrap;transition:.15s}
-.ntab:hover{color:#fff;background:rgba(255,255,255,.05)}
-.ntab.active{color:#fff;border-bottom-color:var(--teal2)}
-.nbdg{background:var(--teal);color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:700}
-.nright{padding:0 12px;border-left:1px solid rgba(255,255,255,.1);flex-shrink:0;display:flex;align-items:center;gap:6px}
-.nbtn{display:inline-flex;align-items:center;gap:5px;border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:6px 12px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:'Sarabun',sans-serif;background:rgba(255,255,255,.1);text-decoration:none;transition:.15s;white-space:nowrap}
-.nbtn:hover{background:rgba(255,255,255,.2)}
-.nbtn.green{background:#059669;border-color:#059669}
-.nbtn.orange{background:#ea580c;border-color:#ea580c}
-.flash{font-size:11px;font-weight:700;color:#6ee7b7;opacity:0;transition:opacity .3s;white-space:nowrap}
-.flash.show{opacity:1}
-.sbar{padding:10px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.sbar.idle{background:linear-gradient(135deg,#1565c0,#1976d2)}
-.sbar.loading{background:linear-gradient(135deg,#d97706,#f59e0b)}
-.sbar.done{background:linear-gradient(135deg,#1b5e20,#2e7d32)}
-.sbar.err{background:linear-gradient(135deg,#991b1b,#dc2626)}
-.sbar.hidden{display:none}
-.sbar-txt{color:#fff;font-size:13px;font-weight:700;flex:1}
-.sbar-sub{color:rgba(255,255,255,.75);font-size:11px}
-.spill{background:rgba(255,255,255,.2);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;color:#fff}
-.sact{display:inline-flex;align-items:center;gap:5px;border-radius:6px;padding:6px 14px;font-family:'Sarabun',sans-serif;font-size:12px;font-weight:700;cursor:pointer;border:none;white-space:nowrap}
-.sact.wh{background:#fff;color:#1e293b}
-.sact.gh{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3)}
-.sprog{height:3px;background:rgba(255,255,255,.3);overflow:hidden}
-.sprog.hidden{display:none}
-.sprog-fill{height:100%;background:#fff;transition:width .5s}
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px)}
-.modal-bg.hidden{display:none}
-.modal{background:#fff;border-radius:14px;width:100%;max-width:540px;box-shadow:0 24px 60px rgba(0,0,0,.3);overflow:hidden;max-height:90vh;display:flex;flex-direction:column}
-.mhdr{padding:18px 22px;display:flex;align-items:flex-start;justify-content:space-between;flex-shrink:0;background:linear-gradient(135deg,#1b5e20,#2e7d32)}
-.mhdr-t{color:#fff;font-weight:800;font-size:15px}
-.mhdr-s{color:rgba(255,255,255,.7);font-size:11px;margin-top:2px}
-.mclose{background:rgba(255,255,255,.15);border:none;color:#fff;width:28px;height:28px;border-radius:7px;cursor:pointer;font-size:15px}
-.mbdy{padding:20px 22px;overflow-y:auto;flex:1}
-.mft{padding:14px 22px;border-top:1px solid var(--brd);display:flex;gap:8px;justify-content:flex-end;flex-shrink:0}
-.mbtn{padding:9px 20px;border-radius:8px;font-family:'Sarabun',sans-serif;font-size:13px;font-weight:700;cursor:pointer;border:none;display:inline-flex;align-items:center;gap:6px}
-.mbtn.ok{background:#1b5e20;color:#fff}
-.mbtn.no{background:#f8fafc;color:var(--txt);border:1px solid var(--brd)}
-.dropzone{border:2px dashed var(--brd);border-radius:10px;padding:28px;text-align:center;cursor:pointer;transition:.2s;margin-bottom:12px}
-.dropzone:hover,.dropzone.drag{border-color:var(--teal);background:#f0f9ff}
-.mstats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
-.mst{background:#fff;border:1px solid var(--brd);border-radius:8px;padding:10px;text-align:center}
-.mst .mv{font-size:22px;font-weight:800}.mst .ml{font-size:10px;color:var(--mut);font-weight:700;text-transform:uppercase;margin-top:2px}
-.mst.a .mv{color:var(--grn)}.mst.u .mv{color:var(--amb)}.mst.d .mv{color:var(--red)}.mst.k .mv{color:var(--teal)}
-.mlist{max-height:160px;overflow-y:auto;border:1px solid var(--brd);border-radius:8px}
-.mi{display:flex;align-items:center;gap:8px;padding:7px 12px;border-bottom:1px solid #f1f5f9;font-size:12px}
-.mi:last-child{border-bottom:none}
-.mit{padding:2px 7px;border-radius:10px;font-size:10px;font-weight:700;flex-shrink:0}
-.mit.a{background:var(--grnbg);color:var(--grn)}.mit.u{background:var(--ambbg);color:var(--amb)}.mit.d{background:var(--redbg);color:var(--red)}
-.page{display:none;padding:20px 24px;max-width:1600px;margin:0 auto}
-.page.active{display:block}
-.sgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
-.sc{background:var(--sur);border-radius:var(--r);border:1px solid var(--brd);padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
-.sc .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--mut);margin-bottom:8px}
-.sc .val{font-size:32px;font-weight:800;line-height:1}
-.sc .sub{font-size:11px;color:var(--mut);margin-top:6px}
-.sc.r .val{color:var(--red)}.sc.a .val{color:var(--amb)}.sc.g .val{color:var(--grn)}.sc.n .val{color:var(--navy)}
-.drow{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
-.card{background:var(--sur);border-radius:var(--r);border:1px solid var(--brd);padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
-.card h3{font-size:11px;font-weight:700;color:var(--navy);margin-bottom:14px;text-transform:uppercase;letter-spacing:.5px}
-.tli{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--brd)}
-.tli:last-child{border-bottom:none}
-.tdot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
-.tdot.urgent{background:var(--red)}.tdot.warn{background:var(--amb)}
-.tinfo{flex:1;min-width:0}
-.tlic{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--mut)}
-.tmfr{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tdays{flex-shrink:0;font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px}
-.tdays.urgent{background:var(--redbg);color:var(--red)}.tdays.warn{background:var(--ambbg);color:var(--amb)}
-.barchart{display:flex;flex-direction:column;gap:8px}
-.br{display:flex;align-items:center;gap:10px}
-.blbl{width:130px;text-align:right;color:var(--mut);font-size:11px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.btrk{flex:1;height:16px;background:var(--brd);border-radius:3px;overflow:hidden}
-.bfil{height:100%;background:linear-gradient(90deg,var(--teal),var(--teal2));border-radius:3px}
-.bval{width:30px;font-weight:700;font-size:11px}
-.ctrl{display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
-.sw{position:relative;flex:1;min-width:220px;max-width:400px}
-.sw svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--lgt);width:15px;height:15px;pointer-events:none}
-.si{width:100%;padding:8px 12px 8px 32px;border:1px solid var(--brd);border-radius:var(--rs);font-family:'Sarabun',sans-serif;font-size:13px;background:var(--sur);outline:none}
-.si:focus{border-color:var(--teal)}
-.fg{display:flex;gap:4px;flex-wrap:wrap}
-.fb{padding:7px 11px;border:1px solid var(--brd);border-radius:var(--rs);background:var(--sur);color:var(--mut);font-family:'Sarabun',sans-serif;font-size:12px;font-weight:600;cursor:pointer}
-.fb.fa.on{background:var(--navy);color:#fff;border-color:var(--navy)}
-.fb.fr.on{background:var(--red);color:#fff;border-color:var(--red)}
-.fb.fw.on{background:var(--amb);color:#fff;border-color:var(--amb)}
-.fb.fok.on{background:var(--grn);color:#fff;border-color:var(--grn)}
-.fb.fe.on{background:var(--gry);color:#fff;border-color:var(--gry)}
-.ss{padding:7px 10px;border:1px solid var(--brd);border-radius:var(--rs);background:var(--sur);font-family:'Sarabun',sans-serif;font-size:12px;outline:none;cursor:pointer}
-.rinfo{font-size:12px;color:var(--mut);margin-left:auto}
-.ll{display:flex;flex-direction:column;gap:8px}
-.row{background:var(--sur);border:1px solid var(--brd);border-radius:var(--r);overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06)}
-.row:hover{box-shadow:0 4px 12px rgba(0,0,0,.1)}
-.row.urgent{border-left:4px solid var(--red)}.row.warn{border-left:4px solid var(--amb)}
-.row.ok{border-left:4px solid var(--grn)}.row.expired{border-left:4px solid var(--gry);opacity:.8}
-.rhdr{display:flex;align-items:center;padding:12px 16px;cursor:pointer;gap:12px;user-select:none}
-.rhdr:hover{background:var(--sur2)}
-.udot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.urgent .udot{background:var(--red)}.warn .udot{background:var(--amb)}
-.ok .udot{background:var(--grn)}.expired .udot{background:var(--gry)}
-.rno{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--mut);min-width:140px;flex-shrink:0}
-.ri{flex:1;min-width:0}
-.rmfr{font-weight:700;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.rcnt{font-size:11px;color:var(--mut);margin-top:1px}
-.rmeta{display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:wrap}
-.edate .d{font-size:13px;font-weight:700}
-.urgent .edate .d{color:var(--red)}.warn .edate .d{color:var(--amb)}
-.ok .edate .d{color:var(--grn)}.expired .edate .d{color:var(--gry)}
-.edate .l{font-size:10px;color:var(--mut)}
-.dpill{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}
-.urgent .dpill{background:var(--redbg);color:var(--red);border:1px solid var(--redbr)}
-.warn .dpill{background:var(--ambbg);color:var(--amb);border:1px solid var(--ambbr)}
-.ok .dpill{background:var(--grnbg);color:var(--grn);border:1px solid var(--grnbr)}
-.expired .dpill{background:var(--grybg);color:var(--gry);border:1px solid var(--grybr)}
-.ppill{background:#f1f5f9;border:1px solid var(--brd);border-radius:20px;padding:3px 10px;font-size:11px;color:var(--mut)}
-.pdfbtn{display:inline-flex;align-items:center;gap:5px;border-radius:5px;padding:5px 11px;font-size:11px;font-weight:700;text-decoration:none;white-space:nowrap;flex-shrink:0;cursor:pointer;border:none}
-.pdfbtn.has{background:#1b5e20;color:#fff}
-.pdfbtn.none{background:#94a3b8;color:#fff}
-.editbtn{display:inline-flex;align-items:center;gap:4px;border-radius:5px;padding:5px 10px;font-size:11px;font-weight:700;border:1px solid #bae6fd;background:#f0f9ff;color:#0891b2;cursor:pointer;font-family:'Sarabun',sans-serif;white-space:nowrap;flex-shrink:0}
-.expi{color:var(--lgt);font-size:13px;width:18px;text-align:center;flex-shrink:0;transition:transform .2s}
-.row.open .expi{transform:rotate(180deg)}
-.rpanel{display:none;border-top:1px solid var(--brd)}
-.row.open .rpanel{display:block}
-.pb{padding:18px}
-.istrip{display:flex;background:var(--sur2);border:1px solid var(--brd);border-radius:var(--rs);margin-bottom:14px;flex-wrap:wrap;overflow:hidden}
-.ic{flex:1;min-width:100px;padding:9px 13px;border-right:1px solid var(--brd)}
-.ic:last-child{border-right:none}
-.icl{font-size:9px;text-transform:uppercase;letter-spacing:.5px;font-weight:700;color:var(--lgt);margin-bottom:2px}
-.icv{font-size:13px;font-weight:700}
-.icv.mono{font-family:'IBM Plex Mono',monospace;font-size:10px}
-.url-box{background:#f0f7ff;border:1px solid #bfdbfe;border-radius:var(--rs);padding:14px;margin-bottom:14px}
-.url-lbl{font-size:11px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
-.url-badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700}
-.url-badge.linked{background:var(--grnbg);color:var(--grn);border:1px solid var(--grnbr)}
-.url-badge.unlinked{background:var(--grybg);color:var(--gry);border:1px solid var(--grybr)}
-.url-inp{width:100%;padding:7px 10px;border:1px solid var(--brd);border-radius:var(--rs);font-size:12px;font-family:'IBM Plex Mono',monospace;outline:none;background:#fff;margin-bottom:8px}
-.url-inp:focus{border-color:var(--teal)}
-.url-acts{display:flex;gap:8px;flex-wrap:wrap}
-.ubtn{padding:7px 14px;border-radius:var(--rs);font-family:'Sarabun',sans-serif;font-size:12px;font-weight:700;cursor:pointer;border:none;display:inline-flex;align-items:center;gap:5px;text-decoration:none}
-.ubtn.save{background:var(--navy);color:#fff}.ubtn.open{background:#1b5e20;color:#fff}
-.p2c{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
-.chkbox{background:#f0f7ff;border:1px solid #bfdbfe;border-radius:var(--rs);padding:14px}
-.chktit{font-size:11px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px}
-.chklist{list-style:none;display:flex;flex-direction:column;gap:4px}
-.chki{display:flex;align-items:flex-start;gap:8px;padding:3px 4px;border-radius:4px;cursor:pointer}
-.chki:hover{background:rgba(8,145,178,.07)}
-.chki input{appearance:none;-webkit-appearance:none;width:15px;height:15px;min-width:15px;border:1.5px solid #93c5fd;border-radius:3px;background:#fff;cursor:pointer;margin-top:2px;position:relative}
-.chki input:checked{background:#2563eb;border-color:#2563eb}
-.chki input:checked::after{content:"";position:absolute;left:4px;top:1px;width:5px;height:8px;border:2px solid #fff;border-top:none;border-left:none;transform:rotate(45deg)}
-.chki label{cursor:pointer;font-size:12px;flex:1;line-height:1.4}
-.chki.done label{text-decoration:line-through;color:var(--mut)}
-.chkprog{margin-top:10px;font-size:11px;color:var(--mut);display:flex;align-items:center;gap:8px}
-.pgbar{flex:1;height:5px;background:#dbeafe;border-radius:3px;overflow:hidden}
-.pgfil{height:100%;background:#2563eb;border-radius:3px;transition:width .3s}
-.tlbox{background:#fffbf5;border:1px solid #fed7aa;border-radius:var(--rs);padding:14px}
-.tlst{display:flex;gap:10px;padding:6px 0 6px 12px;border-left:2px solid #fed7aa;margin-left:6px;position:relative;font-size:12px}
-.tlst::before{content:'';width:8px;height:8px;border-radius:50%;background:#f97316;position:absolute;left:-5px;top:10px}
-.tlsl{color:var(--mut);width:85px;flex-shrink:0;font-size:11px}
-.tlsv{font-weight:600}
-.prdhdr{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
-.prdtit{font-size:11px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px}
-.psi{padding:6px 10px;border:1px solid var(--brd);border-radius:var(--rs);font-family:'Sarabun',sans-serif;font-size:12px;outline:none;flex:1;min-width:150px;max-width:280px}
-.tblw{border:1px solid var(--brd);border-radius:var(--rs);overflow:hidden;max-height:260px;overflow-y:auto}
-.ptbl{width:100%;border-collapse:collapse}
-.ptbl th{background:var(--navy);color:#fff;font-size:10px;font-weight:700;text-transform:uppercase;padding:8px 10px;text-align:left;position:sticky;top:0;z-index:1}
-.ptbl td{padding:7px 10px;font-size:12px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
-.ptbl tr:last-child td{border-bottom:none}
-.ptbl tr:hover td{background:var(--sur2)}
-.mono{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--mut)}
-.pact{display:flex;gap:8px;padding-top:14px;border-top:1px solid var(--brd);margin-top:14px;flex-wrap:wrap}
-.btn{padding:8px 16px;border-radius:var(--rs);font-family:'Sarabun',sans-serif;font-size:13px;font-weight:700;cursor:pointer;border:none;display:inline-flex;align-items:center;gap:6px;text-decoration:none}
-.btnp{background:var(--navy);color:#fff}.btnc{background:var(--sur2);color:var(--txt);border:1px solid var(--brd)}
-.empty{text-align:center;padding:60px 20px;color:var(--mut)}
-.empty .ei{font-size:40px;margin-bottom:12px}
-::-webkit-scrollbar{width:6px;height:6px}
-::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:3px}
-/* ── ROLE SYSTEM ── */
-.role-bar{background:linear-gradient(135deg,#7c3aed,#6d28d9);padding:8px 20px;display:flex;align-items:center;gap:12px}
-.role-bar.admin{background:linear-gradient(135deg,#1565c0,#1976d2)}
-.role-bar.viewer{background:linear-gradient(135deg,#374151,#4b5563)}
-.role-badge{padding:3px 12px;border-radius:20px;font-size:11px;font-weight:800;letter-spacing:.5px}
-.role-badge.admin{background:#fbbf24;color:#1e3a5f}
-.role-badge.viewer{background:rgba(255,255,255,.2);color:#fff}
-.role-txt{color:rgba(255,255,255,.85);font-size:12px;flex:1}
-.role-switch{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Sarabun',sans-serif}
-[data-admin-only]{transition:opacity .2s}
-body.viewer-mode [data-admin-only]{display:none!important}
+body{font-family:'Sarabun',sans-serif;background:#f0f4f8;color:#1e293b;font-size:14px}
 
-/* ── DARK MODE ── */
+/* ── DARK ── */
 body.dark{background:#0f172a;color:#e2e8f0}
-body.dark .sbar{background:linear-gradient(135deg,#0a1628,#0f2342)!important}
-body.dark .ntab{color:#94a3b8}
-body.dark .ntab.active{color:#38bdf8;border-color:#38bdf8}
-body.dark .nbtn{background:#1e293b;border-color:#334155;color:#cbd5e1}
-body.dark .nbtn:hover{background:#334155}
-body.dark #btn-darkmode{background:#f59e0b;border-color:#d97706;color:#1c1917;font-weight:700}
-body.dark .role-bar{background:#0f172a;border-color:#1e293b}
-body.dark .role-bar.viewer{background:linear-gradient(135deg,#1e293b,#0f172a)}
-body.dark .role-bar.admin{background:linear-gradient(135deg,#1e3a5f,#1565c0)}
-body.dark .page{background:#0f172a}
-body.dark .ctrl{background:#0f172a;border-color:#1e293b}
-body.dark .lsrch{background:#1e293b;border-color:#334155;color:#e2e8f0}
-body.dark .lsrch::placeholder{color:#64748b}
-body.dark .lsort{background:#1e293b;border-color:#334155;color:#e2e8f0}
-body.dark .swbtn{background:#1e293b;color:#94a3b8;border-color:#334155}
-body.dark .swbtn.on{background:#0f4c81;color:#fff;border-color:#1565c0}
-body.dark .card{background:#1e293b;border-color:#334155;color:#e2e8f0}
-body.dark .cnum{color:#38bdf8}
-body.dark .clbl{color:#94a3b8}
-body.dark .row{background:#1e293b;border-color:#334155;color:#e2e8f0}
-body.dark .row:hover{background:#263148}
-body.dark .row.open{background:#162032;border-color:#334155}
-body.dark .rpanel{background:#162032;border-color:#1e3a5f}
-body.dark .rhdr{color:#e2e8f0}
-body.dark .rmfr{color:#94a3b8}
-body.dark .edate .d{color:#e2e8f0}
-body.dark .ic{background:#1e3a5f;border-color:#334155}
-body.dark .icl{color:#94a3b8}
-body.dark .icv{color:#e2e8f0}
-body.dark .istrip{background:#1e293b;border-color:#334155}
-body.dark .chkbox,.dark .tlbox{background:#1e3a5f;border-color:#334155}
-body.dark .tlbox{background:#1e293b;border-color:#334155}
-body.dark .chktit{color:#94a3b8}
-body.dark .chki label{color:#cbd5e1}
-body.dark .chki.done label{color:#64748b}
-body.dark .tlsl{color:#94a3b8}
-body.dark .tlsv{color:#e2e8f0}
-body.dark .url-box{background:#1e3a5f;border-color:#334155}
-body.dark .url-lbl{color:#94a3b8}
-body.dark .url-inp{background:#0f172a;border-color:#334155;color:#e2e8f0}
-body.dark .ubtn{background:#1e293b;border-color:#334155;color:#cbd5e1}
-body.dark .psi{background:#1e293b;border-color:#334155;color:#e2e8f0}
-body.dark .ptbl{color:#e2e8f0}
-body.dark .ptbl thead{background:#1e3a5f}
-body.dark .ptbl tbody tr:hover{background:#263148}
-body.dark .ptbl td{border-color:#334155;color:#e2e8f0}
-body.dark .btn{background:#1e293b;border-color:#334155;color:#cbd5e1}
-body.dark .btn:hover{background:#334155}
-body.dark .modal{background:#1e293b;border-color:#334155}
-body.dark .mhdr{background:linear-gradient(135deg,#0c1e3a,#1565c0)}
-body.dark .mbdy{background:#1e293b;color:#e2e8f0}
-body.dark .dropzone{background:#0f172a;border-color:#334155;color:#94a3b8}
-body.dark input:not([type=checkbox]),body.dark select,body.dark textarea{background:#0f172a;color:#e2e8f0;border-color:#334155}
-body.dark .barchart .blbl{color:#94a3b8}
-body.dark .barchart .bval{color:#e2e8f0}
-body.dark .barchart .btrk{background:#1e293b}
-body.dark .wi{background:#1e293b;border-color:#334155;color:#e2e8f0}
-body.dark .restore-bar{background:#1e293b;border-color:#334155;color:#e2e8f0}
-body.dark #flash-msg{background:#1e3a5f;color:#e2e8f0}
-/* ── LOGIN OVERLAY ── */
-.login-overlay{position:fixed;inset:0;background:linear-gradient(135deg,#0F2342 0%,#0c1e3a 50%,#071528 100%);display:flex;align-items:center;justify-content:center;z-index:99999;transition:opacity .4s}
-.login-overlay.hidden{display:none}
-.login-box{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:48px 40px;width:100%;max-width:380px;text-align:center;backdrop-filter:blur(20px);box-shadow:0 24px 80px rgba(0,0,0,.5)}
-.login-logo{width:80px;height:80px;background:linear-gradient(135deg,#0891B2,#06B6D4);border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 24px;box-shadow:0 8px 32px rgba(8,145,178,.4)}
-.login-cross{font-size:40px;color:#fff;font-weight:800;line-height:1}
-.login-title{color:#fff;font-size:22px;font-weight:700;margin:0 0 8px}
-.login-sub{color:#94A3B8;font-size:13px;margin:0 0 32px}
-.login-inp{width:100%;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:#fff;font-size:16px;outline:none;box-sizing:border-box;transition:border .2s;font-family:Sarabun,sans-serif}
-.login-inp:focus{border-color:#0891B2;background:rgba(255,255,255,.12)}
-.login-inp::placeholder{color:#64748B}
-.login-submit{width:100%;margin-top:12px;padding:14px;background:linear-gradient(135deg,#0891B2,#06B6D4);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;transition:transform .15s,box-shadow .15s;font-family:Sarabun,sans-serif}
-.login-submit:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(8,145,178,.4)}
-.login-submit:active{transform:translateY(0)}
-.login-err{color:#FCA5A5;font-size:13px;margin-top:12px;padding:8px;background:rgba(239,68,68,.1);border-radius:8px}
-.login-loading{color:#94A3B8;font-size:13px;margin-top:12px}
-/* ── EDIT DATE MODAL ── */
-.edit-modal{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:700;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px)}
-.edit-modal.hidden{display:none}
-.edit-box{background:#fff;border-radius:14px;width:100%;max-width:440px;box-shadow:0 24px 60px rgba(0,0,0,.3);overflow:hidden}
-.edit-hdr{background:linear-gradient(135deg,#0f2342,#1565c0);padding:16px 20px;display:flex;justify-content:space-between;align-items:center}
-.edit-hdr-t{color:#fff;font-weight:800;font-size:15px}
-.edit-hdr-s{color:rgba(255,255,255,.7);font-size:11px;margin-top:2px}
-.edit-close{background:rgba(255,255,255,.15);border:none;color:#fff;width:28px;height:28px;border-radius:7px;cursor:pointer;font-size:15px}
-.edit-bdy{padding:20px}
-.edit-field{margin-bottom:14px}
-.edit-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--mut);margin-bottom:6px}
-.edit-inp{width:100%;padding:9px 12px;border:1.5px solid var(--brd);border-radius:8px;font-family:'Sarabun',sans-serif;font-size:14px;outline:none}
-.edit-inp:focus{border-color:var(--teal)}
-.edit-cur{font-size:12px;color:var(--mut);margin-top:4px}
-.edit-ft{padding:14px 20px;border-top:1px solid var(--brd);display:flex;gap:8px;justify-content:flex-end}
-.edit-btn{padding:9px 20px;border-radius:8px;font-family:'Sarabun',sans-serif;font-size:13px;font-weight:700;cursor:pointer;border:none;display:inline-flex;align-items:center;gap:6px}
-.edit-btn.save{background:#1565c0;color:#fff}
-.edit-btn.cancel{background:#f8fafc;color:var(--txt);border:1px solid var(--brd)}
+body.dark .card,.dark .row-card,.dark .ctrl{background:#1e293b!important;border-color:#334155!important}
+body.dark .nav{background:linear-gradient(135deg,#071121,#0f2342)!important}
+body.dark .stat-card{background:#1e293b!important;border-color:#334155!important}
+body.dark input,body.dark select{background:#0f172a!important;color:#e2e8f0!important;border-color:#334155!important}
+body.dark .panel-wrap{background:#162032!important;border-color:#334155!important}
+body.dark .modal-box{background:#1e293b!important;border-color:#334155!important}
+body.dark .modal-ft{background:#162032!important}
+body.dark .prod-tbl th{background:#0f172a!important}
+body.dark .prod-tbl td{border-color:#334155!important}
+body.dark .info-lbl{color:#94a3b8!important}
+body.dark .tl-desc{color:#64748b!important}
 
-/* ── UPLOAD PDF MODAL ── */
-.upload-dz{border:2px dashed var(--brd);border-radius:10px;padding:28px;text-align:center;cursor:pointer;transition:.2s;margin-bottom:12px}
-.upload-dz:hover,.upload-dz.drag{border-color:var(--teal);background:#f0f9ff}
-.upload-prog{background:#f1f5f9;border-radius:8px;padding:12px;margin-bottom:8px;display:none}
-.upload-prog-bar{height:8px;background:var(--brd);border-radius:4px;overflow:hidden;margin-top:6px}
-.upload-prog-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--teal2));border-radius:4px;transition:width .3s}
-.upload-item{display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--brd);border-radius:8px;margin-bottom:6px;font-size:12px}
-.upload-item .ui-name{flex:1;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.upload-item .ui-status{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700;flex-shrink:0}
-.ui-status.pending{background:#f1f5f9;color:var(--mut)}
-.ui-status.uploading{background:#fef9c3;color:#854d0e}
-.ui-status.done{background:var(--grnbg);color:var(--grn)}
-.ui-status.err{background:var(--redbg);color:var(--red)}
-.lic-match{font-size:10px;color:var(--teal);font-family:monospace}
-.restore-bar{background:linear-gradient(135deg,#1565c0,#1976d2);padding:10px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.restore-bar.hidden{display:none}
-.rbtxt{color:#fff;font-size:13px;font-weight:700;flex:1}
-.rbact{display:inline-flex;align-items:center;gap:5px;border-radius:6px;padding:6px 14px;font-family:'Sarabun',sans-serif;font-size:12px;font-weight:700;cursor:pointer;border:none;white-space:nowrap;background:#fff;color:#1e293b}
-@media(max-width:900px){.sgrid{grid-template-columns:1fr 1fr}.p2c{grid-template-columns:1fr}.drow{grid-template-columns:1fr}}
-@media(max-width:600px){.page{padding:10px 12px}.rno{display:none}.dpill{display:none}}
+/* ── LOGIN ── */
+#pg-login{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#020617 0%,#0f172a 50%,#0c2340 100%);z-index:999}
+.login-box{background:rgba(255,255,255,.06);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:44px 40px 36px;width:360px;text-align:center}
+.login-logo{width:64px;height:64px;background:linear-gradient(135deg,#0891b2,#0f2342);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 20px}
+.login-t{font-size:22px;font-weight:700;color:#fff;margin-bottom:4px}
+.login-s{font-size:12px;color:#94a3b8;margin-bottom:28px}
+.login-inp{width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:13px 14px;color:#fff;font-size:14px;font-family:Sarabun,sans-serif;outline:none;transition:.2s;margin-bottom:10px}
+.login-inp:focus{border-color:#0891b2;background:rgba(8,145,178,.12)}
+.login-inp::placeholder{color:#475569}
+.login-btn{width:100%;background:linear-gradient(135deg,#0891b2,#0369a1);border:none;border-radius:10px;padding:13px;color:#fff;font-size:15px;font-weight:600;font-family:Sarabun,sans-serif;cursor:pointer;transition:.2s;margin-top:2px}
+.login-btn:hover:not(:disabled){opacity:.88;transform:translateY(-1px)}
+.login-btn:disabled{opacity:.5;cursor:default}
+.login-err{color:#f87171;font-size:12px;margin-top:10px;min-height:16px}
 
+/* ── NAV ── */
+.nav{background:linear-gradient(135deg,#0f2342,#1a3960);height:54px;display:flex;align-items:center;padding:0 18px;gap:14px;position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,.35)}
+.brand{display:flex;align-items:center;gap:9px;color:#fff;font-weight:700;font-size:14px;white-space:nowrap}
+.brand-ico{width:30px;height:30px;background:linear-gradient(135deg,#0891b2,#0369a1);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.tabs{display:flex;gap:3px;flex:1}
+.tab{padding:5px 13px;border-radius:7px;color:rgba(255,255,255,.65);cursor:pointer;font-size:13px;font-weight:500;transition:.2s;white-space:nowrap}
+.tab.on,.tab:hover{background:rgba(255,255,255,.14);color:#fff}
+.tab .bdg{background:#ef4444;color:#fff;font-size:10px;padding:1px 5px;border-radius:8px;margin-left:4px}
+.nav-r{display:flex;align-items:center;gap:5px}
+.nbtn{padding:5px 11px;border-radius:7px;border:1px solid rgba(255,255,255,.18);color:#fff;background:transparent;font-size:12px;font-family:Sarabun,sans-serif;cursor:pointer;transition:.2s;white-space:nowrap}
+.nbtn:hover{background:rgba(255,255,255,.14)}
+.nbtn.adm{background:#7c3aed;border-color:#6d28d9}
+.flash{font-size:11px;color:#34d399;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ── ROLE BAR ── */
+.role-bar{padding:7px 18px;display:flex;align-items:center;gap:10px;font-size:12px;border-bottom:1px solid rgba(0,0,0,.08)}
+body:not(.dark) .role-bar{background:#1e3a5f;color:#cbd5e1}
+body.dark .role-bar{background:#0f1e36;border-color:#1e3a5f}
+.rbadge{padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700}
+.rbadge.v{background:#374151;color:#9ca3af}
+.rbadge.a{background:#16a34a;color:#fff}
+.role-info{flex:1;color:#94a3b8;font-size:11px}
+.rsw{background:transparent;border:1px solid rgba(255,255,255,.18);color:#e2e8f0;border-radius:7px;padding:3px 11px;font-size:11px;font-family:Sarabun,sans-serif;cursor:pointer}
+
+/* ── SYNC BAR ── */
+.sync-bar{background:#064e3b;border-bottom:1px solid #065f46;padding:6px 18px;font-size:12px;color:#6ee7b7;display:none;align-items:center;gap:10px}
+.sync-bar.on{display:flex}
+.sync-bar button{background:#047857;border:none;color:#fff;border-radius:5px;padding:3px 10px;font-size:11px;font-family:Sarabun,sans-serif;cursor:pointer}
+
+/* ── PAGES ── */
+.pg{padding:18px;display:none}
+.pg.on{display:block}
+
+/* ── STATS ── */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+@media(max-width:600px){.stats{grid-template-columns:repeat(2,1fr)}}
+.stat-card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:14px 16px}
+.stat-lbl{font-size:11px;color:#64748b;margin-bottom:3px}
+.stat-n{font-size:26px;font-weight:700;line-height:1}
+.stat-n.red{color:#dc2626}.stat-n.yel{color:#d97706}.stat-n.grn{color:#16a34a}.stat-n.nvy{color:#0f2342}
+.stat-s{font-size:11px;color:#94a3b8;margin-top:2px}
+
+/* ── CHART CARDS ── */
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+@media(max-width:700px){.charts{grid-template-columns:1fr}}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:14px}
+.card h3{font-size:12px;font-weight:600;color:#0f2342;margin-bottom:10px}
+.br{display:flex;align-items:center;gap:7px;margin-bottom:5px;font-size:12px}
+.br-lbl{width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#64748b}
+.br-trk{flex:1;background:#f1f5f9;border-radius:3px;height:10px}
+.br-fill{height:100%;background:linear-gradient(90deg,#0891b2,#0f2342);border-radius:3px;transition:.5s}
+.br-n{width:34px;text-align:right;font-weight:600;font-size:11px;color:#0f2342}
+.urg-item{display:flex;align-items:center;gap:7px;padding:7px 9px;background:#fef2f2;border:1px solid #fecaca;border-radius:7px;font-size:12px;margin-bottom:5px}
+.urg-key{font-weight:700;color:#dc2626;font-size:11px;min-width:100px}
+.urg-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.urg-days{font-weight:700;color:#dc2626;white-space:nowrap}
+
+/* ── CTRL BAR ── */
+.ctrl{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:9px 12px;margin-bottom:10px;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.srch-w{position:relative;flex:1;min-width:180px}
+.srch-ico{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:#94a3b8;pointer-events:none}
+.srch{width:100%;border:1px solid #e2e8f0;border-radius:7px;padding:6px 9px 6px 28px;font-size:13px;font-family:Sarabun,sans-serif;background:transparent;color:inherit;outline:none}
+.srch:focus{border-color:#0891b2}
+.fbs{display:flex;gap:3px;flex-wrap:wrap}
+.fb{padding:4px 10px;border-radius:16px;border:1px solid #e2e8f0;background:transparent;font-size:11px;font-family:Sarabun,sans-serif;color:#64748b;cursor:pointer;transition:.15s}
+.fb.on{background:#0f2342;border-color:#0f2342;color:#fff}
+.srt{border:1px solid #e2e8f0;border-radius:7px;padding:5px 8px;font-size:12px;font-family:Sarabun,sans-serif;background:transparent;color:inherit;outline:none;cursor:pointer}
+.cnt{font-size:11px;color:#94a3b8;margin-left:auto;white-space:nowrap}
+
+/* ── ROW CARD ── */
+.row-card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;margin-bottom:7px;overflow:hidden;transition:.15s}
+.row-card:hover{border-color:#0891b2;box-shadow:0 2px 8px rgba(8,145,178,.1)}
+.row-card.urgent{border-left:3px solid #dc2626}
+.row-card.warn{border-left:3px solid #d97706}
+.row-card.ok{border-left:3px solid #16a34a}
+.row-card.expired{border-left:3px solid #94a3b8}
+.row-hdr{display:flex;align-items:center;gap:10px;padding:11px 14px;cursor:pointer;user-select:none}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.d-u{background:#dc2626}.d-w{background:#d97706}.d-o{background:#16a34a}.d-e{background:#94a3b8}
+.row-key{font-size:11px;color:#64748b;width:130px;flex-shrink:0}
+.row-info{flex:1}
+.row-mfr{font-weight:600;font-size:13px}
+.row-ctry{font-size:11px;color:#94a3b8;margin-top:1px}
+.row-exp{text-align:right;flex-shrink:0}
+.row-date{font-weight:600;font-size:12px}
+.row-days{font-size:11px}
+.row-acts{display:flex;gap:5px;flex-shrink:0}
+.abtn{padding:3px 9px;border-radius:6px;border:1px solid;font-size:11px;font-family:Sarabun,sans-serif;cursor:pointer;font-weight:500;transition:.15s;white-space:nowrap}
+.abtn:hover{opacity:.82}
+.pdf-on{background:#15803d;border-color:#166534;color:#fff}
+.pdf-off{background:#f1f5f9;border-color:#e2e8f0;color:#94a3b8;cursor:default}
+.chv{color:#94a3b8;font-size:11px;flex-shrink:0;transition:.25s}
+.row-card.open .chv{transform:rotate(180deg)}
+
+/* ── PANEL ── */
+.panel-wrap{display:none;background:#f8fafc;border-top:1px solid #e2e8f0;padding:14px 16px}
+.row-card.open .panel-wrap{display:block}
+.panel-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:600px){.panel-grid{grid-template-columns:1fr}}
+.psec h4{font-size:12px;font-weight:600;color:#0f2342;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #e2e8f0}
+.irow{display:flex;gap:8px;margin-bottom:5px;font-size:12px}
+.info-lbl{color:#64748b;width:90px;flex-shrink:0}
+.info-val{font-weight:500}
+.prod-srch{width:100%;border:1px solid #e2e8f0;border-radius:6px;padding:5px 8px;font-size:12px;font-family:Sarabun,sans-serif;background:transparent;color:inherit;outline:none;margin-bottom:5px}
+.prod-tbl{width:100%;border-collapse:collapse;font-size:11px}
+.prod-tbl th{background:#f1f5f9;padding:4px 7px;text-align:left;font-weight:600;color:#0f2342;position:sticky;top:0}
+.prod-tbl td{padding:4px 7px;border-bottom:1px solid #f1f5f9}
+.prod-tbl tr:hover td{background:#f8fafc}
+.prod-scroll{max-height:180px;overflow-y:auto}
+.chklist li{display:flex;align-items:center;gap:7px;padding:4px 0;font-size:12px;border-bottom:1px solid #f1f5f9;list-style:none}
+.chklist li:last-child{border:none}
+.chklist li input{cursor:pointer}
+.chklist li.done span{text-decoration:line-through;color:#94a3b8}
+.tl-item{display:flex;gap:9px;font-size:12px;margin-bottom:7px}
+.tl-dot{width:9px;height:9px;border-radius:50%;margin-top:3px;flex-shrink:0}
+.tl-when{font-weight:600;color:#0f2342;font-size:11px}
+.tl-desc{color:#64748b;font-size:11px}
+.p-acts{display:flex;gap:7px;margin-top:12px;flex-wrap:wrap}
+.pbtn{padding:6px 13px;border-radius:7px;border:1px solid;font-size:12px;font-family:Sarabun,sans-serif;cursor:pointer;font-weight:500;transition:.15s}
+.pbtn:hover{opacity:.85}
+.pb-pdf{background:#15803d;border-color:#166534;color:#fff}
+.pb-close{background:#dc2626;border-color:#b91c1c;color:#fff}
+.pb-edit{background:transparent;border-color:#e2e8f0;color:#64748b}
+
+/* ── MODAL ── */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;display:flex;align-items:center;justify-content:center;padding:14px}
+.modal-bg.h{display:none}
+.modal-box{background:#fff;border-radius:14px;width:100%;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modal-hdr{background:linear-gradient(135deg,#0f2342,#1a3960);padding:14px 18px;display:flex;align-items:flex-start;justify-content:space-between}
+.mh-t{font-size:14px;font-weight:700;color:#fff}
+.mh-s{font-size:11px;color:rgba(255,255,255,.65);margin-top:2px}
+.mx{background:rgba(255,255,255,.14);border:none;color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:13px;flex-shrink:0}
+.modal-body{padding:18px}
+.mfield{margin-bottom:12px}
+.mlbl{font-size:12px;font-weight:600;color:#64748b;margin-bottom:3px}
+.minp{width:100%;border:1px solid #e2e8f0;border-radius:7px;padding:8px 11px;font-size:13px;font-family:Sarabun,sans-serif;background:transparent;color:inherit;outline:none}
+.minp:focus{border-color:#0891b2}
+.merr{color:#dc2626;font-size:12px;margin-top:3px;display:none}
+.modal-ft{padding:11px 18px;background:#f8fafc;display:flex;gap:7px;justify-content:flex-end;border-top:1px solid #e2e8f0}
+.mbtn{padding:7px 16px;border-radius:7px;border:1px solid;font-size:13px;font-family:Sarabun,sans-serif;cursor:pointer;font-weight:500;transition:.15s}
+.mb-cancel{background:transparent;border-color:#e2e8f0;color:#64748b}
+.mb-ok{background:#0891b2;border-color:#0e7490;color:#fff}
+.mb-ok:hover{background:#0e7490}
+
+/* ── IMPORT ── */
+.dz{border:2px dashed #e2e8f0;border-radius:10px;padding:28px;text-align:center;cursor:pointer;transition:.2s;margin-bottom:10px}
+.dz:hover,.dz.drag{border-color:#0891b2;background:rgba(8,145,178,.04)}
+.merge-smry{font-size:12px;font-weight:600;margin-bottom:5px}
+.merge-list{max-height:180px;overflow-y:auto}
+.mrow{display:flex;gap:5px;padding:3px 0;border-bottom:1px solid #f1f5f9;font-size:11px}
+.m-add{color:#16a34a}.m-upd{color:#2563eb}.m-skip{color:#94a3b8}
+
+/* ── UPLOAD LIST ── */
+.ul-item{display:flex;align-items:center;gap:7px;padding:5px 0;border-bottom:1px solid #f1f5f9;font-size:12px}
+.us{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.us-q{background:#e2e8f0}.us-ok{background:#16a34a}.us-err{background:#dc2626}
+.ul-scroll{max-height:140px;overflow-y:auto}
+
+/* ── PDF MODAL ── */
+.pdf-bg{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:600;flex-direction:column;align-items:center;justify-content:center;display:none}
+.pdf-bg.on{display:flex}
+.pdf-box{background:#1e293b;border-radius:12px;width:95vw;max-width:880px;height:90vh;display:flex;flex-direction:column;overflow:hidden}
+.pdf-hdr{background:linear-gradient(135deg,#16a34a,#15803d);padding:11px 18px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.pdf-title{font-size:13px;font-weight:700;color:#fff;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pdf-x{background:rgba(255,255,255,.18);border:none;color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:13px}
+.pdf-body{flex:1;position:relative;overflow:hidden}
+.pdf-loading{position:absolute;inset:0;background:#0f172a;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;z-index:2}
+.pdf-spin{width:42px;height:42px;border:4px solid #334155;border-top-color:#38bdf8;border-radius:50%;animation:spin 1s linear infinite}
+.pdf-lt{color:#94a3b8;font-size:12px}
+.pdf-frame{width:100%;height:100%;border:none;display:block}
+.pdf-ft{padding:9px 18px;background:#1e293b;border-top:1px solid #334155;display:flex;justify-content:center;flex-shrink:0}
+.pdf-close{background:#dc2626;border:none;color:#fff;border-radius:7px;padding:7px 22px;font-size:13px;font-family:Sarabun,sans-serif;cursor:pointer;font-weight:600}
+
+/* ── PROG ── */
+.prog{height:3px;background:transparent;position:fixed;top:0;left:0;right:0;z-index:999;display:none}
+.prog.on{display:block}
+.prog-fill{height:100%;background:#0891b2;transition:width .3s}
 
 @keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.row-card{animation:fadeUp .18s ease}
 </style>
 </head>
 <body>
 
-<!-- ── LOGIN MODAL ── -->
-<div id="modal-login" class="login-overlay">
+<!-- PROG BAR -->
+<div class="prog" id="prog"><div class="prog-fill" id="prog-fill" style="width:0"></div></div>
+
+<!-- ══ LOGIN ══ -->
+<div id="pg-login">
   <div class="login-box">
-    <div class="login-logo"><div class="login-cross">+</div></div>
-    <h2 class="login-title">FDA License Manager</h2>
-    <p class="login-sub">ระบบจัดการใบอนุญาตเครื่องมือแพทย์</p>
-    <div class="login-form">
-      <input type="password" id="login-pw" class="login-inp" placeholder="รหัสผ่าน" autocomplete="current-password">
-      <button id="login-btn" class="login-submit">🔐 เข้าสู่ระบบ</button>
-      <div id="login-err" class="login-err" style="display:none">❌ รหัสผ่านไม่ถูกต้อง</div>
-      <div id="login-loading" class="login-loading" style="display:none">⏳ กำลังตรวจสอบ...</div>
-    </div>
+    <div class="login-logo">🏥</div>
+    <div class="login-t">FDA License Manager</div>
+    <div class="login-s">ระบบจัดการใบอนุญาตเครื่องมือแพทย์</div>
+    <input class="login-inp" id="lpw" type="password" placeholder="รหัสผ่าน" autocomplete="current-password">
+    <button class="login-btn" id="lbtn">🔐 เข้าสู่ระบบ</button>
+    <div class="login-err" id="lerr"></div>
   </div>
 </div>
 
-<!-- ── PDF VIEWER MODAL ── -->
-<div class="modal-bg hidden" id="modal-pdf" onclick="if(event.target===this && window.closePDF) window.closePDF()">
-  <div class="modal" style="max-width:900px;width:95vw;height:90vh;display:flex;flex-direction:column;padding:0;overflow:hidden">
-    <div class="mhdr" style="padding:14px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0">
-      <div style="flex:1">
-        <div class="mhdr-t">📄 ดู PDF</div>
-        <div class="mhdr-s" id="pdf-filename" style="font-size:12px;color:#94a3b8"></div>
-      </div>
-      <button onclick="window.closePDF && window.closePDF()" style="background:rgba(255,255,255,.1);border:none;color:#fff;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px">✕</button>
-    </div>
-    <div style="flex:1;position:relative;overflow:hidden">
-      <div id="pdf-loading" style="display:none;position:absolute;inset:0;background:#0f172a;z-index:5;align-items:center;justify-content:center;flex-direction:column;gap:12px">
-        <div style="width:48px;height:48px;border:4px solid #334155;border-top-color:#38bdf8;border-radius:50%;animation:spin 1s linear infinite"></div>
-        <div style="color:#94a3b8;font-family:Sarabun,sans-serif">กำลังโหลด PDF...</div>
-      </div>
+<!-- ══ MAIN ══ -->
+<div id="pg-main" style="display:none">
 
-      <object id="pdf-iframe" data="" type="application/pdf" style="width:100%;height:100%;border:none;background:#1e293b;display:block">
-        <p style="color:#e2e8f0;padding:20px;font-family:Sarabun,sans-serif">Browser ไม่รองรับการแสดง PDF กรุณาอัพเดต Chrome</p>
-      </object>
-      <!-- Overlay บน toolbar ของ Google Drive ปิด open-in-new-tab -->
-      <div style="position:absolute;top:0;right:0;width:120px;height:48px;z-index:10;background:transparent;cursor:default" 
-           onclick="return false;" title=""></div>
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="brand"><div class="brand-ico">🏥</div>FDA License</div>
+    <div class="tabs">
+      <div class="tab on" id="t-dash" onclick="goPg('dash')">📊 Dashboard</div>
+      <div class="tab" id="t-lic" onclick="goPg('lic')">📋 ใบอนุญาต <span class="bdg" id="bdg">0</span></div>
     </div>
-    <div style="padding:10px;text-align:center;flex-shrink:0;background:#1e293b">
-      <button onclick="window.closePDF && window.closePDF()" style="background:#ef4444;color:#fff;border:none;padding:8px 24px;border-radius:8px;cursor:pointer;font-size:14px;font-family:Sarabun,sans-serif">✕ ปิด</button>
-    </div>
-  </div>
-</div>
-
-<div id="wizard">
-<div class="wbox">
-  <div class="whdr"><h2>⚙️ ตั้งค่า Google Drive Sync (ทำครั้งเดียว ~3 นาที)</h2><p>ใช้ Google Apps Script เป็น Backend ฟรี ไม่ต้องตั้ง Server</p></div>
-  <div class="wtabs">
-    <div class="wtab on" id="wtab0">1️⃣ สร้าง Script</div>
-    <div class="wtab" id="wtab1">2️⃣ Deploy</div>
-    <div class="wtab" id="wtab2">3️⃣ ใส่ URL</div>
-  </div>
-  <div id="wt0" class="wbody">
-    <div class="wstep"><div class="wsn">1</div><div class="wsc"><b>เปิด Google Apps Script</b><small>คลิกลิงก์ด้านล่าง แล้วกด New project</small><br><a class="wlink" href="https://script.google.com/create" target="_blank">🔗 เปิด Apps Script</a></div></div>
-    <div class="wstep"><div class="wsn">2</div><div class="wsc"><b>ลบโค้ดเดิมออกทั้งหมด แล้ววางโค้ดนี้:</b>
-      <div class="wcode" id="gas-display"><pre id="gas-pre">const FOLDER_ID = '1pZN6e7oH-kMGOs8lNwWX2fCTf_RTQBvc';
-
-function doGet(e) {
-  try {
-    const folder = DriveApp.getFolderById(FOLDER_ID);
-    const files = folder.getFilesByType('application/pdf');
-    const result = [];
-    while (files.hasNext()) {
-      const f = files.next();
-      const name = f.getName();
-      const licKey = extractKey(name);
-      result.push({ name: name, id: f.getId(), licKey: licKey,
-        url: 'https://drive.google.com/file/d/' + f.getId() + '/view' });
-    }
-    return ContentService
-      .createTextOutput(JSON.stringify({ files: result, count: result.length }))
-      .setMimeType(ContentService.MimeType.JSON);
-  } catch(err) {
-    return ContentService
-      .createTextOutput(JSON.stringify({ error: err.message }))
-      .setMimeType(ContentService.MimeType.JSON);
-  }
-}
-
-function extractKey(filename) {
-  const name = filename.replace(/\.pdf$/i, '').trim();
-  const m1 = name.match(/(\d{2}-\d{1,2}-\d{1,2}-\d{1,2}-\d{7})/);
-  if (m1) return m1[1];
-  const m2 = name.match(/\b(\d{7})\b/);
-  if (m2) return m2[1];
-  return name;
-}</pre><button class="wcopy" id="btn-copy-gas">Copy</button></div>
-    </div></div>
-    <div class="wstep"><div class="wsn">3</div><div class="wsc"><b>กด Save (Ctrl+S) ตั้งชื่อ Project ว่า FDA PDF Sync</b></div></div>
-  </div>
-  <div id="wt1" class="wbody" style="display:none">
-    <div class="wstep"><div class="wsn">1</div><div class="wsc"><b>กด Deploy → New deployment</b><div class="snote">📍 ปุ่ม Deploy อยู่มุมขวาบนของ Apps Script Editor</div></div></div>
-    <div class="wstep"><div class="wsn">2</div><div class="wsc"><b>ตั้งค่าดังนี้:</b><small>• Type: <b>Web app</b><br>• Execute as: <b>Me</b><br>• Who has access: <b>Anyone</b> ← สำคัญมาก</small></div></div>
-    <div class="wstep"><div class="wsn">3</div><div class="wsc"><b>กด Deploy → อนุมัติสิทธิ์ → Copy URL ที่ได้</b><div class="snote">URL รูปแบบ: https://script.google.com/macros/s/.../exec</div></div></div>
-  </div>
-  <div id="wt2" class="wbody" style="display:none">
-    <div class="wstep"><div class="wsn">✓</div><div class="wsc"><b>วาง Web App URL ที่ได้จาก Deploy:</b><input class="winp" id="gas-url-inp" placeholder="https://script.google.com/macros/s/.../exec"></div></div>
-    <div class="wstep"><div class="wsn">💡</div><div class="wsc"><b>ทดสอบการเชื่อมต่อ</b><br><button class="wbtn pri" id="btn-test" style="margin-top:8px">🔍 ทดสอบ</button><div class="wresult" id="wtest"></div></div></div>
-  </div>
-  <div class="wfoot">
-    <button class="wbtn gho" id="btn-skip">ข้ามก่อน</button>
-    <div style="display:flex;gap:8px">
-      <button class="wbtn gho" id="btn-prev" style="display:none">← ก่อนหน้า</button>
-      <button class="wbtn pri" id="btn-next">ถัดไป →</button>
-      <button class="wbtn suc" id="btn-done" style="display:none">✅ เสร็จแล้ว!</button>
-    </div>
-  </div>
-</div>
-</div>
-
-<div class="modal-bg hidden" id="modal-ex">
-<div class="modal">
-  <div class="mhdr"><div><div class="mhdr-t">📊 Import / อัพเดท Excel</div><div class="mhdr-s">Merge อัตโนมัติ คงลิงก์ PDF เดิมไว้</div></div><button class="mclose" id="btn-close-ex">✕</button></div>
-  <div class="mbdy">
-    <div id="ex-drop">
-      <div class="dropzone" id="ex-dz">
-        <div style="font-size:36px;margin-bottom:8px">📊</div>
-        <div style="font-size:14px;font-weight:600;color:var(--navy)">คลิกหรือลากไฟล์ Excel มาวาง</div>
-        <div style="font-size:12px;color:var(--mut);margin-top:4px">.xlsx — Sheet: NEWCODE</div>
-      </div>
-      <input type="file" id="ex-fi" accept=".xlsx,.xls" style="display:none">
-      <input type="file" id="url-fi" accept=".json" style="display:none">
-    </div>
-    <div id="ex-prev" style="display:none">
-      <div class="mstats">
-        <div class="mst a"><div class="mv" id="mp-a">0</div><div class="ml">➕ ใหม่</div></div>
-        <div class="mst u"><div class="mv" id="mp-u">0</div><div class="ml">🔄 อัพเดท</div></div>
-        <div class="mst d"><div class="mv" id="mp-d">0</div><div class="ml">🗑️ ลบ</div></div>
-        <div class="mst k"><div class="mv" id="mp-k">0</div><div class="ml">🔗 คง URL</div></div>
-      </div>
-      <div class="mlist" id="mlist"></div>
-    </div>
-  </div>
-  <div class="mft">
-    <button class="mbtn no" id="btn-cancel-ex">ยกเลิก</button>
-    <button class="mbtn ok" id="btn-mrg" style="display:none">✅ ยืนยัน Merge</button>
-  </div>
-</div>
-</div>
-
-<nav class="nav">
-  <div class="ni">
-    <div class="brand"><div class="bico">🏥</div><div><div class="bt1">FDA License Manager</div><div class="bt2">ระบบจัดการใบอนุญาตเครื่องมือแพทย์</div></div></div>
-    <div class="ntabs">
-      <div class="ntab active" id="ntab-dash">📊 Dashboard</div>
-      <div class="ntab" id="ntab-lic">📋 ใบอนุญาต <span class="nbdg" id="tab-cnt">-</span></div>
-    </div>
-    <div class="nright">
+    <div class="nav-r">
       <span class="flash" id="flash-msg"></span>
-      <button class="nbtn green" id="btn-open-ex" data-admin-only>📊 Import Excel</button>
-      <button class="nbtn" id="btn-open-upload" style="background:#7c3aed;border-color:#7c3aed" data-admin-only>📤 Upload PDF</button>
-      <button class="nbtn orange" id="btn-sync" data-admin-only>🔄 Sync Drive</button>
-      <button class="nbtn" onclick="window.open(DRIVE_URL,'_blank')" data-admin-only style="background:#1565c0;border-color:#1565c0">📂 Drive</button>
-      <button class="nbtn" id="btn-darkmode" onclick="toggleDark()" title="Dark Mode">🌙</button>
-      <button class="nbtn" id="btn-settings" style="background:#475569;border-color:#475569" data-admin-only>⚙️</button>
+      <button class="nbtn" id="btn-import" style="display:none" onclick="openModal('m-import')">📊 Import</button>
+      <button class="nbtn" id="btn-upload" style="display:none" onclick="openModal('m-upload')">📤 Upload</button>
+      <button class="nbtn" id="btn-sync"   style="display:none" onclick="doSync()">🔄 Sync</button>
+      <button class="nbtn" onclick="toggleDark()" id="btn-dk">🌙</button>
+      <button class="nbtn" onclick="doLogout()">ออก</button>
     </div>
+  </nav>
+
+  <!-- ROLE BAR -->
+  <div class="role-bar">
+    <span class="rbadge v" id="rbadge">👁 VIEWER</span>
+    <span class="role-info" id="rinfo">โหมดดูอย่างเดียว</span>
+    <button class="rsw" id="rsw">🔐 เข้า Admin</button>
   </div>
-</nav>
 
-<!-- ROLE BAR -->
-<div class="role-bar viewer" id="role-bar">
-  <span class="role-badge viewer" id="role-badge">👁 VIEWER</span>
-  <span class="role-txt" id="role-txt">โหมดดูอย่างเดียว — ไม่สามารถแก้ไขข้อมูลได้</span>
-  <button class="role-switch" id="btn-role-switch">🔐 เข้าสู่ระบบ Admin</button>
-</div>
+  <!-- SYNC BAR -->
+  <div class="sync-bar" id="sync-bar">
+    <span id="sync-txt">🔄 กำลังโหลดข้อมูล...</span>
+    <button onclick="loadData()">โหลดใหม่</button>
+  </div>
 
-<!-- ADMIN PASSWORD MODAL -->
-<div class="edit-modal hidden" id="modal-pw">
-  <div class="edit-box">
-    <div class="edit-hdr"><div><div class="edit-hdr-t">🔐 Admin Login</div><div class="edit-hdr-s">ใส่รหัสผ่านเพื่อเข้าโหมดแก้ไข</div></div><button class="edit-close" id="btn-close-pw">✕</button></div>
-    <div class="edit-bdy">
-      <div class="edit-field"><div class="edit-lbl">รหัสผ่าน</div><input class="edit-inp" type="password" id="pw-inp" placeholder="••••••••"></div>
-      <div id="pw-err" style="color:#dc2626;font-size:12px;display:none">❌ รหัสผ่านไม่ถูกต้อง</div>
+  <!-- DASHBOARD -->
+  <div class="pg on" id="pg-dash">
+    <div class="stats">
+      <div class="stat-card"><div class="stat-lbl">🔴 ด่วน &lt;60 วัน</div><div class="stat-n red" id="s-u">—</div><div class="stat-s">ใบอนุญาต</div></div>
+      <div class="stat-card"><div class="stat-lbl">🟡 แจ้งเตือน &lt;180 วัน</div><div class="stat-n yel" id="s-w">—</div><div class="stat-s">ใบอนุญาต</div></div>
+      <div class="stat-card"><div class="stat-lbl">🟢 ปกติ</div><div class="stat-n grn" id="s-o">—</div><div class="stat-s">ใบอนุญาต</div></div>
+      <div class="stat-card"><div class="stat-lbl">📋 ทั้งหมด</div><div class="stat-n nvy" id="s-t">—</div><div class="stat-s" id="s-p">—</div></div>
     </div>
-    <div class="edit-ft"><button class="edit-btn cancel" id="btn-pw-cancel">ยกเลิก</button><button class="edit-btn save" id="btn-pw-ok">✅ เข้าสู่ระบบ</button></div>
+    <div class="charts">
+      <div class="card"><h3>⚠️ ต้องดำเนินการด่วน</h3><div id="d-urg"></div></div>
+      <div class="card"><h3>🏭 ผู้ผลิต Top 10</h3><div id="d-mfr"></div></div>
+    </div>
+    <div class="card" style="margin-bottom:20px"><h3>📅 แยกตามปีหมดอายุ (พ.ศ.)</h3><div id="d-yr"></div></div>
   </div>
-</div>
 
-<!-- EDIT DATE MODAL -->
-<div class="edit-modal hidden" id="modal-edit">
-  <div class="edit-box">
-    <div class="edit-hdr"><div><div class="edit-hdr-t">✏️ แก้ไขวันหมดอายุ</div><div class="edit-hdr-s" id="edit-lic-label">เลขใบอนุญาต</div></div><button class="edit-close" id="btn-close-edit">✕</button></div>
-    <div class="edit-bdy">
-      <div class="edit-field">
-        <div class="edit-lbl">ผู้ผลิต</div>
-        <div id="edit-mfr" style="font-size:13px;font-weight:600;color:var(--navy);padding:6px 0"></div>
+  <!-- LICENSE LIST -->
+  <div class="pg" id="pg-lic">
+    <div class="ctrl">
+      <div class="srch-w">
+        <span class="srch-ico">🔍</span>
+        <input class="srch" id="srch" placeholder="ค้นหาเลขใบ, ผู้ผลิต, ประเทศ..." oninput="renderList()">
       </div>
-      <div class="edit-field">
-        <div class="edit-lbl">วันหมดอายุปัจจุบัน</div>
-        <div class="edit-cur" id="edit-cur-date"></div>
+      <div class="fbs">
+        <button class="fb on" onclick="setF('all',this)">ทั้งหมด</button>
+        <button class="fb" onclick="setF('urgent',this)">ด่วน</button>
+        <button class="fb" onclick="setF('warn',this)">เตือน</button>
+        <button class="fb" onclick="setF('ok',this)">ปกติ</button>
+        <button class="fb" onclick="setF('expired',this)">หมดอายุ</button>
       </div>
-      <div class="edit-field">
-        <div class="edit-lbl">วันหมดอายุใหม่ (ค.ศ.)</div>
-        <input class="edit-inp" type="date" id="edit-date-inp">
-        <div class="edit-cur">ปี ค.ศ. เช่น 2027-03-31</div>
-      </div>
+      <select class="srt" id="srt" onchange="renderList()">
+        <option value="exp">วันหมดอายุ</option>
+        <option value="key">เลขใบ</option>
+        <option value="mfr">ผู้ผลิต</option>
+      </select>
+      <span class="cnt" id="cnt">—</span>
     </div>
-    <div class="edit-ft"><button class="edit-btn cancel" id="btn-edit-cancel">ยกเลิก</button><button class="edit-btn save" id="btn-edit-save">💾 บันทึก</button></div>
+    <div id="lic-list"></div>
   </div>
 </div>
 
-<!-- UPLOAD PDF MODAL -->
-<div class="modal-bg hidden" id="modal-upload">
-  <div class="modal" style="max-width:560px">
-    <div class="mhdr" style="background:linear-gradient(135deg,#7c3aed,#6d28d9)">
-      <div><div class="mhdr-t">📤 อัพโหลด PDF → Google Drive</div><div class="mhdr-s">เลือกไฟล์ PDF แล้วระบบจะส่งไปเก็บใน Drive อัตโนมัติ</div></div>
-      <button class="mclose" id="btn-close-upload">✕</button>
+<!-- ══ MODALS ══ -->
+
+<!-- Admin Login -->
+<div class="modal-bg h" id="m-admin">
+  <div class="modal-box" style="max-width:380px">
+    <div class="modal-hdr"><div><div class="mh-t">🔐 เข้าสู่ระบบ Admin</div></div><button class="mx" onclick="closeModal('m-admin')">✕</button></div>
+    <div class="modal-body">
+      <div class="mfield"><div class="mlbl">รหัสผ่าน Admin</div><input class="minp" type="password" id="apw" placeholder="••••••••"></div>
+      <div class="merr" id="aerr">❌ รหัสผ่านไม่ถูกต้อง</div>
     </div>
-    <div class="mbdy">
-      <div class="upload-dz" id="upload-dz">
-        <div style="font-size:36px;margin-bottom:8px">📄</div>
-        <div style="font-size:14px;font-weight:600;color:var(--navy)">คลิกหรือลากไฟล์ PDF มาวาง</div>
-        <div style="font-size:12px;color:var(--mut);margin-top:4px">รองรับหลายไฟล์พร้อมกัน</div>
+    <div class="modal-ft"><button class="mbtn mb-cancel" onclick="closeModal('m-admin')">ยกเลิก</button><button class="mbtn mb-ok" id="a-ok">เข้าสู่ระบบ</button></div>
+  </div>
+</div>
+
+<!-- Edit Date -->
+<div class="modal-bg h" id="m-edit">
+  <div class="modal-box" style="max-width:380px">
+    <div class="modal-hdr"><div><div class="mh-t">📅 แก้วันหมดอายุ</div><div class="mh-s" id="edit-lbl">—</div></div><button class="mx" onclick="closeModal('m-edit')">✕</button></div>
+    <div class="modal-body">
+      <div class="mfield"><div class="mlbl">วันหมดอายุใหม่</div><input class="minp" type="date" id="edit-date"></div>
+    </div>
+    <div class="modal-ft"><button class="mbtn mb-cancel" onclick="closeModal('m-edit')">ยกเลิก</button><button class="mbtn mb-ok" id="edit-ok">💾 บันทึก</button></div>
+  </div>
+</div>
+
+<!-- Import Excel -->
+<div class="modal-bg h" id="m-import">
+  <div class="modal-box" style="max-width:560px">
+    <div class="modal-hdr" style="background:linear-gradient(135deg,#16a34a,#15803d)">
+      <div><div class="mh-t">📊 Import Excel</div><div class="mh-s">อัพโหลด .xlsx เพื่ออัพเดทใบอนุญาต</div></div>
+      <button class="mx" onclick="closeModal('m-import')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="dz" id="imp-dz">
+        <div style="font-size:28px">📊</div>
+        <div style="font-weight:600;margin:6px 0">คลิกหรือลากไฟล์ .xlsx มาวาง</div>
+        <div style="font-size:11px;color:#64748b">คอลัมน์: เลขใบ, ผู้ผลิต, ประเทศ, วันหมดอายุ, จำนวนสินค้า</div>
       </div>
-      <input type="file" id="upload-fi" accept=".pdf" multiple style="display:none">
-      <div id="upload-note" style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:10px 14px;font-size:12px;color:#92400e;margin-bottom:10px">
-        💡 ชื่อไฟล์ควรมีเลขใบอนุญาต เช่น <b>65-2-3-2-0011352.pdf</b> เพื่อให้ระบบ match ได้อัตโนมัติ
+      <input type="file" id="imp-fi" accept=".xlsx,.xls" style="display:none">
+      <div id="merge-wrap" style="display:none">
+        <div class="merge-smry" id="merge-smry"></div>
+        <div class="merge-list" id="merge-list"></div>
       </div>
-      <div id="upload-list"></div>
     </div>
-    <div class="mft">
-      <button class="mbtn no" id="btn-upload-cancel">ปิด</button>
-      <button class="mbtn ok" id="btn-upload-start" style="background:#7c3aed;display:none">📤 อัพโหลดทั้งหมด</button>
+    <div class="modal-ft">
+      <button class="mbtn mb-cancel" onclick="closeModal('m-import')">ยกเลิก</button>
+      <button class="mbtn mb-ok" id="imp-ok" style="display:none" onclick="applyMerge()">✅ ยืนยัน Import</button>
     </div>
   </div>
 </div>
 
-<div class="restore-bar hidden" id="restore-bar">
-  <div class="rbtxt" id="restore-txt">🔗 พบข้อมูลลิงก์ PDF จากไฟล์ backup</div>
-  <button class="rbact" id="btn-restore-yes">✅ โหลด URL กลับมา</button>
-  <button class="rbact" style="background:rgba(255,255,255,.2);color:#fff" id="btn-restore-no">✕</button>
-</div>
-<div class="sbar hidden" id="sbar" style="visibility:hidden">
-  <div style="flex:1"><div class="sbar-txt" id="sbar-txt"></div><div class="sbar-sub" id="sbar-sub"></div></div>
-  <div id="sbar-pills" style="display:flex;gap:6px"></div>
-  <div id="sbar-acts" style="display:flex;gap:6px"></div>
-</div>
-<div class="sprog hidden" id="sprog"><div class="sprog-fill" id="sprog-fill" style="width:0%"></div></div>
-
-<div class="page active" id="page-dash">
-  <div class="sgrid">
-    <div class="sc r"><div class="lbl">🔴 ด่วน &lt;60 วัน</div><div class="val" id="s-urg">-</div><div class="sub">ใบอนุญาต</div></div>
-    <div class="sc a"><div class="lbl">🟡 แจ้งเตือน &lt;180 วัน</div><div class="val" id="s-wrn">-</div><div class="sub">ใบอนุญาต</div></div>
-    <div class="sc g"><div class="lbl">🟢 ปกติ</div><div class="val" id="s-ok">-</div><div class="sub">ใบอนุญาต</div></div>
-    <div class="sc n"><div class="lbl">📋 ทั้งหมด</div><div class="val" id="s-tot">-</div><div class="sub" id="s-prds"></div></div>
+<!-- Upload PDF -->
+<div class="modal-bg h" id="m-upload">
+  <div class="modal-box" style="max-width:500px">
+    <div class="modal-hdr" style="background:linear-gradient(135deg,#7c3aed,#6d28d9)">
+      <div><div class="mh-t">📤 Upload PDF → Drive</div><div class="mh-s">ชื่อไฟล์ควรมีเลขใบ เช่น 65-2-2-0016910.pdf</div></div>
+      <button class="mx" onclick="closeModal('m-upload')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="dz" id="up-dz"><div style="font-size:28px">📄</div><div style="font-weight:600;margin:6px 0">คลิกหรือลากไฟล์ PDF</div></div>
+      <input type="file" id="up-fi" accept=".pdf" multiple style="display:none">
+      <div class="ul-scroll" id="ul-list"></div>
+    </div>
+    <div class="modal-ft">
+      <button class="mbtn mb-cancel" onclick="closeModal('m-upload')">ปิด</button>
+      <button class="mbtn mb-ok" id="up-ok" style="display:none;background:#7c3aed;border-color:#6d28d9" onclick="startUpload()">📤 อัพโหลด</button>
+    </div>
   </div>
-  <div class="drow">
-    <div class="card"><h3>⚠️ ต้องดำเนินการด่วน</h3><div id="d-urg"></div></div>
-    <div class="card"><h3>📊 ผู้ผลิต Top 10</h3><div class="barchart" id="d-mfr"></div></div>
-  </div>
-  <div class="card" style="margin-bottom:20px"><h3>📅 ใบอนุญาตแยกตามปีหมดอายุ (พ.ศ.)</h3><div class="barchart" id="d-yr"></div></div>
 </div>
 
-<div class="page" id="page-lic">
-  <div class="ctrl">
-    <div class="sw">
-      <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"/></svg>
-      <input class="si" id="lsrch" placeholder="ค้นหาเลขใบอนุญาต ผู้ผลิต ประเทศ...">
+<!-- PDF Viewer -->
+<div class="pdf-bg" id="pdf-bg">
+  <div class="pdf-box">
+    <div class="pdf-hdr">
+      <span style="font-size:15px">📄</span>
+      <span class="pdf-title" id="pdf-title">—</span>
+      <button class="pdf-x" onclick="closePDF()">✕</button>
     </div>
-    <div class="fg">
-      <button class="fb fa on" data-f="all">ทั้งหมด</button>
-      <button class="fb fr" data-f="urgent">🔴 ด่วน</button>
-      <button class="fb fw" data-f="warn">🟡 เตือน</button>
-      <button class="fb fok" data-f="ok">🟢 ปกติ</button>
-      <button class="fb fe" data-f="expired">⚫ หมดอายุ</button>
+    <div class="pdf-body">
+      <div class="pdf-loading" id="pdf-load"><div class="pdf-spin"></div><div class="pdf-lt">กำลังโหลด PDF...</div></div>
+      <iframe class="pdf-frame" id="pdf-frame" src="about:blank" allowfullscreen></iframe>
     </div>
-    <select class="ss" id="lsort">
-      <option value="exp">เรียงตามวันหมดอายุ</option>
-      <option value="lic">เรียงตามเลขใบอนุญาต</option>
-      <option value="mfr">เรียงตามผู้ผลิต</option>
-      <option value="cnt">เรียงตามจำนวนสินค้า</option>
-    </select>
-    <span class="rinfo" id="linfo"></span>
+    <div class="pdf-ft"><button class="pdf-close" onclick="closePDF()">✕ ปิด PDF</button></div>
   </div>
-  <div class="ll" id="ll"></div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-(function() {
-  'use strict';
-
-  // ── CONFIG ──
-  var DRIVE_URL = 'https://drive.google.com/drive/u/0/folders/1pZN6e7oH-kMGOs8lNwWX2fCTf_RTQBvc';
-  var DOCS = ['แบบคำขอต่ออายุใบอนุญาตนำเข้า (อ.14)','หนังสือรับรองบริษัทจดทะเบียน (อายุไม่เกิน 6 เดือน)','สำเนาใบอนุญาตนำเข้าฉบับเดิม','Certificate of Free Sale / CE Mark (ปีปัจจุบัน)','รายชื่อสินค้าและรหัสสินค้าที่ขอต่ออายุ','Letter of Authorization จากผู้ผลิต','หลักฐานการชำระค่าธรรมเนียม','รายงานผลการใช้งานในตลาด (ถ้ามี)'];
-
-  // ── STORAGE ──
-  var LK='fda_lic_v8', UK='fda_url_v8', CK='fda_chk_v8', GK='fda_gas_url';
-  function ls(k) { try { return JSON.parse(localStorage.getItem(k)); } catch(e) { return null; } }
-  function lss(k,v) { localStorage.setItem(k, JSON.stringify(v)); }
-
-  // ── DATA ──
-  // BASE_DATA ถูกลบ — ดึงจาก Sheets แทน
-  // ── SECURE: ไม่มีข้อมูลฝังใน HTML ──
-  var LICENSES = [];
-  var urlMap = ls(UK) || {};
-  var checks = ls(CK) || {};
-  var BUILTIN_GAS_URL = 'https://script.google.com/macros/s/AKfycbxEln9oOk5JT-Nhj4-bn_UGnjxcBfeulmBifQA-8xaq2wl_pw7XnWfAQDeS97Uy8dQd/exec';
-  var SESSION_TOKEN = localStorage.getItem('fda_token') || '';
-  var SESSION_ROLE  = localStorage.getItem('fda_role')  || '';
-  var SESSION_EXP   = parseInt(localStorage.getItem('fda_token_exp') || '0');
-    var gasUrl = localStorage.getItem(GK) || BUILTIN_GAS_URL;
-  var pendingMerge = null;
-
-  // ── UTILS ──
-  function dL(iso) {
-    if (!iso || iso === 'undefined' || iso === '') return null;
-    var d = new Date(iso);
-    if (isNaN(d.getTime())) return null;
-    return Math.ceil((d - new Date()) / 86400000);
-  }
-  function urg(iso) { var d = dL(iso); if (!d && d !== 0) return 'ok'; if (d < 0) return 'expired'; if (d <= 60) return 'urgent'; if (d <= 180) return 'warn'; return 'ok'; }
-  function thD(iso) {
-    if (!iso || iso === 'undefined' || iso === '') return '-';
-    // รองรับ ISO format: 2025-03-01
-    if (typeof iso === 'string' && iso.includes('-')) {
-      var p = iso.split('-');
-      if (p.length === 3 && p[0].length === 4) return p[2]+'/'+p[1]+'/'+(+p[0]+543);
-    }
-    // รองรับ Date object หรือ format อื่น
-    var d = new Date(iso);
-    if (!isNaN(d.getTime())) {
-      return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+(d.getFullYear()+543);
-    }
-    return '-';
-  }
-  function fmtD(iso) { return iso ? new Date(iso).toLocaleDateString('th-TH',{year:'numeric',month:'short',day:'numeric'}) : '-'; }
-  function addD(iso,n) { if (!iso) return null; var d = new Date(iso); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); }
-  function getLic(r) { var ov = urlMap[r.k] || {}; var url = r.url || ov.url || ''; var prods = r.prods || []; return Object.assign({}, r, {url: url, d: dL(r.e), u: urg(r.e), prods: prods}); }
-  window.openPDF = function(url, filename) {
-    if (!url) return;
-    var tok = SESSION_TOKEN || localStorage.getItem('fda_token') || '';
-    var m = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-    if (!m) return;
-    var fileId = m[1];
-
-    ge('pdf-filename').textContent = filename || '';
-    ge('modal-pdf').classList.remove('hidden');
-
-    var obj = ge('pdf-iframe'); // object tag
-    obj.data = '';
-    var loadDiv = ge('pdf-loading');
-    if (loadDiv) loadDiv.style.display = 'flex';
-
-    // fetch PDF blob ผ่าน Apps Script token
-    var proxyUrl = gasUrl + '?action=viewPdf&fileId=' + encodeURIComponent(fileId)
-                          + '&token=' + encodeURIComponent(tok);
-    fetch(proxyUrl)
-      .then(function(r) {
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        return r.text();
-      })
-      .then(function(b64) {
-        if (loadDiv) loadDiv.style.display = 'none';
-        b64 = b64.trim();
-        if (!b64 || b64.startsWith('<') || b64.startsWith('{')) {
-          // error response
-          obj.data = '';
-          obj.innerHTML = '<p style="color:#dc2626;padding:30px;font-family:Sarabun,sans-serif">❌ ' + (b64.includes('Login') ? 'กรุณา Login ใหม่' : 'โหลดไม่ได้') + '</p>';
-          return;
-        }
-        // base64 → Blob → object URL
-        try {
-          var bin = atob(b64);
-          var buf = new Uint8Array(bin.length);
-          for (var i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
-          var blob = new Blob([buf], { type: 'application/pdf' });
-          var burl = URL.createObjectURL(blob);
-          // เก็บ URL เก่าเพื่อ revoke ตอนปิด
-          if (obj._blobUrl) URL.revokeObjectURL(obj._blobUrl);
-          obj._blobUrl = burl;
-          obj.data = burl;
-        } catch(ex) {
-          obj.innerHTML = '<p style="color:#dc2626;padding:30px;font-family:Sarabun,sans-serif">❌ parse error: ' + ex.message + '</p>';
-        }
-      })
-      .catch(function(err) {
-        if (loadDiv) loadDiv.style.display = 'none';
-        obj.innerHTML = '<p style="color:#dc2626;padding:30px;font-family:Sarabun,sans-serif">❌ ' + err.message + '</p>';
-      });
-  }
-  window.closePDF = function() {
-    window.closePDF ? window.closePDF() : null;
-  }
-  // ESC key ปิด modal
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') closePDF();
-  });
-
-  // toggleDark moved to global scope
-  // โหลด Dark Mode preference
-  if (localStorage.getItem('fda_dark') === '1') {
-    document.body.classList.add('dark');
-    setTimeout(function(){
-      var btn = ge('btn-darkmode');
-      if (btn) btn.textContent = '☀️ Light Mode';
-    }, 100);
-  }
-
-  
-  // โหลด dark mode preference
-
-  function flashMsg(msg) {
-    var el = document.getElementById('flash-msg');
-    el.textContent = msg || '✅ บันทึกแล้ว';
-    el.classList.add('show');
-    setTimeout(function() { el.classList.remove('show'); }, 2800);
-  }
-  function ge(id) { return document.getElementById(id); }
-
-  // ── WIZARD ──
-  var curTab = 0;
-  function goTab(n) {
-    n = Math.max(0, Math.min(2, n));
-    curTab = n;
-    [0,1,2].forEach(function(i) {
-      ge('wt'+i).style.display = i===n ? '' : 'none';
-      ge('wtab'+i).className = 'wtab' + (i===n ? ' on' : '');
-    });
-    ge('btn-prev').style.display = n > 0 ? '' : 'none';
-    ge('btn-next').style.display = n < 2 ? '' : 'none';
-    ge('btn-done').style.display = n === 2 ? '' : 'none';
-  }
-
-  ge('wtab0').onclick = function() { goTab(0); };
-  ge('wtab1').onclick = function() { goTab(1); };
-  ge('wtab2').onclick = function() { goTab(2); };
-  ge('btn-skip').onclick = function() { ge('wizard').classList.add('gone'); };
-  ge('btn-prev').onclick = function() { goTab(curTab-1); };
-  ge('btn-next').onclick = function() { goTab(curTab+1); };
-  ge('btn-done').onclick = function() {
-    var url = ge('gas-url-inp').value.trim();
-    if (url) { gasUrl = url; localStorage.setItem(GK, url); }
-    ge('wizard').classList.add('gone');
-    if (url) flashMsg('✅ ตั้งค่าเสร็จแล้ว! กด Sync Drive PDF ได้เลย');
-  };
-  ge('btn-copy-gas').onclick = function() {
-    var txt = ge('gas-pre').textContent;
-    navigator.clipboard.writeText(txt).then(function() {
-      ge('btn-copy-gas').textContent = '✓ Copied!';
-      setTimeout(function() { ge('btn-copy-gas').textContent = 'Copy'; }, 2000);
-    });
-  };
-  ge('btn-test').onclick = async function() {
-    var url = ge('gas-url-inp').value.trim();
-    var res = ge('wtest');
-    if (!url) { res.style.display=''; res.className='wresult err'; res.textContent='❌ กรุณาใส่ URL ก่อน'; return; }
-    res.style.display=''; res.className='wresult'; res.textContent='⏳ กำลังทดสอบ...';
-    try {
-      var r = await fetch(url);
-      var d = await r.json();
-      if (d.error) throw new Error(d.error);
-      res.className='wresult ok';
-      res.textContent='✅ เชื่อมต่อสำเร็จ! พบ ' + d.count + ' ไฟล์ PDF';
-      ge('btn-done').style.display = '';
-    } catch(e) {
-      res.className='wresult err';
-      res.textContent='❌ เชื่อมต่อไม่ได้: ' + e.message;
-    }
-  };
-  ge('wizard').classList.add('gone');  // ซ่อน wizard เสมอตอนเริ่ม
-
-  // ── SYNC ──
-  ge('btn-sync').onclick = function() {
-    if (!gasUrl) { ge('wizard').classList.remove('gone'); goTab(0); return; }
-    runSync();
-  };
-
-  function setBar(state, txt, sub, pct) {
-    var bar = ge('sbar'), prog = ge('sprog');
-    bar.className = 'sbar ' + state;
-    bar.classList.remove('hidden');
-    ge('sbar-txt').textContent = txt;
-    ge('sbar-sub').textContent = sub || '';
-    ge('sbar-pills').innerHTML = '';
-    ge('sbar-acts').innerHTML = '';
-    if (pct != null) { prog.classList.remove('hidden'); ge('sprog-fill').style.width = pct+'%'; }
-    else prog.classList.add('hidden');
-  }
-
-  async function runSync() {
-    setBar('loading', '⏳ กำลังดึงไฟล์จาก Google Drive...', '', 30);
-    try {
-      var syncUrl = gasUrl + '?action=syncPDF&token=' + (SESSION_TOKEN||'');
-      var r = await fetch(syncUrl);
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      var d = await r.json();
-      if (d.error) throw new Error(d.error);
-      var files = d.files || [];
-      setBar('loading', '🔗 แมช '+files.length+' ไฟล์...', '', 70);
-      var licSet = {};
-      LICENSES.forEach(function(l) { licSet[l.k] = true; });
-      var matched = 0, unmatched = [];
-      files.forEach(function(f) {
-        var k = f.licKey || '';
-        if (!k || !licSet[k]) {
-          var name = (f.name||'').replace(/\.pdf$/i,'');
-          var m1 = name.match(/(\d{2}-\d{1,2}-\d{1,2}-\d{1,2}-\d{7})/);
-          var m2 = name.match(/\b(\d{7})\b/);
-          k = (m1&&m1[1]) || (m2&&m2[1]) || name.trim();
-        }
-        if (licSet[k]) { urlMap[k] = {url: f.url, dt: 'pdf'}; matched++; }
-        else unmatched.push(f.name);
-      });
-      lss(UK, urlMap);
-      // sync URL กลับลง LICENSES แล้วบันทึกลง Sheets
-      LICENSES.forEach(function(l) {
-        if (urlMap[l.k] && urlMap[l.k].url) l.url = urlMap[l.k].url;
-      });
-      var tok = SESSION_TOKEN || localStorage.getItem('fda_token') || '';
-      if (tok) {
-        fetch(gasUrl, {
-          method: 'POST', headers: {'Content-Type': 'text/plain'},
-          body: JSON.stringify({ action: 'importLicenses', token: tok, licenses: LICENSES })
-        }).then(function(r){ return r.json(); })
-          .then(function(d){ if (d.success) console.log('✅ URL saved to Sheets'); })
-          .catch(function(){});
-      }
-      buildDash(); renderLic();
-      setBar('done', '✅ Sync สำเร็จ! ลิงก์แล้ว '+matched+'/'+LICENSES.length+' ใบ',
-        unmatched.length ? (unmatched.length+' ไฟล์ไม่พบในระบบ') : 'ครบทุกใบ 🎉', null);
-      ge('sbar-pills').innerHTML = '<span class="spill">🔗 '+matched+' PDF</span>' +
-        (unmatched.length ? '<span class="spill" style="background:rgba(251,191,36,.3);cursor:pointer" id="pill-unmatched">⚠️ '+unmatched.length+' ไม่พบ</span>' : '');
-      var syncAgainBtn = document.createElement('button');
-      syncAgainBtn.className = 'sact wh'; syncAgainBtn.textContent = '🔄 Sync ใหม่';
-      syncAgainBtn.onclick = runSync;
-      var closeBtn = document.createElement('button');
-      closeBtn.className = 'sact gh'; closeBtn.textContent = '✕';
-      closeBtn.onclick = function() { ge('sbar').classList.add('hidden'); };
-      ge('sbar-acts').appendChild(syncAgainBtn);
-      ge('sbar-acts').appendChild(closeBtn);
-      // แสดง unmatched list
-      if (unmatched.length) {
-        setTimeout(function() {
-          var pill = document.getElementById('pill-unmatched');
-          if (pill) pill.onclick = function() { showUnmatched(unmatched, matched, LICENSES.length); };
-        }, 100);
-      }
-      lss(URL_BACKUP_KEY, urlMap);  // auto-backup หลัง sync
-      flashMsg('🔗 PDF '+matched+' ใบพร้อมแล้ว!');
-    } catch(e) {
-      setBar('err', '❌ เชื่อมต่อไม่ได้', e.message, null);
-      var retryBtn = document.createElement('button');
-      retryBtn.className = 'sact wh'; retryBtn.textContent = 'ลองใหม่';
-      retryBtn.onclick = runSync;
-      var setupBtn = document.createElement('button');
-      setupBtn.className = 'sact wh'; setupBtn.textContent = '⚙️ ตั้งค่า';
-      setupBtn.onclick = function() { ge('wizard').classList.remove('gone'); goTab(2); };
-      ge('sbar-acts').appendChild(retryBtn);
-      ge('sbar-acts').appendChild(setupBtn);
-    }
-  }
-
-  // ── EXCEL ──
-  ge('btn-open-ex').onclick = function() { if (!isAdmin) { ge('btn-role-switch').click(); return; } ge('modal-ex').classList.remove('hidden'); };
-  ge('btn-close-ex').onclick = closeEx;
-  ge('btn-cancel-ex').onclick = closeEx;
-  ge('btn-mrg').onclick = applyMerge;
-  ge('ex-dz').onclick = function() { ge('ex-fi').click(); };
-  ge('ex-dz').ondragover = function(e) { e.preventDefault(); ge('ex-dz').classList.add('drag'); };
-  ge('ex-dz').ondragleave = function() { ge('ex-dz').classList.remove('drag'); };
-  ge('ex-dz').ondrop = function(e) { e.preventDefault(); ge('ex-dz').classList.remove('drag'); readExcel(e.dataTransfer.files[0]); };
-  ge('ex-fi').onchange = function() { readExcel(this.files[0]); };
-
-  function closeEx() {
-    ge('modal-ex').classList.add('hidden');
-    ge('ex-drop').style.display = '';
-    ge('ex-prev').style.display = 'none';
-    ge('btn-mrg').style.display = 'none';
-    pendingMerge = null;
-  }
-  function readExcel(file) {
-    if (!file) return;
-    var reader = new FileReader();
-    reader.onload = function(e) {
-      try { showMergePreview(parseExcel(XLSX.read(e.target.result, {type:'array'}))); }
-      catch(ex) { alert('อ่านไฟล์ไม่ได้: ' + ex.message); }
-    };
-    reader.readAsArrayBuffer(file);
-  }
-  function parseExcel(wb) {
-    var sn = wb.SheetNames.includes('NEWCODE') ? 'NEWCODE' : wb.SheetNames[0];
-    var rows = XLSX.utils.sheet_to_json(wb.Sheets[sn], {header:1, defval:''});
-    var map = {};
-    for (var i = 1; i < rows.length; i++) {
-      var r = rows[i];
-      var k = String(r[0]||'').trim();
-      if (!k || k === 'undefined' || k.toLowerCase() === 'none') continue;
-      var cat = String(r[3]||'').trim(); if (cat.toLowerCase().startsWith('none')) cat = '';
-      var mfr = String(r[6]||'').trim(), country = String(r[7]||'').trim();
-      var expRaw = r[10], expIso = '';
-      if (expRaw) {
-        if (typeof expRaw === 'number') {
-          var dd = XLSX.SSF.parse_date_code(expRaw);
-          var y = dd.y; if (y > 2400) y -= 543;
-          expIso = y+'-'+String(dd.m).padStart(2,'0')+'-'+String(dd.d).padStart(2,'0');
-        } else {
-          var m2x = String(expRaw).match(/(\d{4})-(\d{2})-(\d{2})/);
-          if (m2x) { var y2 = +m2x[1]; if (y2 > 2400) y2 -= 543; expIso = y2+'-'+m2x[2]+'-'+m2x[3]; }
-        }
-      }
-      if (!map[k]) map[k] = {k:k, m:mfr, c:country, e:expIso, n:0, prods:[]};
-      map[k].m = mfr; map[k].c = country; if (expIso) map[k].e = expIso;
-      map[k].prods.push([cat, String(r[4]||''), String(r[5]||''), String(r[8]||''), String(r[9]||'')]);
-    }
-    return Object.values(map).map(function(l) { return Object.assign({},l,{n:l.prods.length}); });
-  }
-  function showMergePreview(nd) {
-    if (!nd.length) { alert('ไม่พบข้อมูล'); return; }
-    var om = {}; LICENSES.forEach(function(l) { om[l.k] = l; });
-    var nm = {}; nd.forEach(function(l) { nm[l.k] = l; });
-    var adds=[], upds=[], dels=[];
-    nd.forEach(function(l) { if (!om[l.k]) adds.push(l); else if (om[l.k].e!==l.e||om[l.k].m!==l.m) upds.push(l); });
-    LICENSES.forEach(function(l) { if (!nm[l.k]) dels.push(l); });
-    ge('mp-a').textContent = adds.length; ge('mp-u').textContent = upds.length;
-    ge('mp-d').textContent = dels.length;
-    ge('mp-k').textContent = Object.keys(urlMap).filter(function(k) { return nm[k]; }).length;
-    var items = adds.map(function(l) { return '<div class="mi"><span class="mit a">+ ใหม่</span><span class="mono">'+l.k+'</span> — '+l.m+'</div>'; })
-      .concat(upds.map(function(l) {
-          var old = om[l.k];
-          var dateChange = (old && old.e !== l.e) ? ' <span style="color:#64748b;font-size:11px">'+thD(old.e)+' → '+thD(l.e)+'</span>' : '';
-          return '<div class="mi"><span class="mit u">↻ อัพเดท</span><span class="mono">'+l.k+'</span> — '+l.m+dateChange+'</div>';
-        }))
-      .concat(dels.map(function(l) { return '<div class="mi"><span class="mit d">✕ ลบ</span><span class="mono">'+l.k+'</span> — '+l.m+'</div>'; }));
-    ge('mlist').innerHTML = items.length ? items.join('') : '<div class="mi" style="color:var(--mut)">ข้อมูลเหมือนเดิม ✓</div>';
-    ge('ex-drop').style.display = 'none';
-    ge('ex-prev').style.display = '';
-    ge('btn-mrg').style.display = '';
-    pendingMerge = nd;
-  }
-  function applyMerge() {
-    if (!isAdmin) { ge('btn-role-switch').click(); return; }
-    // Smart merge: อัพเดทเฉพาะที่เปลี่ยน ไม่ลบใบเดิม ไม่ทับทั้งหมด
-    var om = {}; LICENSES.forEach(function(l) { om[l.k] = l; });
-    var added = 0, updated = 0, skipped = 0;
-    var changedLics = [];  // เก็บเฉพาะที่ added หรือ updated
-    pendingMerge.forEach(function(newL) {
-      var old = om[newL.k];
-      if (!old) {
-        // ใหม่ — เพิ่มเลย
-        LICENSES.push(newL); added++;
-        changedLics.push(newL);
-      } else {
-        // ซ้ำ — อัพเดทเฉพาะ field ที่เปลี่ยน
-        var changed = false;
-        if (newL.e && newL.e !== old.e) { old.e = newL.e; changed = true; }
-        if (newL.m && newL.m !== old.m) { old.m = newL.m; changed = true; }
-        if (newL.c && newL.c !== old.c) { old.c = newL.c; changed = true; }
-        if (newL.n && newL.n !== old.n) { old.n = newL.n; changed = true; }
-        if (newL.cat && newL.cat !== old.cat) { old.cat = newL.cat; changed = true; }
-        if (newL.prods && newL.prods.length) { old.prods = newL.prods; changed = true; }
-        if (changed) { updated++; changedLics.push(old); } else skipped++;
-      }
-    });
-    // บันทึกเฉพาะใบที่เปลี่ยนแปลง (added + updated) ลง Sheets
-    var tok = SESSION_TOKEN || localStorage.getItem('fda_token') || '';
-    if (tok && changedLics.length > 0) {
-      flashMsg('⏳ กำลังบันทึก ' + changedLics.length + ' ใบที่เปลี่ยนแปลง...');
-      (function sendChanged(lics, batchNum) {
-        var CHUNK = 30;
-        var chunk = lics.slice(0, CHUNK);
-        var rest  = lics.slice(CHUNK);
-        fetch(gasUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain' },
-          body: JSON.stringify({ action: 'upsertLicenses', token: tok, licenses: chunk })
-        }).then(function(r){ return r.json(); })
-          .then(function(d){
-            if (!d.success) { flashMsg('❌ บันทึกไม่ได้: ' + (d.error||'?')); return; }
-            if (rest.length > 0) {
-              setTimeout(function(){ sendChanged(rest, batchNum + 1); }, 200);
-            } else {
-              flashMsg('✅ อัพเดท ' + changedLics.length + ' ใบ (เพิ่ม: ' + added + ', แก้: ' + updated + ')');
-            }
-          }).catch(function(e){ flashMsg('❌ ' + e.message); });
-      })(changedLics, 1);
-    } else if (tok && changedLics.length === 0) {
-      flashMsg('✅ ข้อมูลเหมือนเดิมทั้งหมด ไม่มีการเปลี่ยนแปลง');
-    } else {
-      flashMsg('⚠️ Merge สำเร็จ แต่ไม่พบ token — กรุณา Login ใหม่');
-    }
-    closeEx(); buildDash(); renderLic();
-  }
-
-  // ── DASHBOARD ──
-  function buildDash() {
-    var all = LICENSES.map(getLic);
-    var u = all.filter(function(l) { return l.u==='urgent'; });
-    var w = all.filter(function(l) { return l.u==='warn'; });
-    var tp = LICENSES.reduce(function(s,l) { return s+l.n; }, 0);
-    ge('s-urg').textContent = u.length; ge('s-wrn').textContent = w.length;
-    ge('s-ok').textContent = all.filter(function(l) { return l.u==='ok'; }).length;
-    ge('s-tot').textContent = all.length;
-    ge('s-prds').textContent = tp.toLocaleString()+' รายการสินค้า';
-    ge('tab-cnt').textContent = all.length;
-    var ul = u.concat(w).sort(function(a,b) { return (a.d||0)-(b.d||0); }).slice(0,10);
-    ge('d-urg').innerHTML = ul.length ? ul.map(function(l) {
-      var pdf = l.url ? '<button class="pdfbtn has pdf-open-btn" data-url="' + l.url + '" data-name="' + (l.m||'').replace(/"/g,'') + ' - ' + l.k + '">📄 PDF</button>'
-        : '';
-      return '<div class="tli"><div class="tdot '+l.u+'"></div>'
-        +'<div class="tinfo"><div class="tlic">'+l.k+'</div><div class="tmfr">'+l.m+'</div></div>'
-        +'<span class="tdays '+l.u+'">'+(l.d<0?'หมดอายุ':'เหลือ '+l.d+' วัน')+'</span>'+pdf+'</div>';
-    }).join('') : '<div class="empty"><div class="ei">✅</div>ไม่มีด่วน</div>';
-    var mM = {}; LICENSES.forEach(function(l) { if (!mM[l.m]) mM[l.m]=0; mM[l.m]+=l.n; });
-    var mT = Object.entries(mM).sort(function(a,b) { return b[1]-a[1]; }).slice(0,10);
-    var maxM = mT.length ? mT[0][1] : 1;
-    ge('d-mfr').innerHTML = mT.map(function(e) {
-      return '<div class="br"><div class="blbl" title="'+e[0]+'">'+(e[0].length>18?e[0].slice(0,18)+'…':e[0])+'</div>'
-        +'<div class="btrk"><div class="bfil" style="width:'+Math.round(e[1]/maxM*100)+'%"></div></div>'
-        +'<div class="bval">'+e[1]+'</div></div>';
-    }).join('');
-    var yM = {}; LICENSES.forEach(function(l) {
-      if (!l.e || l.e === '' || l.e === 'undefined') return;  // ข้ามถ้าไม่มีวันหมดอายุ
-      var yr = parseInt(l.e.slice(0,4));
-      if (isNaN(yr)) return;  // ข้าม NaN
-      var y = String(yr + 543);
-      if (!yM[y]) yM[y] = 0; yM[y]++;
-    });
-    var yA = Object.entries(yM).sort(function(a,b) { return a[0].localeCompare(b[0]); });
-    var maxY = Math.max.apply(null, yA.map(function(e) { return e[1]; }));
-    var nowY = String(new Date().getFullYear()+543);
-    ge('d-yr').innerHTML = yA.map(function(e) {
-      return '<div class="br"><div class="blbl">'+e[0]+'</div>'
-        +'<div class="btrk"><div class="bfil" style="width:'+Math.round(e[1]/maxY*100)+'%;'
-        +(e[0]===nowY?'background:linear-gradient(90deg,#dc2626,#f87171)':'')+'"></div></div>'
-        +'<div class="bval">'+e[1]+'</div></div>';
-    }).join('');
-  }
-
-  // ── LICENSE LIST ──
-  var curF = 'all', openId = null;
-  ge('lsrch').oninput = renderLic;
-  ge('lsort').onchange = renderLic;
-  ge('ntab-dash').onclick = function() { showPage('dash'); };
-  ge('ntab-lic').onclick = function() { showPage('lic'); };
-
-  document.querySelectorAll('.fb[data-f]').forEach(function(btn) {
-    btn.onclick = function() {
-      curF = this.dataset.f;
-      document.querySelectorAll('.fb').forEach(function(b) { b.classList.remove('on'); });
-      this.classList.add('on');
-      renderLic();
-    };
-  });
-
-  function renderLic() {
-    var q = ge('lsrch').value.toLowerCase();
-    var sort = ge('lsort').value;
-    var list = LICENSES.map(getLic).filter(function(l) {
-      if (curF !== 'all' && l.u !== curF) return false;
-      if (q) return l.k.toLowerCase().includes(q) || l.m.toLowerCase().includes(q) || l.c.toLowerCase().includes(q);
-      return true;
-    });
-    if (sort==='exp') list.sort(function(a,b) { return (a.d!=null?a.d:99999)-(b.d!=null?b.d:99999); });
-    else if (sort==='lic') list.sort(function(a,b) { return a.k.localeCompare(b.k); });
-    else if (sort==='mfr') list.sort(function(a,b) { return a.m.localeCompare(b.m); });
-    else if (sort==='cnt') list.sort(function(a,b) { return b.n-a.n; });
-    ge('linfo').textContent = 'แสดง '+list.length+' จาก '+LICENSES.length+' ใบ';
-    var c = ge('ll');
-    if (!list.length) { c.innerHTML='<div class="empty"><div class="ei">🔍</div><h3>ไม่พบข้อมูล</h3></div>'; return; }
-    c.innerHTML = list.map(rowHTML).join('');
-    // attach events via delegation (no inline onclick needed)
-    c.querySelectorAll('.rhdr').forEach(function(el) {
-      el.onclick = function() { toggleRow(this.closest('.row').dataset.key); };
-    });
-    c.querySelectorAll('.editbtn').forEach(function(el) {
-      el.onclick = function(e) { e.stopPropagation(); openUrlEdit(this.closest('.row').dataset.key); };
-    });
-    c.querySelectorAll('.pdfbtn').forEach(function(el) {
-      el.onclick = function(e) { e.stopPropagation(); };
-    });
-  }
-
-  function rowHTML(l) {
-    var sid = l.k.replace(/[^a-z0-9]/gi,'_'), isOpen = (openId===l.k);
-    var dTxt = !l.e ? '-' : (l.d < 0 ? 'หมดอายุแล้ว' : 'เหลือ '+l.d+' วัน');
-    var pdfBtn = l.url
-      ? '<button class="pdfbtn has pdf-open-btn" data-url="'+l.url+'" data-name="'+(l.m||'').replace(/"/g,'')+' - '+l.k+'">📄 PDF</button>'
-      : '';  // ไม่มี PDF — ไม่แสดงปุ่มเลย (Viewer ไม่เห็น Drive folder)
-    return '<div class="row '+l.u+(isOpen?' open':'')+'" id="row_'+sid+'" data-key="'+l.k.replace(/"/g,'&quot;')+'">'
-      +'<div class="rhdr">'
-      +'<div class="udot"></div><div class="rno">'+l.k+'</div>'
-      +'<div class="ri"><div class="rmfr">'+l.m+'</div><div class="rcnt">🌐 '+l.c+'</div></div>'
-      +'<div class="rmeta">'
-      +'<div class="edate"><div class="d">'+thD(l.e)+'</div><div class="l">หมดอายุ</div></div>'
-      +'<span class="dpill">'+dTxt+'</span><span class="ppill">📦 '+l.n+'</span>'
-      +pdfBtn
-      +'<button class="editbtn" data-action="edit-url" data-admin-only>✏️ URL</button>'
-      +'<button class="editbtn" style="background:#fef9c3;border-color:#fde68a;color:#854d0e" data-action="edit-date" data-admin-only>📅 วันหมดอายุ</button>'
-      +'<span class="expi">▼</span>'
-      +'</div></div>'
-      +'<div class="rpanel">'+(isOpen?panelHTML(l):'')+'</div>'
-      +'</div>';
-  }
-
-  function panelHTML(l) {
-    var key = l.k, sid = key.replace(/[^a-z0-9]/gi,'_');
-    if (!checks[key]) checks[key] = new Array(DOCS.length).fill(false);
-    var ch = checks[key], done = ch.filter(Boolean).length;
-    var prods = l.prods || [];
-    var docHTML = DOCS.map(function(d,i) {
-      return '<li class="chki'+(ch[i]?' done':'')+'"><input type="checkbox" data-k="'+key.replace(/"/g,'&quot;')+'" data-i="'+i+'"'+(ch[i]?' checked':'')+'><label>'+d+'</label></li>';
-    }).join('');
-    var prodRows = prods.map(function(p) {
-      return '<tr><td class="mono">'+(p[0]||'-')+'</td><td>'+p[1]+'</td><td>'+p[2]+'</td>'
-        +'<td style="color:var(--mut);font-size:11px">'+p[3]+'</td>'
-        +'<td class="mono" style="font-size:9px">'+p[4]+'</td></tr>';
-    }).join('');
-    var linked = !!l.url;
-    return '<div class="pb">'
-      +'<div class="istrip">'
-      +'<div class="ic"><div class="icl">เลขใบอนุญาต</div><div class="icv mono">'+key+'</div></div>'
-      +'<div class="ic"><div class="icl">ผู้ผลิต</div><div class="icv" style="font-size:11px">'+l.m+'</div></div>'
-      +'<div class="ic"><div class="icl">ประเทศ</div><div class="icv" style="font-size:12px">'+l.c+'</div></div>'
-      +'<div class="ic"><div class="icl">วันหมดอายุ</div><div class="icv">'+thD(l.e)+'</div></div>'
-      +'<div class="ic"><div class="icl">กำหนดยื่น</div><div class="icv">'+fmtD(addD(l.e,-90))+'</div></div>'
-      +'<div class="ic"><div class="icl">สินค้า</div><div class="icv">'+prods.length+' รายการ</div></div>'
-      +'</div>'
-      +'<div class="url-box" id="ueb_'+sid+'" data-admin-only>'
-      +'<div class="url-lbl">🔗 ลิงก์ PDF <span class="url-badge '+(linked?'linked':'unlinked')+'">'+(linked?'✅ มีลิงก์':'⚠️ ยังไม่มีลิงก์')+'</span></div>'
-      +'<input class="url-inp" id="ui_'+sid+'" value="'+(l.url||'')+'" placeholder="https://drive.google.com/file/d/.../view">'
-      +'<div class="url-acts" id="uact_'+sid+'">'
-      +'<button class="ubtn save" data-save="'+key.replace(/"/g,'&quot;')+'" data-admin-only>💾 บันทึก</button>'
-      +(l.url ? '<button class="ubtn open pdf-open-btn" data-url="'+l.url+'" data-name="'+(l.m||'').replace(/"/g,'')+' - '+l.k+'">📄 เปิด PDF</button>'
-        : '<button class="ubtn" style="background:#1565c0;color:#fff" id="sync-from-panel">🔄 Sync Drive</button>')
-      +'</div></div>'
-      +'<div class="p2c">'
-      +'<div class="chkbox"><div class="chktit">☑️ เอกสารที่ต้องเตรียม</div><ul class="chklist">'+docHTML+'</ul>'
-      +'<div class="chkprog"><span id="cp'+sid+'">'+done+'/'+DOCS.length+' เสร็จ</span>'
-      +'<div class="pgbar"><div class="pgfil" id="pf'+sid+'" style="width:'+Math.round(done/DOCS.length*100)+'%"></div></div></div>'
-      +'</div>'
-      +'<div class="tlbox"><div class="chktit">📅 ขั้นตอนต่ออายุ</div>'
-      +'<div class="tlst"><span class="tlsl">90 วันก่อน</span><span class="tlsv">เตรียมเอกสาร ติดต่อผู้ผลิต</span></div>'
-      +'<div class="tlst"><span class="tlsl">60 วันก่อน</span><span class="tlsv">ยื่นคำขอต่ออายุ อย.</span></div>'
-      +'<div class="tlst"><span class="tlsl">30 วันก่อน</span><span class="tlsv">ติดตามผลการพิจารณา</span></div>'
-      +'<div class="tlst"><span class="tlsl">หมดอายุ</span><span class="tlsv">'+thD(l.e)+'</span></div>'
-      +'</div></div>'
-      +'<div class="prdhdr"><div class="prdtit">📦 สินค้า ('+prods.length+' รายการ)</div>'
-      +'<input class="psi" id="psrch_'+sid+'" placeholder="ค้นหาสินค้า..."></div>'
-      +'<div class="tblw"><table class="ptbl" id="pt'+sid+'"><thead><tr>'
-      +'<th>รหัส</th><th>ชื่อทางการค้า</th><th>ชื่อผลิตภัณฑ์</th><th>รายละเอียด</th><th>U-Number</th>'
-      +'</tr></thead><tbody>'+prodRows+'</tbody></table></div>'
-      +'<div class="pact">'
-      +(l.url?'<button class="btn btnp pdf-open-btn" style="background:#1b5e20" data-url="'+l.url+'" data-name="'+(l.m||'').replace(/"/g,'')+' - '+l.k+'">📄 เปิด PDF</button>'
-        :'')
-      +'<button class="btn btnc" data-close="'+key.replace(/"/g,'&quot;')+'">✕ ปิด</button>'
-      +'</div></div>';
-  }
-
-  // Event delegation for panel elements
-  document.getElementById('ll').addEventListener('click', function(e) {
-    // guard admin-only actions
-    var adminEl = e.target.closest('[data-admin-only]');
-    if (adminEl && !isAdmin) { e.stopPropagation(); ge('btn-role-switch').click(); return; }
-    var saveBtn = e.target.closest('[data-save]');
-    if (saveBtn) { saveUrl(saveBtn.dataset.save); return; }
-    var closeBtn = e.target.closest('[data-close]');
-    if (closeBtn) { toggleRow(closeBtn.dataset.close); return; }
-    var syncBtn = e.target.closest('#sync-from-panel');
-    if (syncBtn) { ge('btn-sync').click(); return; }
-    var editDateBtn = e.target.closest('[data-action="edit-date"]');
-    if (editDateBtn) { e.stopPropagation(); openEditDate(editDateBtn.closest('.row').dataset.key); return; }
-    var editUrlBtn = e.target.closest('[data-action="edit-url"]');
-    if (editUrlBtn) { e.stopPropagation(); openUrlEdit(editUrlBtn.closest('.row').dataset.key); return; }
-  });
-
-  document.getElementById('ll').addEventListener('input', function(e) {
-    if (e.target.classList.contains('psi')) {
-      var sid = e.target.id.replace('psrch_','');
-      var q = e.target.value.toLowerCase();
-      document.querySelectorAll('#pt'+sid+' tbody tr').forEach(function(r) {
-        var txt = Array.from(r.cells).map(function(c) { return c.textContent; }).join(' ').toLowerCase();
-        r.style.display = txt.includes(q) ? '' : 'none';
-      });
-    }
-  });
-
-  document.addEventListener('change', function(e) {
-    var cb = e.target;
-    if (!cb.dataset.k) return;
-    var key = cb.dataset.k, i = parseInt(cb.dataset.i);
-    if (!checks[key]) checks[key] = new Array(DOCS.length).fill(false);
-    checks[key][i] = cb.checked;
-    cb.closest('.chki').classList.toggle('done', cb.checked);
-    var sid = key.replace(/[^a-z0-9]/gi,'_'), done = checks[key].filter(Boolean).length;
-    var pf = ge('pf'+sid), cp = ge('cp'+sid);
-    if (pf) pf.style.width = Math.round(done/DOCS.length*100)+'%';
-    if (cp) cp.textContent = done+'/'+DOCS.length+' เสร็จ';
-    lss(CK, checks);
-  });
-
-  function saveUrl(key) {
-    var sid = key.replace(/[^a-z0-9]/gi,'_');
-    var inp = ge('ui_'+sid);
-    if (!inp) return;
-    var url = inp.value.trim();
-    urlMap[key] = {url: url, dt: 'pdf'};
-    lss(UK, urlMap);
-    flashMsg();
-    var raw = LICENSES.find(function(r) { return r.k===key; });
-    var row = ge('row_'+sid);
-    if (raw && row && row.classList.contains('open')) {
-      row.querySelector('.rpanel').innerHTML = panelHTML(getLic(raw));
-    }
-  }
-
-  function openUrlEdit(key) {
-    var sid = key.replace(/[^a-z0-9]/gi,'_');
-    var row = ge('row_'+sid);
-    if (!row) return;
-    if (!row.classList.contains('open')) {
-      toggleRow(key);
-      setTimeout(function() { var el=ge('ueb_'+sid); if(el) el.scrollIntoView({behavior:'smooth',block:'center'}); }, 150);
-    } else {
-      var el = ge('ueb_'+sid);
-      if (el) el.scrollIntoView({behavior:'smooth',block:'center'});
-    }
-  }
-
-  function toggleRow(key) {
-    var sid = key.replace(/[^a-z0-9]/gi,'_');
-    var row = ge('row_'+sid);
-    if (!row) return;
-    if (openId === key) {
-      openId = null;
-      row.classList.remove('open');
-      row.querySelector('.rpanel').innerHTML = '';
-    } else {
-      if (openId) {
-        var p = ge('row_'+openId.replace(/[^a-z0-9]/gi,'_'));
-        if (p) { p.classList.remove('open'); p.querySelector('.rpanel').innerHTML = ''; }
-      }
-      openId = key;
-      row.classList.add('open');
-      var raw = LICENSES.find(function(r) { return r.k===key; });
-      if (raw) {
-        // แสดงก่อนด้วยข้อมูลที่มี
-        row.querySelector('.rpanel').innerHTML = panelHTML(getLic(raw));
-        // lazy load prods ถ้ายังไม่มี
-        if (!raw.prods || raw.prods.length === 0) {
-          var tok = SESSION_TOKEN || localStorage.getItem('fda_token') || '';
-          if (tok) {
-            fetch(gasUrl + '?action=getProds&token=' + encodeURIComponent(tok) + '&key=' + encodeURIComponent(key))
-              .then(function(r) { return r.json(); })
-              .then(function(d) {
-                if (d.prods && d.prods.length > 0) {
-                  raw.prods = d.prods;
-                  // re-render panel ถ้ายังเปิดอยู่
-                  if (openId === key) {
-                    row.querySelector('.rpanel').innerHTML = panelHTML(getLic(raw));
-                  }
-                }
-              }).catch(function() {});
-          }
-        }
-      }
-      setTimeout(function() { row.scrollIntoView({behavior:'smooth',block:'nearest'}); }, 50);
-    }
-  }
-
-  function showPage(id) {
-    document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
-    document.querySelectorAll('.ntab').forEach(function(t) { t.classList.remove('active'); });
-    ge('page-'+id).classList.add('active');
-    ge('ntab-'+id).classList.add('active');
-    if (id==='lic') renderLic();
-  }
-
-  // ── URL EXPORT / IMPORT ──
-  var URL_BACKUP_KEY = 'fda_url_backup_v1';
-
-  // Auto-detect: ตรวจว่ามี backup ใน localStorage ไหม
-  function checkUrlBackup() {
-    // ตรวจ localStorage ทุก key ที่น่าจะเป็น urlMap
-    var backupKeys = ['fda_url_v8','fda_url_v7','fda_url_v6','fda_url_v5','fda_url_backup_v1'];
-    var bestMap = null, bestCount = 0;
-    backupKeys.forEach(function(k) {
-      try {
-        var m = JSON.parse(localStorage.getItem(k));
-        if (m && typeof m === 'object') {
-          var cnt = Object.keys(m).filter(function(key) { return m[key] && m[key].url; }).length;
-          if (cnt > bestCount) { bestCount = cnt; bestMap = m; }
-        }
-      } catch(e) {}
-    });
-    if (bestMap && bestCount > 0 && Object.keys(urlMap).filter(function(k){ return urlMap[k]&&urlMap[k].url; }).length === 0) {
-      ge('restore-txt').textContent = '🔗 พบ URL สำรอง ' + bestCount + ' ใบในเบราว์เซอร์นี้ — โหลดกลับมาไหม?';
-      ge('restore-bar').classList.remove('hidden');
-      ge('btn-restore-yes').onclick = function() {
-        urlMap = bestMap;
-        lss(UK, urlMap);
-        ge('restore-bar').classList.add('hidden');
-        buildDash(); renderLic();
-        flashMsg('✅ โหลด URL กลับมา ' + bestCount + ' ใบแล้ว!');
-      };
-      ge('btn-restore-no').onclick = function() { ge('restore-bar').classList.add('hidden'); };
-    }
-  }
-
-  
-
-  function importUrls(file) {
-    if (!file) return;
-    var reader = new FileReader();
-    reader.onload = function(e) {
-      try {
-        var data = JSON.parse(e.target.result);
-        var map = data.urls || data;
-        var cnt = Object.keys(map).filter(function(k) { return map[k] && map[k].url; }).length;
-        if (!cnt) { alert('ไม่พบ URL ในไฟล์นี้'); return; }
-        urlMap = Object.assign({}, urlMap, map);
-        lss(UK, urlMap);
-        lss(URL_BACKUP_KEY, urlMap);
-        buildDash(); renderLic();
-        flashMsg('📥 Import URLs ' + cnt + ' ใบสำเร็จ!');
-      } catch(ex) { alert('อ่านไฟล์ไม่ได้: ' + ex.message); }
-    };
-    reader.readAsText(file);
-  }
-
-  // btn-import-url removed
-  var urlFiEl = ge('url-fi'); if (urlFiEl) urlFiEl.onchange = function() { importUrls(this.files[0]); this.value=''; };
-
-  // Auto-save urlMap ทุกครั้งที่ sync
-  var _origRunSync = runSync;
-
-  // ── ROLE SYSTEM ──
-  var ADMIN_PW_KEY = 'fda_admin_pw';
-  var ROLE_KEY = 'fda_role_session';
-  var DEFAULT_PW = 'admin1234';
-  var isAdmin = false;
-
-  function setRole(admin) {
-    isAdmin = admin;
-    var bar = ge('role-bar'), badge = ge('role-badge'), txt = ge('role-txt'), sw = ge('btn-role-switch');
-    if (admin) {
-      bar.className = 'role-bar admin';
-      badge.className = 'role-badge admin'; badge.textContent = '⚡ ADMIN';
-      txt.textContent = 'โหมดผู้ดูแล — สามารถแก้ไข Import และจัดการข้อมูลได้';
-      sw.textContent = '🔓 ออกจากระบบ Admin';
-      document.body.classList.remove('viewer-mode');
-    } else {
-      bar.className = 'role-bar viewer';
-      badge.className = 'role-badge viewer'; badge.textContent = '👁 VIEWER';
-      txt.textContent = 'โหมดดูอย่างเดียว — กดปุ่ม "เข้าสู่ระบบ Admin" เพื่อแก้ไขข้อมูล';
-      sw.textContent = '🔐 เข้าสู่ระบบ Admin';
-      document.body.classList.add('viewer-mode');
-    }
-  }
-  setRole(false);  // เริ่มต้นเป็น viewer เสมอ
-
-  ge('btn-role-switch').onclick = function() {
-    if (isAdmin) { setRole(false); flashMsg('👁 ออกจาก Admin แล้ว'); return; }
-    ge('pw-inp').value = ''; ge('pw-err').style.display = 'none';
-    ge('modal-pw').classList.remove('hidden');
-    setTimeout(function(){ ge('pw-inp').focus(); }, 100);
-  };
-  ge('btn-close-pw').onclick = ge('btn-pw-cancel').onclick = function() { ge('modal-pw').classList.add('hidden'); };
-  ge('btn-pw-ok').onclick = function() {
-    var pw = ge('pw-inp').value;
-    var stored = localStorage.getItem(ADMIN_PW_KEY) || DEFAULT_PW;
-    if (pw === stored) {
-      ge('modal-pw').classList.add('hidden');
-      setRole(true); flashMsg('⚡ เข้าสู่โหมด Admin แล้ว');
-    } else {
-      ge('pw-err').style.display = ''; ge('pw-inp').value = ''; ge('pw-inp').focus();
-    }
-  };
-  ge('pw-inp').onkeydown = function(e) { if(e.key==='Enter') ge('btn-pw-ok').click(); };
-
-  // ── EDIT DATE ──
-  var editingKey = null;
-  function openEditDate(key) {
-    if (!isAdmin) { ge('btn-role-switch').click(); return; }
-    var lic = LICENSES.find(function(l){ return l.k===key; });
-    if (!lic) return;
-    editingKey = key;
-    ge('edit-lic-label').textContent = 'เลขใบอนุญาต: ' + key;
-    ge('edit-mfr').textContent = lic.m + ' (' + lic.c + ')';
-    ge('edit-cur-date').textContent = 'ปัจจุบัน: ' + thD(lic.e) + (lic.e ? ' (ค.ศ. '+lic.e+')' : ' — ไม่มีข้อมูล');
-    ge('edit-date-inp').value = lic.e || '';
-    ge('modal-edit').classList.remove('hidden');
-    setTimeout(function(){ ge('edit-date-inp').focus(); }, 100);
-  }
-  ge('btn-close-edit').onclick = ge('btn-edit-cancel').onclick = function() { ge('modal-edit').classList.add('hidden'); editingKey=null; };
-  ge('btn-edit-save').onclick = function() {
-    if (!editingKey) return;
-    var newDate = ge('edit-date-inp').value;
-    if (!newDate) { alert('กรุณาเลือกวันที่'); return; }
-    var lic = LICENSES.find(function(l){ return l.k===editingKey; });
-    if (!lic) return;
-    var oldDate = lic.e;
-    lic.e = newDate;
-    lss(LK, LICENSES);
-    ge('modal-edit').classList.add('hidden');
-    editingKey = null;
-    buildDash(); renderLic();
-    flashMsg('📅 แก้วันหมดอายุ '+thD(oldDate)+' → '+thD(newDate)+' แล้ว!');
-  };
-
-  // ── UPLOAD PDF TO DRIVE ──
-  var uploadFiles = [];
-  ge('btn-open-upload').onclick = function() {
-    if (!isAdmin) { ge('btn-role-switch').click(); return; }
-    if (!gasUrl) { ge('wizard').classList.remove('gone'); goTab(0); return; }
-    uploadFiles = []; ge('upload-list').innerHTML = '';
-    ge('btn-upload-start').style.display = 'none';
-    ge('modal-upload').classList.remove('hidden');
-  };
-  ge('btn-close-upload').onclick = ge('btn-upload-cancel').onclick = function() { ge('modal-upload').classList.add('hidden'); };
-  ge('upload-dz').onclick = function() { ge('upload-fi').click(); };
-  ge('upload-dz').ondragover = function(e) { e.preventDefault(); ge('upload-dz').classList.add('drag'); };
-  ge('upload-dz').ondragleave = function() { ge('upload-dz').classList.remove('drag'); };
-  ge('upload-dz').ondrop = function(e) { e.preventDefault(); ge('upload-dz').classList.remove('drag'); addUploadFiles(e.dataTransfer.files); };
-  ge('upload-fi').onchange = function() { addUploadFiles(this.files); this.value=''; };
-
-  function extractKeyFromName(fname) {
-    var name = fname.replace(/\.pdf$/i,'');
-    var m1 = name.match(/(\d{2}-\d{1,2}-\d{1,2}-\d{1,2}-\d{5,7})/);
-    if (m1) {
-      var parts = m1[1].split('-'); parts[parts.length-1] = parts[parts.length-1].padStart(7,'0');
-      return parts.join('-');
-    }
-    var m2 = name.match(/\b(\d{7})\b/); return m2 ? m2[1] : '';
-  }
-
-  function addUploadFiles(fileList) {
-    var licSet = {}; LICENSES.forEach(function(l){ licSet[l.k]=true; });
-    Array.from(fileList).forEach(function(f) {
-      if (!f.name.toLowerCase().endsWith('.pdf')) return;
-      var key = extractKeyFromName(f.name);
-      var matched = key && licSet[key];
-      uploadFiles.push({ file: f, key: key, matched: matched, status: 'pending' });
-    });
-    renderUploadList();
-    ge('btn-upload-start').style.display = uploadFiles.length ? '' : 'none';
-  }
-
-  function renderUploadList() {
-    ge('upload-list').innerHTML = uploadFiles.map(function(item, i) {
-      var statusMap = { pending: 'รอ', uploading: 'กำลังส่ง...', wait: 'ส่งแล้ว ⏳', done: 'สำเร็จ ✅', err: 'ผิดพลาด ❌' };
-      var matchTxt = item.key ? ('🔗 '+item.key+(item.matched?' ✅':' ⚠️ ไม่พบในระบบ')) : '⚠️ หาเลขใบอนุญาตไม่เจอ';
-      return '<div class="upload-item" id="uitem_'+i+'">'
-        +'<span>📄</span><div class="ui-name" title="'+item.file.name+'">'+item.file.name+'</div>'
-        +'<div style="font-size:10px;color:var(--teal);flex-shrink:0">'+matchTxt+'</div>'
-        +'<span class="ui-status '+item.status+'">'+statusMap[item.status]+'</span>'
-        +'</div>';
-    }).join('');
-  }
-
-  ge('btn-upload-start').onclick = async function() {
-    if (!gasUrl) return;
-    var btn = ge('btn-upload-start');
-    btn.disabled = true;
-    var successCount = 0;
-
-    for (var i = 0; i < uploadFiles.length; i++) {
-      var item = uploadFiles[i];
-      if (item.status === 'done') continue;
-      item.status = 'uploading'; renderUploadList();
-      try {
-        var b64 = await fileToBase64(item.file);
-        var payload = JSON.stringify({
-          action: 'upload',
-          filename: item.file.name,
-          data: b64,
-          mimeType: 'application/pdf'
-        });
-        // ส่งแบบ text/plain = simple request ไม่มี preflight
-        var resp = await fetch(gasUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain' },
-          body: payload
-        });
-        var result = await resp.json();
-        if (result.error) throw new Error(result.error);
-        item.status = 'done';
-        if (item.key || result.licKey) {
-          var k = item.key || result.licKey;
-          urlMap[k] = { url: result.url, dt: 'pdf' };
-        }
-        successCount++;
-      } catch(e) {
-        item.status = 'err';
-        console.error('Upload error:', e);
-      }
-      renderUploadList();
-    }
-
-    if (successCount > 0) {
-      lss(UK, urlMap); lss(URL_BACKUP_KEY, urlMap);
-      btn.disabled = false;
-      ge('modal-upload').classList.add('hidden');
-      buildDash(); renderLic();
-      flashMsg('📤 อัพโหลด '+successCount+'/'+uploadFiles.length+' ไฟล์สำเร็จ!');
-    } else {
-      btn.disabled = false;
-      btn.textContent = '📤 อัพโหลดทั้งหมด';
-      flashMsg('❌ อัพโหลดไม่สำเร็จ ตรวจสอบ Apps Script URL');
-    }
-  };
-
-  function fileToBase64(file) {
-    return new Promise(function(resolve, reject) {
-      var r = new FileReader();
-      r.onload = function(e) { resolve(e.target.result.split(',')[1]); };
-      r.onerror = reject;
-      r.readAsDataURL(file);
-    });
-  }
-
-  // ── ROW DELEGATION: เพิ่ม edit-date action ──
-  // (เพิ่มใน existing ll delegation)
-
-  // ── EXPORT: ติด [EXPORT] ในชื่อไฟล์ ──
-  function exportUrls() {
-    var linked = Object.keys(urlMap).filter(function(k) { return urlMap[k] && urlMap[k].url; });
-    if (!linked.length) { alert('ยังไม่มี URL กรุณา Sync Drive PDF ก่อน'); return; }
-    var exportData = { version: 1, note: '[EXPORT] ไฟล์นี้เป็นข้อมูลสำรอง ไม่ใช่ไฟล์ต้นฉบับ', exported: new Date().toISOString(), count: linked.length, urls: urlMap };
-    var blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = '[EXPORT] fda_urls_backup_' + new Date().toISOString().slice(0,10) + '.json';
-    a.click();
-    flashMsg('💾 Export ' + linked.length + ' URLs แล้ว');
-  }
-
-  // ── SETTINGS BUTTON ──
-  ge('btn-settings').onclick = function() {
-    ge('gas-url-inp').value = gasUrl || '';
-    ge('wizard').classList.remove('gone');
-    goTab(2);
-  };
-
-  // ── UNMATCHED POPUP ──
-  function showUnmatched(unmatchedList, matched, total) {
-    var existing = document.getElementById('unmatched-modal');
-    if (existing) existing.remove();
-    var modal = document.createElement('div');
-    modal.id = 'unmatched-modal';
-    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:600;display:flex;align-items:center;justify-content:center;padding:16px';
-    var box = document.createElement('div');
-    box.style.cssText = 'background:#fff;border-radius:14px;width:100%;max-width:560px;max-height:80vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,.3)';
-    var hdr = '<div style="background:linear-gradient(135deg,#d97706,#f59e0b);padding:16px 20px;display:flex;justify-content:space-between;align-items:center">'
-      + '<div><div style="color:#fff;font-weight:800;font-size:15px">⚠️ ไฟล์ที่ไม่ match กับระบบ</div>'
-      + '<div style="color:rgba(255,255,255,.8);font-size:12px">Sync สำเร็จ '+matched+'/'+total+' ใบ — ไม่พบ '+unmatchedList.length+' ไฟล์</div></div>'
-      + '<button id="btn-close-unmatched" style="background:rgba(255,255,255,.2);border:none;color:#fff;width:28px;height:28px;border-radius:7px;cursor:pointer;font-size:15px">✕</button>'
-      + '</div>';
-    var explain = '<div style="background:#fffbeb;border-bottom:1px solid #fde68a;padding:12px 20px;font-size:12px;color:#92400e">'
-      + '💡 ชื่อไฟล์ต้องมีเลขใบอนุญาต เช่น <b>65-2-3-2-0011352.pdf</b> หรือ <b>ใบรับจดแจ้ง 65-2-3-2-0011352 ชื่อ.pdf</b>'
-      + '</div>';
-    var listItems = unmatchedList.map(function(name) {
-      return '<div style="padding:8px 20px;border-bottom:1px solid #f1f5f9;font-size:12px;font-family:monospace;color:#374151">📄 ' + name + '</div>';
-    }).join('');
-    var body = '<div style="overflow-y:auto;flex:1">' + listItems + '</div>';
-    box.innerHTML = hdr + explain + body;
-    modal.appendChild(box);
-    document.body.appendChild(modal);
-    document.getElementById('btn-close-unmatched').onclick = function() { modal.remove(); };
-    modal.onclick = function(e) { if (e.target === modal) modal.remove(); };
-  }
-
-  // ── LOGIN & SESSION LOGIC ──
-  function showLogin() {
-    ge('modal-login').classList.remove('hidden');
-    // ซ่อน UI ทั้งหมด
-    ['sbar','main-content','dash-section','lic-section'].forEach(function(id){
-      var el = ge(id); if (el) el.style.visibility = 'hidden';
-    });
-    document.querySelectorAll('.modal-bg,.flash').forEach(function(el){ el.style.visibility='hidden'; });
-    ge('login-pw').value = '';
-    ge('login-err').style.display = 'none';
-    ge('login-loading').style.display = 'none';
-    ge('login-btn').disabled = false;
-    setTimeout(function(){ ge('login-pw').focus(); }, 100);
-  }
-
-  function hideLogin() {
-    ge('modal-login').classList.add('hidden');
-    ['sbar','main-content','dash-section','lic-section'].forEach(function(id){
-      var el = ge(id); if (el) el.style.visibility = 'visible';
-    });
-    document.querySelectorAll('.modal-bg,.flash').forEach(function(el){ el.style.visibility=''; });
-  }
-
-  async function doLogin() {
-    var pw = ge('login-pw').value.trim();
-    if (!pw) return;
-    ge('login-err').style.display = 'none';
-    ge('login-loading').style.display = 'block';
-    ge('login-btn').disabled = true;
-    try {
-      var resp = await fetch(gasUrl + '?action=login&pw=' + encodeURIComponent(pw));
-      var d = await resp.json();
-      if (d.error) {
-        ge('login-err').style.display = 'block';
-        ge('login-loading').style.display = 'none';
-        ge('login-btn').disabled = false;
-        return;
-      }
-      // บันทึก session
-      SESSION_TOKEN = d.token;
-      SESSION_ROLE  = d.role;
-      SESSION_EXP   = Date.now() + d.ttl;
-      localStorage.setItem('fda_token', SESSION_TOKEN);
-      localStorage.setItem('fda_role',  SESSION_ROLE);
-      localStorage.setItem('fda_token_exp', String(SESSION_EXP));
-      // ตั้ง Admin mode
-      setRole(SESSION_ROLE === 'admin');
-      hideLogin();
-      await loadLicensesFromSheets();
-    } catch(ex) {
-      var errMsg = ex.message || 'Unknown error';
-      if (errMsg.includes('fetch')) errMsg = 'ไม่สามารถเชื่อมต่อ Apps Script ได้ — ตรวจสอบ URL และ deployment';
-      ge('login-err').textContent = '❌ ' + errMsg;
-      ge('login-err').style.display = 'block';
-      ge('login-loading').style.display = 'none';
-      ge('login-btn').disabled = false;
-    }
-  }
-
-  async function loadLicensesFromSheets() {
-    if (!SESSION_TOKEN) { showLogin(); return; }
-    if (Date.now() > SESSION_EXP) {
-      localStorage.removeItem('fda_token');
-      localStorage.removeItem('fda_role');
-      showLogin();
-      flashMsg('⏰ Session หมดอายุ กรุณา Login ใหม่');
-      return;
-    }
-    try {
-      var resp = await fetch(gasUrl + '?action=getLicenses&token=' + SESSION_TOKEN);
-      var d = await resp.json();
-      if (d.error) { showLogin(); return; }
-      LICENSES = d.licenses || [];
-      ls(LK, LICENSES);
-      buildDash(); renderLic();
-      flashMsg('✅ โหลดข้อมูล ' + LICENSES.length + ' ใบ จาก Sheets');
-      // Auto-sync PDF หลังโหลดข้อมูล — ถ้ายังไม่มี URL ครบ
-      var missingUrl = LICENSES.filter(function(l){ return !l.url; }).length;
-      if (missingUrl > 0) {
-        setTimeout(function(){
-          flashMsg('🔄 Auto-sync PDF (' + missingUrl + ' ใบยังไม่มีลิงก์)...');
-          runSync();
-        }, 1500);
-      }
-    } catch(ex) {
-      // fallback: ลอง localStorage
-      var cached = ls(LK);
-      if (cached && cached.length) {
-        LICENSES = cached;
-        buildDash(); renderLic();
-        flashMsg('⚠️ ใช้ข้อมูล Cache — เชื่อมต่อ Sheets ไม่ได้');
-      } else {
-        showLogin();
-      }
-    }
-  }
-
-  function doLogout() {
-    localStorage.removeItem('fda_token');
-    localStorage.removeItem('fda_role');
-    localStorage.removeItem('fda_token_exp');
-    SESSION_TOKEN = ''; SESSION_ROLE = ''; SESSION_EXP = 0;
-    LICENSES = [];
-    setRole(false);
-    showLogin();
-  }
-
-  // ── Login button events ──
-  // ── PDF open via event delegation (ทำงานได้แน่นอน) ──
-  document.addEventListener('click', function(e) {
-    var btn = e.target.closest('.pdf-open-btn');
-    if (!btn) return;
-    var url = btn.getAttribute('data-url');
-    var name = btn.getAttribute('data-name');
-    if (url && window.openPDF) window.openPDF(url, name);
-  });
-
-  ge('login-btn').onclick = doLogin;
-  ge('login-pw').onkeydown = function(e) { if (e.key === 'Enter') doLogin(); };
-
-  // ── แทนที่ logout admin ให้ logout จริง ──
-  // btn-role-logout removed
-
-  // ── Startup: ตรวจ session ──
-  if (SESSION_TOKEN && SESSION_EXP && Date.now() < SESSION_EXP) {
-    // session ยังใช้ได้
-    setRole(SESSION_ROLE === 'admin');
-    hideLogin();
-    loadLicensesFromSheets();
-  } else {
-    // clear session เก่า
-    localStorage.removeItem('fda_token');
-    localStorage.removeItem('fda_role');
-    localStorage.removeItem('fda_token_exp');
-    SESSION_TOKEN = ''; SESSION_ROLE = ''; SESSION_EXP = 0;
-    showLogin();
-  }
-
-  buildDash();
-  renderLic();
-  checkUrlBackup();
-  // Auto-sync ถูกปิด — ต้อง Login ก่อน
-
-})();
-</script>
-
-<script>
-// Global dark mode functions (outside IIFE for onclick access)
-window.toggleDark = function() {
-    var isDark = document.body.classList.toggle('dark');
-    localStorage.setItem('fda_dark', isDark ? '1' : '0');
-    var btn = ge('btn-darkmode');
-    if (btn) btn.textContent = isDark ? '☀️ Light' : '🌙 Dark';
-  };
-
-// Init dark mode from localStorage
-if (localStorage.getItem('fda_dark') === '1') {
-  document.body.classList.add('dark');
-  document.addEventListener('DOMContentLoaded', function() {
-    var b = document.getElementById('btn-darkmode');
-    if (b) b.textContent = '☀️ Light';
-  });
+// ══════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════
+var GAS = 'https://script.google.com/macros/s/AKfycbxEln9oOk5JT-Nhj4-bn_UGnjxcBfeulmBifQA-8xaq2wl_pw7XnWfAQDeS97Uy8dQd/exec';
+var FOLDER_ID = '1pZN6e7oH-kMGOs8lNwWX2fCTf_RTQBvc';
+var DRIVE_URL = 'https://drive.google.com/drive/folders/' + FOLDER_ID;
+var K = { tok:'fda12_tok', role:'fda12_role', exp:'fda12_exp', lics:'fda12_lics' };
+
+var DOCS = [
+  'แบบคำขอต่ออายุ (อ.14)',
+  'หนังสือรับรองบริษัท (อายุไม่เกิน 6 เดือน)',
+  'สำเนาใบอนุญาตฉบับเดิม',
+  'Certificate of Free Sale / CE Mark',
+  'รายชื่อสินค้าที่ขอต่ออายุ',
+  'Letter of Authorization จากผู้ผลิต',
+  'หลักฐานการชำระค่าธรรมเนียม',
+];
+
+// ══════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════
+var LICS=[], TOK='', ROLE='', EXP=0, ADMIN=false;
+var FILTER='all', OPEN=null, EDIT_K=null, PENDING=null, UP_FILES=[];
+var g = function(id){ return document.getElementById(id); };
+
+// ══════════════════════════════════════════
+// DARK MODE — global เพื่อ onclick
+// ══════════════════════════════════════════
+function toggleDark(){
+  var on = document.body.classList.toggle('dark');
+  localStorage.setItem('fda12_dark', on?'1':'0');
+  g('btn-dk').textContent = on?'☀️':'🌙';
 }
+if(localStorage.getItem('fda12_dark')==='1'){
+  document.body.classList.add('dark');
+  document.addEventListener('DOMContentLoaded',function(){ var b=g('btn-dk'); if(b)b.textContent='☀️'; });
+}
+
+// ══════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════
+function save(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
+function load(k){ try{ var r=localStorage.getItem(k); return r?JSON.parse(r):null; }catch(e){ return null; } }
+
+function daysLeft(iso){
+  if(!iso||iso==='') return null;
+  var d=new Date(iso); if(isNaN(d)) return null;
+  return Math.ceil((d-new Date())/86400000);
+}
+function urg(iso){
+  var d=daysLeft(iso);
+  if(d===null) return 'ok';
+  if(d<0) return 'expired'; if(d<=60) return 'urgent'; if(d<=180) return 'warn'; return 'ok';
+}
+function thDate(iso){
+  if(!iso||iso==='') return '—';
+  var p=iso.split('-');
+  if(p.length===3&&p[0].length===4) return p[2]+'/'+p[1]+'/'+(+p[0]+543);
+  return iso;
+}
+function flash(msg,t){
+  var el=g('flash-msg'); el.textContent=msg;
+  clearTimeout(el._t); el._t=setTimeout(function(){ el.textContent=''; },t||4000);
+}
+function prog(pct){
+  var p=g('prog'),f=g('prog-fill');
+  if(pct>=100){ p.classList.add('on'); f.style.width='100%'; setTimeout(function(){ p.classList.remove('on'); f.style.width='0'; },500); }
+  else{ p.classList.add('on'); f.style.width=pct+'%'; }
+}
+function openModal(id){ g(id).classList.remove('h'); }
+function closeModal(id){ g(id).classList.add('h'); }
+function escQ(s){ return (s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
+
+// ══════════════════════════════════════════
+// AUTH
+// ══════════════════════════════════════════
+function doLogin(){
+  var pw=g('lpw').value.trim();
+  if(!pw) return;
+  g('lbtn').disabled=true; g('lbtn').textContent='⏳ กำลังตรวจสอบ...'; g('lerr').textContent='';
+  fetch(GAS+'?action=login&pw='+encodeURIComponent(pw))
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      g('lbtn').disabled=false; g('lbtn').textContent='🔐 เข้าสู่ระบบ';
+      if(d.token){
+        TOK=d.token; ROLE=d.role; EXP=Date.now()+(d.ttl||28800000);
+        save(K.tok,TOK); save(K.role,ROLE); save(K.exp,EXP);
+        afterLogin();
+      } else {
+        g('lerr').textContent='❌ '+(d.error||'รหัสผ่านไม่ถูกต้อง');
+      }
+    })
+    .catch(function(e){
+      g('lbtn').disabled=false; g('lbtn').textContent='🔐 เข้าสู่ระบบ';
+      g('lerr').textContent='❌ เชื่อมต่อไม่ได้: '+e.message;
+    });
+}
+
+function doLogout(){
+  TOK=''; ROLE=''; EXP=0; ADMIN=false; LICS=[];
+  save(K.tok,''); save(K.role,''); save(K.exp,0); save(K.lics,[]);
+  g('pg-main').style.display='none';
+  g('pg-login').style.display='flex';
+  g('lpw').value=''; g('lerr').textContent='';
+}
+
+function afterLogin(){
+  g('pg-login').style.display='none';
+  g('pg-main').style.display='block';
+  setRole(ROLE==='admin');
+  loadData();
+}
+
+function setRole(isAdmin){
+  ADMIN=isAdmin;
+  var badge=g('rbadge'), info=g('rinfo'), sw=g('rsw');
+  if(isAdmin){
+    badge.className='rbadge a'; badge.textContent='⚙️ ADMIN';
+    info.textContent='โหมดแก้ไข — Import / Upload / Sync ได้';
+    sw.textContent='🔓 ออกจาก Admin'; sw.onclick=downgrade;
+    g('btn-import').style.display='';
+    g('btn-upload').style.display='';
+    g('btn-sync').style.display='';
+    if(!g('btn-drive')){
+      var btn=document.createElement('button');
+      btn.className='nbtn'; btn.id='btn-drive';
+      btn.textContent='📂 Drive';
+      btn.onclick=function(){ window.open(DRIVE_URL,'_blank'); };
+      g('btn-sync').insertAdjacentElement('afterend',btn);
+    }
+  } else {
+    badge.className='rbadge v'; badge.textContent='👁 VIEWER';
+    info.textContent='โหมดดูอย่างเดียว';
+    sw.textContent='🔐 เข้า Admin'; sw.onclick=function(){ openModal('m-admin'); };
+    g('btn-import').style.display='none';
+    g('btn-upload').style.display='none';
+    g('btn-sync').style.display='none';
+    var dr=g('btn-drive'); if(dr) dr.remove();
+  }
+  renderList();
+}
+
+function downgrade(){
+  ADMIN=false; ROLE='viewer'; save(K.role,'viewer'); setRole(false);
+}
+
+// Admin modal
+g('a-ok').onclick=function(){
+  var pw=g('apw').value.trim(); g('aerr').style.display='none';
+  fetch(GAS+'?action=login&pw='+encodeURIComponent(pw))
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if(d.token&&d.role==='admin'){
+        TOK=d.token; ROLE='admin'; EXP=Date.now()+(d.ttl||28800000);
+        save(K.tok,TOK); save(K.role,ROLE); save(K.exp,EXP);
+        closeModal('m-admin'); g('apw').value='';
+        setRole(true); flash('✅ เข้าสู่ระบบ Admin แล้ว');
+      } else { g('aerr').style.display='block'; }
+    }).catch(function(){ g('aerr').style.display='block'; });
+};
+g('apw').addEventListener('keypress',function(e){ if(e.key==='Enter') g('a-ok').click(); });
+
+// ══════════════════════════════════════════
+// LOAD DATA FROM SHEETS
+// ══════════════════════════════════════════
+function loadData(){
+  if(!TOK||Date.now()>EXP){ doLogout(); return; }
+  var bar=g('sync-bar'), txt=g('sync-txt');
+  bar.classList.add('on'); txt.textContent='🔄 กำลังโหลดข้อมูลจาก Sheets...';
+  prog(30);
+
+  fetch(GAS+'?action=getLicenses&token='+encodeURIComponent(TOK))
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      prog(100);
+      if(d.code===401){ doLogout(); return; }
+      if(d.licenses && Array.isArray(d.licenses)){
+        LICS=d.licenses;
+        save(K.lics, LICS);
+        txt.textContent='✅ โหลดแล้ว '+LICS.length+' ใบ';
+        setTimeout(function(){ bar.classList.remove('on'); },3000);
+        buildDash(); renderList();
+        flash('✅ โหลดข้อมูล '+LICS.length+' ใบจาก Sheets');
+      } else {
+        throw new Error(d.error||'ไม่พบข้อมูล');
+      }
+    })
+    .catch(function(e){
+      prog(100);
+      var cached=load(K.lics);
+      if(cached&&cached.length){
+        LICS=cached;
+        txt.textContent='⚠️ ใช้ Cache ('+LICS.length+' ใบ) — '+e.message;
+        setTimeout(function(){ bar.classList.remove('on'); },5000);
+        buildDash(); renderList();
+        flash('⚠️ Sheets ไม่ตอบสนอง ใช้ข้อมูล Cache');
+      } else {
+        txt.textContent='❌ โหลดไม่ได้: '+e.message;
+        flash('❌ '+e.message);
+      }
+    });
+}
+
+// ══════════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════════
+function buildDash(){
+  var u=0,w=0,o=0,ex=0,pr=0;
+  LICS.forEach(function(l){
+    var s=urg(l.e);
+    if(s==='urgent')u++; else if(s==='warn')w++; else if(s==='expired')ex++; else o++;
+    pr+=(+l.n||0);
+  });
+  g('s-u').textContent=u; g('s-w').textContent=w;
+  g('s-o').textContent=o+(ex?' (หมด:'+ex+')':'');
+  g('s-t').textContent=LICS.length; g('s-p').textContent=pr.toLocaleString()+' รายการสินค้า';
+  g('bdg').textContent=LICS.length;
+
+  // Urgent
+  var ul=LICS.filter(function(l){ return urg(l.e)==='urgent'; })
+    .sort(function(a,b){ return daysLeft(a.e)-daysLeft(b.e); }).slice(0,6);
+  g('d-urg').innerHTML=ul.length
+    ? ul.map(function(l){ var d=daysLeft(l.e);
+        return '<div class="urg-item"><span class="urg-key">'+l.k+'</span><span class="urg-name">'+l.m+'</span><span class="urg-days">'+(d<0?'หมดแล้ว':d+' วัน')+'</span></div>'; }).join('')
+    : '<div style="text-align:center;padding:18px;color:#94a3b8">✅ ไม่มีด่วน</div>';
+
+  // Mfr
+  var mfr={};
+  LICS.forEach(function(l){ mfr[l.m]=(mfr[l.m]||0)+(+l.n||1); });
+  var top=Object.entries(mfr).sort(function(a,b){ return b[1]-a[1]; }).slice(0,10);
+  var mx=top[0]?top[0][1]:1;
+  g('d-mfr').innerHTML=top.map(function(x){
+    return '<div class="br"><div class="br-lbl" title="'+x[0]+'">'+x[0]+'</div><div class="br-trk"><div class="br-fill" style="width:'+(x[1]/mx*100)+'%"></div></div><div class="br-n">'+x[1]+'</div></div>'; }).join('');
+
+  // Year
+  var yr={};
+  LICS.forEach(function(l){ if(l.e){ var y=+l.e.split('-')[0]+543; yr[y]=(yr[y]||0)+1; } });
+  var ys=Object.entries(yr).sort(function(a,b){ return a[0]-b[0]; });
+  var ym=ys.reduce(function(m,x){ return Math.max(m,x[1]); },1);
+  g('d-yr').innerHTML=ys.map(function(x){
+    return '<div class="br"><div class="br-lbl">'+x[0]+'</div><div class="br-trk"><div class="br-fill" style="width:'+(x[1]/ym*100)+'%"></div></div><div class="br-n">'+x[1]+'</div></div>'; }).join('');
+}
+
+// ══════════════════════════════════════════
+// LIST
+// ══════════════════════════════════════════
+function goPg(p){
+  g('pg-dash').classList.toggle('on',p==='dash');
+  g('pg-lic').classList.toggle('on',p==='lic');
+  g('t-dash').classList.toggle('on',p==='dash');
+  g('t-lic').classList.toggle('on',p==='lic');
+}
+function setF(f,btn){
+  FILTER=f;
+  document.querySelectorAll('.fb').forEach(function(b){ b.classList.toggle('on',b===btn); });
+  renderList();
+}
+function renderList(){
+  var q=(g('srch').value||'').toLowerCase(), srt=g('srt').value;
+  var list=LICS.filter(function(l){
+    if(FILTER!=='all'&&urg(l.e)!==FILTER) return false;
+    if(q&&!l.k.toLowerCase().includes(q)&&!l.m.toLowerCase().includes(q)&&!(l.c||'').toLowerCase().includes(q)) return false;
+    return true;
+  }).sort(function(a,b){
+    if(srt==='exp') return (daysLeft(a.e)??9999)-(daysLeft(b.e)??9999);
+    if(srt==='key') return a.k.localeCompare(b.k);
+    return (a.m||'').localeCompare(b.m||'');
+  });
+  g('cnt').textContent='แสดง '+list.length+'/'+LICS.length;
+  g('lic-list').innerHTML=list.map(rowHTML).join('');
+}
+
+function rowHTML(l){
+  var u=urg(l.e), d=daysLeft(l.e);
+  var dc={urgent:'color:#dc2626',warn:'color:#d97706',expired:'color:#94a3b8',ok:'color:#16a34a'}[u];
+  var ds=d===null?'—':d<0?'หมดอายุแล้ว':'เหลือ '+d+' วัน';
+  var pdf=l.url
+    ?'<button class="abtn pdf-on" onclick="event.stopPropagation();openPDF(\''+escQ(l.url)+'\',\''+escQ(l.k)+'\')">📄 PDF</button>'
+    :'<button class="abtn pdf-off" disabled>📄 PDF</button>';
+  var edt=ADMIN?'<button class="abtn" style="background:transparent;border-color:#e2e8f0;color:#64748b" onclick="event.stopPropagation();openEdit(\''+escQ(l.k)+'\')">📅</button>':'';
+  return '<div class="row-card '+u+'" data-k="'+escQ(l.k)+'">'
+    +'<div class="row-hdr" onclick="toggle(\''+escQ(l.k)+'\')">'
+    +'<div class="dot d-'+u[0]+'"></div>'
+    +'<div class="row-key">'+l.k+'</div>'
+    +'<div class="row-info"><div class="row-mfr">'+l.m+'</div><div class="row-ctry">'+( l.c||'—' )+'</div></div>'
+    +'<div class="row-exp"><div class="row-date">'+thDate(l.e)+'</div><div class="row-days" style="'+dc+'">'+ds+'</div></div>'
+    +'<div class="row-acts">'+pdf+edt+'</div>'
+    +'<div class="chv">▼</div>'
+    +'</div>'
+    +'<div class="panel-wrap" id="pw_'+l.k.replace(/[^a-z0-9]/gi,'_')+'"></div>'
+    +'</div>';
+}
+
+function toggle(key){
+  var card=document.querySelector('[data-k="'+key+'"]');
+  var sid=key.replace(/[^a-z0-9]/gi,'_');
+  var pw=g('pw_'+sid);
+  if(!card||!pw) return;
+
+  if(OPEN===key){
+    card.classList.remove('open'); pw.innerHTML=''; OPEN=null; return;
+  }
+  if(OPEN){
+    var oc=document.querySelector('[data-k="'+OPEN+'"]');
+    var op=g('pw_'+OPEN.replace(/[^a-z0-9]/gi,'_'));
+    if(oc) oc.classList.remove('open');
+    if(op) op.innerHTML='';
+  }
+  OPEN=key; card.classList.add('open');
+  var l=LICS.find(function(x){ return x.k===key; });
+  if(!l) return;
+  pw.innerHTML=buildPanel(l);
+
+  // lazy load prods
+  if((!l.prods||!l.prods.length)&&TOK){
+    fetch(GAS+'?action=getProds&token='+encodeURIComponent(TOK)+'&key='+encodeURIComponent(key))
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if(d.prods&&d.prods.length){ l.prods=d.prods; if(OPEN===key) pw.innerHTML=buildPanel(l); }
+      }).catch(function(){});
+  }
+  card.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function buildPanel(l){
+  var chks=load('chk_'+l.k)||new Array(DOCS.length).fill(false);
+  var done=chks.filter(Boolean).length;
+  var d=daysLeft(l.e);
+  var sid=l.k.replace(/[^a-z0-9]/gi,'_');
+
+  var prodsH='';
+  if(l.prods&&l.prods.length){
+    prodsH='<input class="prod-srch" placeholder="ค้นหา..." oninput="fprod(this,\'pt_'+sid+'\')">'
+      +'<div class="prod-scroll"><table class="prod-tbl" id="pt_'+sid+'">'
+      +'<thead><tr><th>รหัส</th><th>ทางค้า</th><th>ผลิตภัณฑ์</th><th>รายละเอียด</th></tr></thead><tbody>'
+      +l.prods.map(function(p){
+        return '<tr><td style="color:#64748b">'+(p[0]||'—')+'</td><td>'+(p[1]||'—')+'</td><td>'+(p[2]||'—')+'</td><td style="color:#94a3b8;font-size:10px">'+(p[3]||'')+'</td></tr>';
+      }).join('')+'</tbody></table></div>';
+  } else {
+    prodsH='<div style="text-align:center;color:#94a3b8;padding:12px;font-size:12px">⏳ กำลังโหลดสินค้า...</div>';
+  }
+
+  var tls=[
+    {days:90,lbl:'เตรียมเอกสาร ติดต่อผู้ผลิต'},
+    {days:60,lbl:'ยื่นคำขอต่ออายุ อย.'},
+    {days:30,lbl:'ติดตามผลการพิจารณา'},
+  ];
+
+  return '<div class="panel-grid">'
+    +'<div>'
+      +'<div class="psec"><h4>📋 ข้อมูล</h4>'
+        +'<div class="irow"><span class="info-lbl">เลขใบอนุญาต</span><span class="info-val" style="color:#0891b2;font-weight:700">'+l.k+'</span></div>'
+        +'<div class="irow"><span class="info-lbl">ผู้ผลิต</span><span class="info-val">'+l.m+'</span></div>'
+        +'<div class="irow"><span class="info-lbl">ประเทศ</span><span class="info-val">'+(l.c||'—')+'</span></div>'
+        +'<div class="irow"><span class="info-lbl">วันหมดอายุ</span><span class="info-val">'+thDate(l.e)+'</span></div>'
+        +'<div class="irow"><span class="info-lbl">จำนวนสินค้า</span><span class="info-val">'+(l.n||0)+' รายการ</span></div>'
+      +'</div>'
+      +'<div class="psec" style="margin-top:10px"><h4>📝 เอกสาร ('+done+'/'+DOCS.length+')</h4>'
+        +'<ul class="chklist">'+DOCS.map(function(doc,i){
+          return '<li class="'+(chks[i]?'done':'')+'"><input type="checkbox"'+(chks[i]?' checked':'')
+            +' onchange="chk(\''+escQ(l.k)+'\','+i+',this.checked)"><span>'+doc+'</span></li>';
+        }).join('')+'</ul>'
+      +'</div>'
+    +'</div>'
+    +'<div>'
+      +'<div class="psec"><h4>📦 สินค้า ('+(l.prods?l.prods.length:0)+')</h4>'+prodsH+'</div>'
+      +'<div class="psec" style="margin-top:10px"><h4>⏰ ขั้นตอนต่ออายุ</h4>'
+        +tls.map(function(t){
+          var c=d!==null&&d<=t.days?'#dc2626':'#0891b2';
+          return '<div class="tl-item"><div class="tl-dot" style="background:'+c+'"></div><div><div class="tl-when">ก่อน '+t.days+' วัน</div><div class="tl-desc">'+t.lbl+'</div></div></div>';
+        }).join('')
+        +'<div class="tl-item"><div class="tl-dot" style="background:'+(d!==null&&d<0?'#94a3b8':'#d97706')+'"></div><div><div class="tl-when">หมดอายุ</div><div class="tl-desc">'+thDate(l.e)+'</div></div></div>'
+      +'</div>'
+    +'</div>'
+  +'</div>'
+  +'<div class="p-acts">'
+    +(l.url?'<button class="pbtn pb-pdf" onclick="openPDF(\''+escQ(l.url)+'\',\''+escQ(l.k)+'\')">📄 เปิด PDF</button>':'')
+    +(ADMIN?'<button class="pbtn pb-edit" onclick="openEdit(\''+escQ(l.k)+'\')">📅 แก้วัน</button>':'')
+    +'<button class="pbtn pb-close" onclick="toggle(\''+escQ(l.k)+'\')">✕ ปิด</button>'
+  +'</div>';
+}
+
+function fprod(inp,tid){ var q=inp.value.toLowerCase(); var t=g(tid); if(!t) return; t.querySelectorAll('tbody tr').forEach(function(r){ r.style.display=r.textContent.toLowerCase().includes(q)?'':'none'; }); }
+function chk(key,i,v){ var arr=load('chk_'+key)||new Array(DOCS.length).fill(false); arr[i]=v; save('chk_'+key,arr); }
+
+// ══════════════════════════════════════════
+// PDF VIEWER — ใช้ Drive embed URL ตรง (ไม่ผ่าน base64)
+// ══════════════════════════════════════════
+function openPDF(urlRaw, name){
+  var url=urlRaw;
+  var m=url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  if(!m){ flash('❌ ไม่พบ Drive File ID'); return; }
+  var embedUrl='https://drive.google.com/file/d/'+m[1]+'/preview';
+  g('pdf-title').textContent=name||'';
+  g('pdf-load').style.display='flex';
+  g('pdf-frame').src='about:blank';
+  g('pdf-bg').classList.add('on');
+  setTimeout(function(){ g('pdf-frame').src=embedUrl; },80);
+  g('pdf-frame').onload=function(){ g('pdf-load').style.display='none'; };
+}
+function closePDF(){
+  g('pdf-bg').classList.remove('on');
+  g('pdf-frame').src='about:blank';
+}
+document.addEventListener('keydown',function(e){ if(e.key==='Escape') closePDF(); });
+g('pdf-bg').addEventListener('click',function(e){ if(e.target===this) closePDF(); });
+
+// ══════════════════════════════════════════
+// EDIT DATE
+// ══════════════════════════════════════════
+function openEdit(key){
+  if(!ADMIN) return;
+  EDIT_K=key;
+  var l=LICS.find(function(x){ return x.k===key; });
+  g('edit-lbl').textContent=key+(l?' — '+l.m:'');
+  g('edit-date').value=l?(l.e||''):'';
+  openModal('m-edit');
+}
+g('edit-ok').onclick=function(){
+  if(!EDIT_K) return;
+  var nd=g('edit-date').value; if(!nd) return;
+  var l=LICS.find(function(x){ return x.k===EDIT_K; });
+  if(l){ l.e=nd; save(K.lics,LICS); }
+  closeModal('m-edit');
+  renderList(); buildDash();
+  // บันทึกใน Sheets
+  fetch(GAS,{method:'POST',headers:{'Content-Type':'text/plain'},
+    body:JSON.stringify({action:'updateDate',token:TOK,key:EDIT_K,date:nd})})
+    .then(function(r){ return r.json(); })
+    .then(function(d){ flash(d.success?'✅ แก้วันหมดอายุแล้ว':'❌ บันทึกไม่ได้'); })
+    .catch(function(e){ flash('❌ '+e.message); });
+};
+
+// ══════════════════════════════════════════
+// IMPORT EXCEL
+// ══════════════════════════════════════════
+g('imp-dz').onclick=function(){ g('imp-fi').click(); };
+g('imp-fi').onchange=function(){ if(this.files[0]) parseXlsx(this.files[0]); this.value=''; };
+g('imp-dz').ondragover=function(e){ e.preventDefault(); this.classList.add('drag'); };
+g('imp-dz').ondragleave=function(){ this.classList.remove('drag'); };
+g('imp-dz').ondrop=function(e){ e.preventDefault(); this.classList.remove('drag'); if(e.dataTransfer.files[0]) parseXlsx(e.dataTransfer.files[0]); };
+
+function parseXlsx(file){
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var wb=XLSX.read(e.target.result,{type:'array',cellDates:true});
+      var sn=wb.SheetNames.includes('NEWCODE')?'NEWCODE':wb.SheetNames[0];
+      var rows=XLSX.utils.sheet_to_json(wb.Sheets[sn],{header:1,defval:''});
+      var map={};
+      for(var i=1;i<rows.length;i++){
+        var r=rows[i];
+        var k=String(r[0]||'').trim();
+        if(!k||k==='undefined'||k.toLowerCase()==='none') continue;
+        var expRaw=r[10], expIso='';
+        if(expRaw instanceof Date){
+          expIso=expRaw.getFullYear()+'-'+String(expRaw.getMonth()+1).padStart(2,'0')+'-'+String(expRaw.getDate()).padStart(2,'0');
+        } else if(typeof expRaw==='string'&&expRaw.trim()){
+          var pd=new Date(expRaw);
+          if(!isNaN(pd)) expIso=pd.getFullYear()+'-'+String(pd.getMonth()+1).padStart(2,'0')+'-'+String(pd.getDate()).padStart(2,'0');
+        }
+        var mfr=String(r[6]||'').trim(), ctry=String(r[7]||'').trim(), cat=String(r[3]||'').trim();
+        if(!map[k]) map[k]={k:k,m:mfr,c:ctry,e:expIso,n:0,cat:cat,url:'',prods:[]};
+        map[k].e=expIso;
+        map[k].prods.push([String(r[3]||''),String(r[4]||''),String(r[5]||''),String(r[8]||'')]);
+        map[k].n=map[k].prods.length;
+      }
+      PENDING=Object.values(map);
+      showPreview();
+    } catch(ex){ flash('❌ อ่านไฟล์ไม่ได้: '+ex.message); }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function showPreview(){
+  var om={}; LICS.forEach(function(l){ om[l.k]=l; });
+  var added=[],updated=[],skipped=[];
+  PENDING.forEach(function(n){
+    if(!om[n.k]) added.push(n);
+    else if(n.e!==om[n.k].e) updated.push(n);
+    else skipped.push(n);
+  });
+  g('merge-smry').textContent='➕ เพิ่ม: '+added.length+' | 🔄 อัพเดท: '+updated.length+' | ⏭ เหมือนเดิม: '+skipped.length;
+  var html='';
+  added.slice(0,8).forEach(function(l){ html+='<div class="mrow m-add">➕ '+l.k+' — '+l.m+'</div>'; });
+  updated.slice(0,8).forEach(function(l){ html+='<div class="mrow m-upd">🔄 '+l.k+' — '+thDate(l.e)+'</div>'; });
+  if(added.length+updated.length>16) html+='<div class="mrow m-skip">... อีก '+(added.length+updated.length-16)+' รายการ</div>';
+  g('merge-list').innerHTML=html||'<div class="mrow m-skip">ไม่มีการเปลี่ยนแปลง</div>';
+  g('merge-wrap').style.display='block';
+  g('imp-ok').style.display=(added.length+updated.length>0)?'':'none';
+}
+
+function applyMerge(){
+  if(!PENDING) return;
+  var om={}; LICS.forEach(function(l){ om[l.k]=l; });
+  var changed=[];
+  PENDING.forEach(function(n){
+    if(!om[n.k]){ LICS.push(n); changed.push(n); }
+    else{
+      var o=om[n.k],c=false;
+      if(n.e&&n.e!==o.e){o.e=n.e;c=true;}
+      if(n.m&&n.m!==o.m){o.m=n.m;c=true;}
+      if(n.c&&n.c!==o.c){o.c=n.c;c=true;}
+      if(n.n&&n.n!==o.n){o.n=n.n;c=true;}
+      if(n.prods&&n.prods.length){o.prods=n.prods;c=true;}
+      if(c) changed.push(o);
+    }
+  });
+  closeModal('m-import');
+  g('imp-ok').style.display='none'; g('merge-wrap').style.display='none'; PENDING=null;
+  save(K.lics,LICS); buildDash(); renderList();
+  if(!changed.length){ flash('✅ ไม่มีการเปลี่ยนแปลง'); return; }
+  flash('⏳ กำลังบันทึก '+changed.length+' ใบ...');
+  sendBatch(changed,0);
+}
+
+function sendBatch(all,offset){
+  var CHUNK=30, chunk=all.slice(offset,offset+CHUNK);
+  if(!chunk.length){ flash('✅ บันทึกลง Sheets ครบ '+all.length+' ใบ'); return; }
+  fetch(GAS,{method:'POST',headers:{'Content-Type':'text/plain'},
+    body:JSON.stringify({action:'upsertLicenses',token:TOK,licenses:chunk})})
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if(!d.success){ flash('❌ บันทึกไม่ได้ batch '+(offset/CHUNK+1)); return; }
+      setTimeout(function(){ sendBatch(all,offset+CHUNK); },200);
+    }).catch(function(e){ flash('❌ '+e.message); });
+}
+
+// ══════════════════════════════════════════
+// UPLOAD PDF
+// ══════════════════════════════════════════
+g('up-dz').onclick=function(){ g('up-fi').click(); };
+g('up-fi').onchange=function(){ addFiles(this.files); this.value=''; };
+g('up-dz').ondragover=function(e){ e.preventDefault(); this.classList.add('drag'); };
+g('up-dz').ondragleave=function(){ this.classList.remove('drag'); };
+g('up-dz').ondrop=function(e){ e.preventDefault(); this.classList.remove('drag'); addFiles(e.dataTransfer.files); };
+
+function addFiles(files){
+  UP_FILES=Array.from(files);
+  g('ul-list').innerHTML=UP_FILES.map(function(f){
+    return '<div class="ul-item"><div class="us us-q"></div><span>'+f.name+'</span></div>';
+  }).join('');
+  g('up-ok').style.display=UP_FILES.length?'':'none';
+}
+
+function startUpload(){
+  if(!UP_FILES.length) return;
+  g('up-ok').disabled=true;
+  var items=g('ul-list').querySelectorAll('.ul-item');
+  var idx=0;
+  function next(){
+    if(idx>=UP_FILES.length){ g('up-ok').disabled=false; flash('✅ อัพโหลดเสร็จ'); setTimeout(doSync,1500); return; }
+    var f=UP_FILES[idx], dot=items[idx].querySelector('.us');
+    var reader=new FileReader();
+    reader.onload=function(e){
+      var b64=btoa(e.target.result);
+      fetch(GAS,{method:'POST',headers:{'Content-Type':'text/plain'},
+        body:JSON.stringify({action:'upload',token:TOK,filename:f.name,data:b64})})
+        .then(function(r){ return r.json(); })
+        .then(function(d){ dot.className='us '+(d.success?'us-ok':'us-err'); idx++; next(); })
+        .catch(function(){ dot.className='us us-err'; idx++; next(); });
+    };
+    reader.readAsBinaryString(f);
+  }
+  next();
+}
+
+// ══════════════════════════════════════════
+// SYNC
+// ══════════════════════════════════════════
+function doSync(){
+  flash('🔄 กำลัง Sync PDF จาก Drive...');
+  fetch(GAS+'?action=syncPDF&token='+encodeURIComponent(TOK))
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if(!d.files){ flash('⚠️ Sync ผิดพลาด'); return; }
+      var hit=0;
+      d.files.forEach(function(f){
+        if(!f.licKey) return;
+        var l=LICS.find(function(x){ return x.k===f.licKey; });
+        if(l){ l.url=f.url; hit++; }
+      });
+      save(K.lics,LICS); renderList();
+      flash('✅ Sync แล้ว — PDF: '+d.files.length+' ไฟล์ (match: '+hit+')');
+      if(hit>0) saveUrls();
+    }).catch(function(e){ flash('❌ '+e.message); });
+}
+
+function saveUrls(){
+  var toSave=LICS.filter(function(l){ return l.url; })
+    .map(function(l){ return {k:l.k,url:l.url}; });
+  if(!toSave.length) return;
+  fetch(GAS,{method:'POST',headers:{'Content-Type':'text/plain'},
+    body:JSON.stringify({action:'saveUrls',token:TOK,licenses:toSave})}).catch(function(){});
+}
+
+// ══════════════════════════════════════════
+// INIT — เข้าใหม่ทุกครั้งต้อง login เสมอ ยกเว้น session ยังมีอยู่
+// ══════════════════════════════════════════
+(function init(){
+  // restore session ถ้ายังไม่หมดอายุ
+  var savedTok = load(K.tok) || '';
+  var savedRole= load(K.role) || '';
+  var savedExp = load(K.exp)  || 0;
+
+  if(savedTok && savedExp && Date.now() < savedExp){
+    // session ยังอยู่ — ข้าม login แต่โหลดข้อมูลใหม่เสมอ
+    TOK=savedTok; ROLE=savedRole; EXP=savedExp;
+    afterLogin();
+  } else {
+    // หมดอายุ หรือไม่มี — แสดง login
+    save(K.tok,''); save(K.role,''); save(K.exp,0);
+    g('pg-login').style.display='flex';
+    g('pg-main').style.display='none';
+  }
+
+  g('lbtn').onclick=doLogin;
+  g('lpw').addEventListener('keypress',function(e){ if(e.key==='Enter') doLogin(); });
+})();
 </script>
 </body>
 </html>
