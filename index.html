@@ -67,28 +67,28 @@ body{font-family:'Sarabun',sans-serif;font-size:14px;background:#f1f5f9;color:#1
 /* ─── NAV ─── */
 .nav{
   background:linear-gradient(135deg,#0f2342,#1a3960);
-  height:52px;display:flex;align-items:center;padding:0 16px;gap:12px;
+  height:52px;display:flex;align-items:center;padding:0 12px;gap:8px;
   position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.35);
 }
-.nav-brand{display:flex;align-items:center;gap:8px;color:#fff;font-weight:700;font-size:14px;white-space:nowrap}
+.nav-brand{display:flex;align-items:center;gap:8px;color:#fff;font-weight:700;font-size:13px;white-space:nowrap;flex-shrink:0}
 .nav-logo{width:28px;height:28px;background:linear-gradient(135deg,#0891b2,#0369a1);
   border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px}
 .nav-tabs{display:flex;gap:2px;flex:1}
 .ntab{
-  padding:5px 13px;border-radius:7px;color:rgba(255,255,255,.6);
-  cursor:pointer;font-size:13px;font-weight:500;transition:.15s;white-space:nowrap;user-select:none;
+  padding:5px 10px;border-radius:7px;color:rgba(255,255,255,.6);
+  cursor:pointer;font-size:12px;font-weight:500;transition:.15s;white-space:nowrap;user-select:none;
 }
 .ntab:hover,.ntab.on{background:rgba(255,255,255,.14);color:#fff}
 .ntab .cnt{
   background:#ef4444;color:#fff;font-size:10px;
   padding:1px 5px;border-radius:8px;margin-left:4px;
 }
-.nav-right{display:flex;align-items:center;gap:5px;margin-left:auto}
-.nav-flash{font-size:11px;color:#34d399;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nav-right{display:flex;align-items:center;gap:4px;margin-left:auto;flex-shrink:0}
+.nav-flash{font-size:11px;color:#34d399;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:1}
 .nav-btn{
-  padding:5px 11px;border-radius:7px;border:1px solid rgba(255,255,255,.18);
-  color:#fff;background:transparent;font-size:12px;font-family:'Sarabun',sans-serif;
-  cursor:pointer;transition:.15s;white-space:nowrap;font-weight:500;
+  padding:4px 9px;border-radius:7px;border:1px solid rgba(255,255,255,.18);
+  color:#fff;background:transparent;font-size:11px;font-family:'Sarabun',sans-serif;
+  cursor:pointer;transition:.15s;white-space:nowrap;font-weight:500;flex-shrink:0;
 }
 .nav-btn:hover{background:rgba(255,255,255,.14)}
 .nav-btn
@@ -130,8 +130,9 @@ body{font-family:'Sarabun',sans-serif;font-size:14px;background:#f1f5f9;color:#1
 .page.on{display:block}
 
 /* ─── STATS ─── */
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
-@media(max-width:640px){.stats{grid-template-columns:repeat(2,1fr)}}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}
+@media(max-width:900px){.stats{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:600px){.stats{grid-template-columns:repeat(2,1fr)}}
 .stat{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:14px 16px}
 body.dark .stat{background:#1e293b;border-color:#334155}
 .stat-lbl{font-size:11px;color:#64748b;margin-bottom:3px}
@@ -162,10 +163,9 @@ body.dark .brow-n{color:#38bdf8}
 /* ─── URGENT ITEMS ─── */
 .urg-item{
   display:flex;align-items:center;gap:8px;
-  padding:7px 9px;background:#fef2f2;border:1px solid #fecaca;
+  padding:7px 9px;border:1px solid;
   border-radius:7px;font-size:12px;margin-bottom:5px;
 }
-body.dark .urg-item{background:#3b0b0b;border-color:#7f1d1d}
 .urg-key{font-weight:700;color:#dc2626;font-size:11px;min-width:100px}
 .urg-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .urg-days{font-weight:700;color:#dc2626;white-space:nowrap}
@@ -430,6 +430,8 @@ body.dark .nav-flash{color:#34d399}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
 .lic-item{animation:fadeUp .15s ease}
+@media(max-width:900px){.nav-flash{display:none}.nav-brand span{display:none}}
+@media(max-width:600px){.ntab .cnt{display:none}}
 </style>
 </head>
 <body>
@@ -499,10 +501,11 @@ body.dark .nav-flash{color:#34d399}
       <div class="stat"><div class="stat-lbl">🔴 ด่วน &lt;60 วัน</div><div class="stat-n r" id="s-u">—</div><div class="stat-s">ใบอนุญาต</div></div>
       <div class="stat"><div class="stat-lbl">🟡 แจ้งเตือน &lt;180 วัน</div><div class="stat-n y" id="s-w">—</div><div class="stat-s">ใบอนุญาต</div></div>
       <div class="stat"><div class="stat-lbl">🟢 ปกติ</div><div class="stat-n g" id="s-o">—</div><div class="stat-s">ใบอนุญาต</div></div>
+      <div class="stat" style="cursor:pointer" onclick="setFilterAndGo('expired')"><div class="stat-lbl">⚫ หมดอายุแล้ว</div><div class="stat-n" style="color:#94a3b8" id="s-ex">—</div><div class="stat-s">คลิกดูรายการ</div></div>
       <div class="stat"><div class="stat-lbl">📋 ทั้งหมด</div><div class="stat-n b" id="s-t">—</div><div class="stat-s" id="s-p">—</div></div>
     </div>
     <div class="charts">
-      <div class="card"><div class="card-title">⚠️ ต้องดำเนินการด่วน</div><div id="d-urg"><div class="prod-loading">กำลังโหลด...</div></div></div>
+      <div class="card"><div class="card-title">⚠️ ต้องดำเนินการ (ด่วน + แจ้งเตือน)</div><div id="d-urg"><div class="prod-loading">กำลังโหลด...</div></div></div>
       <div class="card"><div class="card-title">🏭 ผู้ผลิต Top 10</div><div id="d-mfr"></div></div>
     </div>
     <div class="card"><div class="card-title">📅 ใบอนุญาตแยกตามปีหมดอายุ (พ.ศ.)</div><div id="d-yr"></div></div>
@@ -765,7 +768,7 @@ function setRole(isAdmin){
     pill.className='role-pill admin'; pill.textContent='⚙️ ADMIN';
     info.textContent='โหมดแก้ไข — สามารถ Import, Upload, Sync ได้';
     sw.textContent='🔓 ออกจาก Admin';
-    document.querySelectorAll('.admin-only').forEach(function(e){ e.style.display='inline-flex'; });
+    document.querySelectorAll('.admin-only').forEach(function(e){ e.style.display='inline-block'; });
   } else {
     pill.className='role-pill viewer'; pill.textContent='👁 VIEWER';
     info.textContent='โหมดดูอย่างเดียว';
@@ -843,20 +846,31 @@ function buildDash(){
     if(s==='urgent')u++;else if(s==='warn')w++;else if(s==='expired')ex++;else o++;
     pr+=(+l.n||0);
   });
-  $('s-u').textContent=u; $('s-w').textContent=w;
-  $('s-o').textContent=o+(ex?' (+หมด:'+ex+')':'');
-  $('s-t').textContent=LICS.length; $('s-p').textContent=pr.toLocaleString()+' รายการสินค้า';
+  $('s-u').textContent=u;
+  $('s-w').textContent=w;
+  $('s-o').textContent=o;
+  $('s-ex').textContent=ex;
+  $('s-t').textContent=LICS.length;
+  $('s-p').textContent=pr.toLocaleString()+' รายการสินค้า';
   $('lic-cnt').textContent=LICS.length;
 
-  // Urgent
-  var ul=LICS.filter(function(l){ return urg(l.e)==='urgent'; })
-    .sort(function(a,b){ return dLeft(a.e)-dLeft(b.e); }).slice(0,6);
-  $('d-urg').innerHTML=ul.length
-    ? ul.map(function(l){ var d=dLeft(l.e);
-        return '<div class="urg-item"><span class="urg-key">'+l.k+'</span>'
-          +'<span class="urg-name">'+l.m+'</span>'
-          +'<span class="urg-days">'+(d<0?'หมดแล้ว':d+' วัน')+'</span></div>'; }).join('')
-    : '<div style="text-align:center;padding:18px;color:#94a3b8">✅ ไม่มีด่วน</div>';
+  // แสดง urgent + warn ในช่อง "ต้องดำเนินการ"
+  var actionList = LICS.filter(function(l){ return urg(l.e)==='urgent'||urg(l.e)==='warn'; })
+    .sort(function(a,b){ return dLeft(a.e)-dLeft(b.e); }).slice(0,8);
+  if(actionList.length){
+    $('d-urg').innerHTML=actionList.map(function(l){
+      var d=dLeft(l.e), u2=urg(l.e);
+      var clr=u2==='urgent'?'#dc2626':'#d97706';
+      var bg=u2==='urgent'?'background:#fef2f2;border-color:#fecaca':'background:#fffbeb;border-color:#fde68a';
+      return '<div class="urg-item" style="'+bg+'">'
+        +'<span class="urg-key" style="color:'+clr+'">'+l.k+'</span>'
+        +'<span class="urg-name">'+l.m+'</span>'
+        +'<span class="urg-days" style="color:'+clr+'">'+(d<0?'หมดแล้ว':d+' วัน')+'</span>'
+        +'</div>';
+    }).join('');
+  } else {
+    $('d-urg').innerHTML='<div style="text-align:center;padding:18px;color:#94a3b8">✅ ไม่มีรายการที่ต้องดำเนินการ</div>';
+  }
 
   // Mfr top10
   var mfr={};
@@ -884,6 +898,20 @@ function buildDash(){
 // ════════════════════════════════════════════
 // LICENSE LIST
 // ════════════════════════════════════════════
+function setFilterAndGo(f){
+  CUR_F=f;
+  document.querySelectorAll('.fbtn').forEach(function(b){
+    b.classList.toggle('on', b.textContent.toLowerCase().includes(f)||
+      (f==='expired'&&b.textContent.includes('หมดอายุ'))||
+      (f==='urgent'&&b.textContent.includes('ด่วน'))||
+      (f==='warn'&&b.textContent.includes('เตือน')));
+  });
+  $('page-dash').classList.remove('on');
+  $('page-lic').classList.add('on');
+  $('t-dash').classList.remove('on');
+  $('t-lic').classList.add('on');
+  renderList();
+}
 function goPage(p){
   $('page-dash').classList.toggle('on',p==='dash');
   $('page-lic').classList.toggle('on',p==='lic');
