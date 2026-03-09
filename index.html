@@ -625,7 +625,7 @@ body.dark .nav-flash{color:#34d399}
 // ════════════════════════════════════════════
 // CONFIG
 // ════════════════════════════════════════════
-var GAS   = 'https://script.google.com/macros/s/AKfycbxEln9oOk5JT-Nhj4-bn_UGnjxcBfeulmBifQA-8xaq2wl_pw7XnWfAQDeS97Uy8dQd/exec';
+var GAS   = 'https://script.google.com/macros/s/AKfycbyikMjI3l2rmE97lyoiJ2pAmqcPvCDY3rj-fHbi6FudrvjgXieSd-oauRhN2JTSbxCG/exec';
 var DRIVE = 'https://drive.google.com/drive/folders/1pZN6e7oH-kMGOs8lNwWX2fCTf_RTQBvc';
 
 // localStorage keys — ใหม่ทั้งหมด ไม่ซ้ำกับเวอร์ชันเก่า
@@ -1171,20 +1171,45 @@ function applyImport(){
   $('imp-ok').style.display='none'; $('imp-preview').style.display='none'; PENDING=null;
   sv(SK.lics,LICS); buildDash(); renderList();
   if(!changed.length){ flash('✅ ไม่มีการเปลี่ยนแปลง'); return; }
-  flash('⏳ กำลังบันทึก '+changed.length+' ใบ...');
-  sendBatch(changed,0);
+  var totalInSheets = LICS.length - changed.filter(function(l){ return !LICS.find(function(x){ return x===l&&x._orig; }); }).length;
+  var needFullImport = (LICS.length - changed.length) < 5; // Sheets เกือบว่าง → ส่งทั้งหมด
+  flash('⏳ กำลังบันทึก '+(needFullImport?LICS.length:changed.length)+' ใบ...');
+  if(needFullImport){
+    sendBatch(LICS,0,true); // importFull
+  } else {
+    sendBatch(changed,0,false); // upsert เฉพาะที่เปลี่ยน
+  }
 }
 
-function sendBatch(all,offset){
+function sendBatch(all,offset,useImportFull){
   var CHUNK=30, chunk=all.slice(offset,offset+CHUNK);
-  if(!chunk.length){ flash('✅ บันทึก Sheets สำเร็จ '+all.length+' ใบ'); return; }
+  if(!chunk.length){ 
+    flash('✅ บันทึก Sheets สำเร็จ '+all.length+' ใบ');
+    loadData(); // โหลดใหม่หลัง import
+    return; 
+  }
+  // ถ้าเป็น importFull ส่งทีละ CHUNK แต่ใช้ upsertLicenses
+  // (importFull ถูกเรียกครั้งแรกเดียวที่ offset=0 เท่านั้น)
+  var action = (useImportFull && offset===0) ? 'importFull' : 'upsertLicenses';
+  var payload = (action==='importFull') ? {action:'importFull',token:TOK,licenses:all} 
+                                        : {action:'upsertLicenses',token:TOK,licenses:chunk};
+  console.log('[FDA] sendBatch action='+action+' offset='+offset+' chunk='+chunk.length);
   fetch(GAS,{method:'POST',headers:{'Content-Type':'text/plain'},
-    body:JSON.stringify({action:'upsertLicenses',token:TOK,licenses:chunk})})
+    body:JSON.stringify(payload)})
     .then(function(r){ return r.json(); })
     .then(function(d){
-      if(!d.success){ flash('❌ บันทึกไม่ได้'); return; }
-      setTimeout(function(){ sendBatch(all,offset+CHUNK); },200);
-    }).catch(function(e){ flash('❌ '+e.message); });
+      console.log('[FDA] response:', JSON.stringify(d));
+      if(!d.success){ flash('❌ บันทึกไม่ได้: '+(d.error||'?')); return; }
+      if(action==='importFull'){
+        flash('✅ Import ครบ '+all.length+' ใบ สำเร็จ!');
+        loadData();
+        return;
+      }
+      setTimeout(function(){ sendBatch(all,offset+CHUNK,false); },200);
+    }).catch(function(e){ 
+      console.error('[FDA] sendBatch error:',e);
+      flash('❌ '+e.message); 
+    });
 }
 
 // ════════════════════════════════════════════
@@ -1262,9 +1287,12 @@ function savePDFUrls(){
   var urls=LICS.filter(function(l){ return l.url; })
     .map(function(l){ return {k:l.k,url:l.url}; });
   if(!urls.length) return;
+  console.log('[FDA] savePDFUrls: '+urls.length+' urls');
   fetch(GAS,{method:'POST',headers:{'Content-Type':'text/plain'},
     body:JSON.stringify({action:'saveUrls',token:TOK,licenses:urls})})
-    .catch(function(){});
+    .then(function(r){ return r.json(); })
+    .then(function(d){ flash('✅ บันทึก URL PDF '+d.saved+' ใบลง Sheets'); })
+    .catch(function(e){ console.error('[FDA] saveUrls error:',e); });
 }
 
 // ════════════════════════════════════════════
