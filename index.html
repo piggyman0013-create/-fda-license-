@@ -6,409 +6,637 @@
 <title>FDA License Manager</title>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
+/* ─── RESET ─── */
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Sarabun',sans-serif;background:#f0f4f8;color:#1e293b;font-size:14px}
+body{font-family:'Sarabun',sans-serif;font-size:14px;background:#f1f5f9;color:#1e293b;overflow-x:hidden}
 
-/* ── DARK ── */
-body.dark{background:#0f172a;color:#e2e8f0}
-body.dark .card,.dark .row-card,.dark .ctrl{background:#1e293b!important;border-color:#334155!important}
-body.dark .nav{background:linear-gradient(135deg,#071121,#0f2342)!important}
-body.dark .stat-card{background:#1e293b!important;border-color:#334155!important}
-body.dark input,body.dark select{background:#0f172a!important;color:#e2e8f0!important;border-color:#334155!important}
-body.dark .panel-wrap{background:#162032!important;border-color:#334155!important}
-body.dark .modal-box{background:#1e293b!important;border-color:#334155!important}
-body.dark .modal-ft{background:#162032!important}
-body.dark .prod-tbl th{background:#0f172a!important}
-body.dark .prod-tbl td{border-color:#334155!important}
-body.dark .info-lbl{color:#94a3b8!important}
-body.dark .tl-desc{color:#64748b!important}
+/* ─── LOADING SCREEN ─── */
+#scr-loading{
+  position:fixed;inset:0;z-index:9999;
+  background:linear-gradient(135deg,#020617,#0f172a,#0c2340);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;
+}
+.ld-logo{width:80px;height:80px;background:linear-gradient(135deg,#0891b2,#0369a1);
+  border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:36px;
+  animation:pulse 1.5s ease-in-out infinite}
+.ld-title{color:#fff;font-size:20px;font-weight:700}
+.ld-sub{color:#94a3b8;font-size:13px}
+.ld-bar{width:220px;height:4px;background:rgba(255,255,255,.12);border-radius:4px;overflow:hidden}
+.ld-fill{height:100%;background:linear-gradient(90deg,#0891b2,#38bdf8);border-radius:4px;
+  width:0;transition:width .4s ease}
+.ld-msg{color:#38bdf8;font-size:12px;min-height:16px}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
 
-/* ── LOGIN ── */
-#pg-login{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#020617 0%,#0f172a 50%,#0c2340 100%);z-index:999}
-.login-box{background:rgba(255,255,255,.06);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:44px 40px 36px;width:360px;text-align:center}
-.login-logo{width:64px;height:64px;background:linear-gradient(135deg,#0891b2,#0f2342);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 20px}
-.login-t{font-size:22px;font-weight:700;color:#fff;margin-bottom:4px}
-.login-s{font-size:12px;color:#94a3b8;margin-bottom:28px}
-.login-inp{width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:13px 14px;color:#fff;font-size:14px;font-family:Sarabun,sans-serif;outline:none;transition:.2s;margin-bottom:10px}
-.login-inp:focus{border-color:#0891b2;background:rgba(8,145,178,.12)}
-.login-inp::placeholder{color:#475569}
-.login-btn{width:100%;background:linear-gradient(135deg,#0891b2,#0369a1);border:none;border-radius:10px;padding:13px;color:#fff;font-size:15px;font-weight:600;font-family:Sarabun,sans-serif;cursor:pointer;transition:.2s;margin-top:2px}
-.login-btn:hover:not(:disabled){opacity:.88;transform:translateY(-1px)}
-.login-btn:disabled{opacity:.5;cursor:default}
-.login-err{color:#f87171;font-size:12px;margin-top:10px;min-height:16px}
+/* ─── LOGIN SCREEN ─── */
+#scr-login{
+  position:fixed;inset:0;z-index:1000;
+  background:linear-gradient(135deg,#020617,#0f172a,#0c2340);
+  display:none;align-items:center;justify-content:center;
+}
+.login-card{
+  background:rgba(255,255,255,.06);backdrop-filter:blur(24px);
+  border:1px solid rgba(255,255,255,.12);border-radius:24px;
+  padding:44px 40px 36px;width:360px;text-align:center;
+  animation:slideUp .35s ease;
+}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+.lc-logo{width:68px;height:68px;background:linear-gradient(135deg,#0891b2,#0369a1);
+  border-radius:18px;display:flex;align-items:center;justify-content:center;
+  font-size:30px;margin:0 auto 20px}
+.lc-title{font-size:22px;font-weight:700;color:#fff;margin-bottom:4px}
+.lc-sub{font-size:12px;color:#94a3b8;margin-bottom:28px}
+.lc-inp{
+  width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);
+  border-radius:10px;padding:13px 14px;color:#fff;font-size:14px;
+  font-family:'Sarabun',sans-serif;outline:none;transition:.2s;margin-bottom:10px;
+}
+.lc-inp:focus{border-color:#0891b2;background:rgba(8,145,178,.14)}
+.lc-inp::placeholder{color:#475569}
+.lc-btn{
+  width:100%;background:linear-gradient(135deg,#0891b2,#0369a1);
+  border:none;border-radius:10px;padding:13px;color:#fff;font-size:15px;
+  font-weight:600;font-family:'Sarabun',sans-serif;cursor:pointer;transition:.2s;margin-top:2px;
+}
+.lc-btn:hover:not(:disabled){filter:brightness(1.1);transform:translateY(-1px)}
+.lc-btn:disabled{opacity:.55;cursor:default;transform:none}
+.lc-err{color:#f87171;font-size:12px;margin-top:10px;min-height:16px}
 
-/* ── NAV ── */
-.nav{background:linear-gradient(135deg,#0f2342,#1a3960);height:54px;display:flex;align-items:center;padding:0 18px;gap:14px;position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,.35)}
-.brand{display:flex;align-items:center;gap:9px;color:#fff;font-weight:700;font-size:14px;white-space:nowrap}
-.brand-ico{width:30px;height:30px;background:linear-gradient(135deg,#0891b2,#0369a1);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px}
-.tabs{display:flex;gap:3px;flex:1}
-.tab{padding:5px 13px;border-radius:7px;color:rgba(255,255,255,.65);cursor:pointer;font-size:13px;font-weight:500;transition:.2s;white-space:nowrap}
-.tab.on,.tab:hover{background:rgba(255,255,255,.14);color:#fff}
-.tab .bdg{background:#ef4444;color:#fff;font-size:10px;padding:1px 5px;border-radius:8px;margin-left:4px}
-.nav-r{display:flex;align-items:center;gap:5px}
-.nbtn{padding:5px 11px;border-radius:7px;border:1px solid rgba(255,255,255,.18);color:#fff;background:transparent;font-size:12px;font-family:Sarabun,sans-serif;cursor:pointer;transition:.2s;white-space:nowrap}
-.nbtn:hover{background:rgba(255,255,255,.14)}
-.nbtn.adm{background:#7c3aed;border-color:#6d28d9}
-.flash{font-size:11px;color:#34d399;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* ─── MAIN APP ─── */
+#app{display:none}
 
-/* ── ROLE BAR ── */
-.role-bar{padding:7px 18px;display:flex;align-items:center;gap:10px;font-size:12px;border-bottom:1px solid rgba(0,0,0,.08)}
-body:not(.dark) .role-bar{background:#1e3a5f;color:#cbd5e1}
-body.dark .role-bar{background:#0f1e36;border-color:#1e3a5f}
-.rbadge{padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700}
-.rbadge.v{background:#374151;color:#9ca3af}
-.rbadge.a{background:#16a34a;color:#fff}
-.role-info{flex:1;color:#94a3b8;font-size:11px}
-.rsw{background:transparent;border:1px solid rgba(255,255,255,.18);color:#e2e8f0;border-radius:7px;padding:3px 11px;font-size:11px;font-family:Sarabun,sans-serif;cursor:pointer}
+/* ─── NAV ─── */
+.nav{
+  background:linear-gradient(135deg,#0f2342,#1a3960);
+  height:52px;display:flex;align-items:center;padding:0 16px;gap:12px;
+  position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.35);
+}
+.nav-brand{display:flex;align-items:center;gap:8px;color:#fff;font-weight:700;font-size:14px;white-space:nowrap}
+.nav-logo{width:28px;height:28px;background:linear-gradient(135deg,#0891b2,#0369a1);
+  border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px}
+.nav-tabs{display:flex;gap:2px;flex:1}
+.ntab{
+  padding:5px 13px;border-radius:7px;color:rgba(255,255,255,.6);
+  cursor:pointer;font-size:13px;font-weight:500;transition:.15s;white-space:nowrap;user-select:none;
+}
+.ntab:hover,.ntab.on{background:rgba(255,255,255,.14);color:#fff}
+.ntab .cnt{
+  background:#ef4444;color:#fff;font-size:10px;
+  padding:1px 5px;border-radius:8px;margin-left:4px;
+}
+.nav-right{display:flex;align-items:center;gap:5px;margin-left:auto}
+.nav-flash{font-size:11px;color:#34d399;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nav-btn{
+  padding:5px 11px;border-radius:7px;border:1px solid rgba(255,255,255,.18);
+  color:#fff;background:transparent;font-size:12px;font-family:'Sarabun',sans-serif;
+  cursor:pointer;transition:.15s;white-space:nowrap;font-weight:500;
+}
+.nav-btn:hover{background:rgba(255,255,255,.14)}
+.nav-btn.admin-only{display:none}
 
-/* ── SYNC BAR ── */
-.sync-bar{background:#064e3b;border-bottom:1px solid #065f46;padding:6px 18px;font-size:12px;color:#6ee7b7;display:none;align-items:center;gap:10px}
-.sync-bar.on{display:flex}
-.sync-bar button{background:#047857;border:none;color:#fff;border-radius:5px;padding:3px 10px;font-size:11px;font-family:Sarabun,sans-serif;cursor:pointer}
+/* ─── INFO BAR ─── */
+.info-bar{
+  background:#1a3a5c;border-bottom:1px solid rgba(255,255,255,.08);
+  padding:6px 16px;display:flex;align-items:center;gap:10px;font-size:12px;
+}
+.role-pill{
+  padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700;
+}
+.role-pill.viewer{background:#374151;color:#9ca3af}
+.role-pill.admin{background:#16a34a;color:#fff}
+.info-text{color:#94a3b8;flex:1}
+.switch-btn{
+  background:transparent;border:1px solid rgba(255,255,255,.2);
+  color:#e2e8f0;border-radius:6px;padding:3px 10px;
+  font-size:11px;font-family:'Sarabun',sans-serif;cursor:pointer;
+}
 
-/* ── PAGES ── */
-.pg{padding:18px;display:none}
-.pg.on{display:block}
+/* ─── STATUS BAR ─── */
+.status-bar{
+  padding:6px 16px;display:flex;align-items:center;gap:10px;
+  font-size:12px;display:none;
+}
+.status-bar.loading{background:#1e3a5f;color:#93c5fd}
+.status-bar.success{background:#064e3b;color:#6ee7b7}
+.status-bar.error{background:#450a0a;color:#fca5a5}
+.status-bar.warn{background:#3b2000;color:#fcd34d}
+.status-bar.show{display:flex}
+.status-refresh{
+  background:rgba(255,255,255,.12);border:none;color:inherit;
+  border-radius:5px;padding:2px 9px;font-size:11px;font-family:'Sarabun',sans-serif;cursor:pointer;
+}
 
-/* ── STATS ── */
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
-@media(max-width:600px){.stats{grid-template-columns:repeat(2,1fr)}}
-.stat-card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:14px 16px}
+/* ─── PAGES ─── */
+.page{padding:16px;display:none;max-width:1400px;margin:0 auto}
+.page.on{display:block}
+
+/* ─── STATS ─── */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+@media(max-width:640px){.stats{grid-template-columns:repeat(2,1fr)}}
+.stat{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:14px 16px}
+body.dark .stat{background:#1e293b;border-color:#334155}
 .stat-lbl{font-size:11px;color:#64748b;margin-bottom:3px}
 .stat-n{font-size:26px;font-weight:700;line-height:1}
-.stat-n.red{color:#dc2626}.stat-n.yel{color:#d97706}.stat-n.grn{color:#16a34a}.stat-n.nvy{color:#0f2342}
+.stat-n.r{color:#dc2626}.stat-n.y{color:#d97706}
+.stat-n.g{color:#16a34a}.stat-n.b{color:#0f2342}
+body.dark .stat-n.b{color:#38bdf8}
 .stat-s{font-size:11px;color:#94a3b8;margin-top:2px}
 
-/* ── CHART CARDS ── */
-.charts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
-@media(max-width:700px){.charts{grid-template-columns:1fr}}
+/* ─── CARD ─── */
 .card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:14px}
-.card h3{font-size:12px;font-weight:600;color:#0f2342;margin-bottom:10px}
-.br{display:flex;align-items:center;gap:7px;margin-bottom:5px;font-size:12px}
-.br-lbl{width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#64748b}
-.br-trk{flex:1;background:#f1f5f9;border-radius:3px;height:10px}
-.br-fill{height:100%;background:linear-gradient(90deg,#0891b2,#0f2342);border-radius:3px;transition:.5s}
-.br-n{width:34px;text-align:right;font-weight:600;font-size:11px;color:#0f2342}
-.urg-item{display:flex;align-items:center;gap:7px;padding:7px 9px;background:#fef2f2;border:1px solid #fecaca;border-radius:7px;font-size:12px;margin-bottom:5px}
+body.dark .card{background:#1e293b;border-color:#334155}
+.card-title{font-size:12px;font-weight:600;color:#0f2342;margin-bottom:10px}
+body.dark .card-title{color:#38bdf8}
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+@media(max-width:700px){.charts{grid-template-columns:1fr}}
+
+/* ─── BAR CHART ─── */
+.brow{display:flex;align-items:center;gap:7px;margin-bottom:5px;font-size:12px}
+.brow-lbl{width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#64748b}
+body.dark .brow-lbl{color:#94a3b8}
+.brow-trk{flex:1;background:#f1f5f9;border-radius:3px;height:10px}
+body.dark .brow-trk{background:#0f172a}
+.brow-fill{height:100%;background:linear-gradient(90deg,#0891b2,#0f2342);border-radius:3px;transition:.6s}
+.brow-n{width:34px;text-align:right;font-weight:600;font-size:11px;color:#0f2342}
+body.dark .brow-n{color:#38bdf8}
+
+/* ─── URGENT ITEMS ─── */
+.urg-item{
+  display:flex;align-items:center;gap:8px;
+  padding:7px 9px;background:#fef2f2;border:1px solid #fecaca;
+  border-radius:7px;font-size:12px;margin-bottom:5px;
+}
+body.dark .urg-item{background:#3b0b0b;border-color:#7f1d1d}
 .urg-key{font-weight:700;color:#dc2626;font-size:11px;min-width:100px}
 .urg-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .urg-days{font-weight:700;color:#dc2626;white-space:nowrap}
 
-/* ── CTRL BAR ── */
-.ctrl{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:9px 12px;margin-bottom:10px;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
-.srch-w{position:relative;flex:1;min-width:180px}
-.srch-ico{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:#94a3b8;pointer-events:none}
-.srch{width:100%;border:1px solid #e2e8f0;border-radius:7px;padding:6px 9px 6px 28px;font-size:13px;font-family:Sarabun,sans-serif;background:transparent;color:inherit;outline:none}
+/* ─── CTRL BAR ─── */
+.ctrl{
+  background:#fff;border:1px solid #e2e8f0;border-radius:10px;
+  padding:9px 12px;margin-bottom:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+}
+body.dark .ctrl{background:#1e293b;border-color:#334155}
+.srch-wrap{position:relative;flex:1;min-width:180px}
+.srch-ico{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:#94a3b8;pointer-events:none;font-size:13px}
+.srch{
+  width:100%;border:1px solid #e2e8f0;border-radius:7px;
+  padding:7px 9px 7px 28px;font-size:13px;font-family:'Sarabun',sans-serif;
+  background:transparent;color:inherit;outline:none;
+}
+body.dark .srch{border-color:#334155}
 .srch:focus{border-color:#0891b2}
-.fbs{display:flex;gap:3px;flex-wrap:wrap}
-.fb{padding:4px 10px;border-radius:16px;border:1px solid #e2e8f0;background:transparent;font-size:11px;font-family:Sarabun,sans-serif;color:#64748b;cursor:pointer;transition:.15s}
-.fb.on{background:#0f2342;border-color:#0f2342;color:#fff}
-.srt{border:1px solid #e2e8f0;border-radius:7px;padding:5px 8px;font-size:12px;font-family:Sarabun,sans-serif;background:transparent;color:inherit;outline:none;cursor:pointer}
-.cnt{font-size:11px;color:#94a3b8;margin-left:auto;white-space:nowrap}
+.fbtn-group{display:flex;gap:3px;flex-wrap:wrap}
+.fbtn{
+  padding:4px 11px;border-radius:16px;border:1px solid #e2e8f0;
+  background:transparent;font-size:11px;font-family:'Sarabun',sans-serif;
+  color:#64748b;cursor:pointer;transition:.15s;
+}
+body.dark .fbtn{border-color:#334155;color:#94a3b8}
+.fbtn.on{background:#0f2342;border-color:#0f2342;color:#fff}
+body.dark .fbtn.on{background:#0369a1;border-color:#0369a1}
+.sort-sel{
+  border:1px solid #e2e8f0;border-radius:7px;padding:5px 8px;
+  font-size:12px;font-family:'Sarabun',sans-serif;background:transparent;
+  color:inherit;outline:none;cursor:pointer;
+}
+body.dark .sort-sel{border-color:#334155}
+.cnt-lbl{font-size:11px;color:#94a3b8;margin-left:auto;white-space:nowrap}
 
-/* ── ROW CARD ── */
-.row-card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;margin-bottom:7px;overflow:hidden;transition:.15s}
-.row-card:hover{border-color:#0891b2;box-shadow:0 2px 8px rgba(8,145,178,.1)}
-.row-card.urgent{border-left:3px solid #dc2626}
-.row-card.warn{border-left:3px solid #d97706}
-.row-card.ok{border-left:3px solid #16a34a}
-.row-card.expired{border-left:3px solid #94a3b8}
-.row-hdr{display:flex;align-items:center;gap:10px;padding:11px 14px;cursor:pointer;user-select:none}
-.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.d-u{background:#dc2626}.d-w{background:#d97706}.d-o{background:#16a34a}.d-e{background:#94a3b8}
-.row-key{font-size:11px;color:#64748b;width:130px;flex-shrink:0}
-.row-info{flex:1}
-.row-mfr{font-weight:600;font-size:13px}
-.row-ctry{font-size:11px;color:#94a3b8;margin-top:1px}
-.row-exp{text-align:right;flex-shrink:0}
-.row-date{font-weight:600;font-size:12px}
-.row-days{font-size:11px}
-.row-acts{display:flex;gap:5px;flex-shrink:0}
-.abtn{padding:3px 9px;border-radius:6px;border:1px solid;font-size:11px;font-family:Sarabun,sans-serif;cursor:pointer;font-weight:500;transition:.15s;white-space:nowrap}
-.abtn:hover{opacity:.82}
-.pdf-on{background:#15803d;border-color:#166534;color:#fff}
-.pdf-off{background:#f1f5f9;border-color:#e2e8f0;color:#94a3b8;cursor:default}
-.chv{color:#94a3b8;font-size:11px;flex-shrink:0;transition:.25s}
-.row-card.open .chv{transform:rotate(180deg)}
+/* ─── LICENSE ROW ─── */
+.lic-item{
+  background:#fff;border:1px solid #e2e8f0;border-radius:10px;
+  margin-bottom:7px;overflow:hidden;transition:.15s;
+}
+body.dark .lic-item{background:#1e293b;border-color:#334155}
+.lic-item:hover{border-color:#0891b2;box-shadow:0 2px 8px rgba(8,145,178,.1)}
+.lic-item.urgent{border-left:3px solid #dc2626}
+.lic-item.warn{border-left:3px solid #d97706}
+.lic-item.ok{border-left:3px solid #16a34a}
+.lic-item.expired{border-left:3px solid #94a3b8}
+.lic-hdr{
+  display:flex;align-items:center;gap:10px;
+  padding:11px 14px;cursor:pointer;user-select:none;
+}
+.lic-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.dot-urgent{background:#dc2626}.dot-warn{background:#d97706}
+.dot-ok{background:#16a34a}.dot-expired{background:#94a3b8}
+.lic-key{font-size:11px;color:#64748b;width:130px;flex-shrink:0}
+body.dark .lic-key{color:#94a3b8}
+.lic-info{flex:1;min-width:0}
+.lic-mfr{font-weight:600;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lic-ctry{font-size:11px;color:#94a3b8;margin-top:1px}
+.lic-exp-wrap{text-align:right;flex-shrink:0}
+.lic-date{font-weight:600;font-size:12px}
+.lic-days{font-size:11px;margin-top:1px}
+.lic-actions{display:flex;gap:5px;flex-shrink:0}
+.act-btn{
+  padding:4px 9px;border-radius:6px;border:1px solid;
+  font-size:11px;font-family:'Sarabun',sans-serif;cursor:pointer;
+  font-weight:500;transition:.15s;white-space:nowrap;
+}
+.act-btn:hover{opacity:.82}
+.btn-pdf{background:#15803d;border-color:#166534;color:#fff}
+.btn-pdf.none{background:#f1f5f9;border-color:#e2e8f0;color:#94a3b8;cursor:default}
+body.dark .btn-pdf.none{background:#0f172a;border-color:#334155;color:#475569}
+.btn-edit{background:transparent;border-color:#e2e8f0;color:#64748b}
+body.dark .btn-edit{border-color:#334155;color:#94a3b8}
+.lic-chv{color:#94a3b8;font-size:11px;flex-shrink:0;transition:.25s}
+.lic-item.open .lic-chv{transform:rotate(180deg)}
 
-/* ── PANEL ── */
-.panel-wrap{display:none;background:#f8fafc;border-top:1px solid #e2e8f0;padding:14px 16px}
-.row-card.open .panel-wrap{display:block}
+/* ─── PANEL ─── */
+.lic-panel{
+  display:none;background:#f8fafc;
+  border-top:1px solid #e2e8f0;padding:14px 16px;
+}
+body.dark .lic-panel{background:#162032;border-color:#334155}
+.lic-item.open .lic-panel{display:block}
 .panel-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 @media(max-width:600px){.panel-grid{grid-template-columns:1fr}}
-.psec h4{font-size:12px;font-weight:600;color:#0f2342;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #e2e8f0}
-.irow{display:flex;gap:8px;margin-bottom:5px;font-size:12px}
-.info-lbl{color:#64748b;width:90px;flex-shrink:0}
-.info-val{font-weight:500}
-.prod-srch{width:100%;border:1px solid #e2e8f0;border-radius:6px;padding:5px 8px;font-size:12px;font-family:Sarabun,sans-serif;background:transparent;color:inherit;outline:none;margin-bottom:5px}
-.prod-tbl{width:100%;border-collapse:collapse;font-size:11px}
-.prod-tbl th{background:#f1f5f9;padding:4px 7px;text-align:left;font-weight:600;color:#0f2342;position:sticky;top:0}
-.prod-tbl td{padding:4px 7px;border-bottom:1px solid #f1f5f9}
-.prod-tbl tr:hover td{background:#f8fafc}
+.psec{margin-bottom:12px}
+.psec-title{
+  font-size:12px;font-weight:600;color:#0f2342;
+  margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #e2e8f0;
+}
+body.dark .psec-title{color:#38bdf8;border-color:#334155}
+.info-row{display:flex;gap:8px;margin-bottom:5px;font-size:12px}
+.inf-lbl{color:#64748b;width:85px;flex-shrink:0;font-size:11px}
+body.dark .inf-lbl{color:#94a3b8}
+.inf-val{font-weight:500}
+/* Prods table */
+.prod-srch-inp{
+  width:100%;border:1px solid #e2e8f0;border-radius:6px;
+  padding:5px 8px;font-size:12px;font-family:'Sarabun',sans-serif;
+  background:transparent;color:inherit;outline:none;margin-bottom:5px;
+}
+body.dark .prod-srch-inp{border-color:#334155}
 .prod-scroll{max-height:180px;overflow-y:auto}
-.chklist li{display:flex;align-items:center;gap:7px;padding:4px 0;font-size:12px;border-bottom:1px solid #f1f5f9;list-style:none}
-.chklist li:last-child{border:none}
-.chklist li input{cursor:pointer}
-.chklist li.done span{text-decoration:line-through;color:#94a3b8}
-.tl-item{display:flex;gap:9px;font-size:12px;margin-bottom:7px}
+.prod-tbl{width:100%;border-collapse:collapse;font-size:11px}
+.prod-tbl th{
+  background:#f1f5f9;padding:4px 6px;text-align:left;
+  font-weight:600;color:#0f2342;position:sticky;top:0;
+}
+body.dark .prod-tbl th{background:#0f172a;color:#38bdf8}
+.prod-tbl td{padding:4px 6px;border-bottom:1px solid #f1f5f9;color:#374151}
+body.dark .prod-tbl td{border-color:#1e293b;color:#cbd5e1}
+.prod-tbl tr:hover td{background:#f1f5f9}
+body.dark .prod-tbl tr:hover td{background:#0f172a}
+.prod-loading{text-align:center;padding:12px;color:#94a3b8;font-size:12px}
+/* Checklist */
+.chklist{list-style:none}
+.chk-item{
+  display:flex;align-items:center;gap:7px;
+  padding:4px 0;font-size:12px;border-bottom:1px solid #f1f5f9;
+}
+body.dark .chk-item{border-color:#1e293b}
+.chk-item:last-child{border:none}
+.chk-item input[type=checkbox]{cursor:pointer;accent-color:#0891b2}
+.chk-item.done>span{text-decoration:line-through;color:#94a3b8}
+/* Timeline */
+.tl-item{display:flex;gap:9px;margin-bottom:7px}
 .tl-dot{width:9px;height:9px;border-radius:50%;margin-top:3px;flex-shrink:0}
-.tl-when{font-weight:600;color:#0f2342;font-size:11px}
-.tl-desc{color:#64748b;font-size:11px}
-.p-acts{display:flex;gap:7px;margin-top:12px;flex-wrap:wrap}
-.pbtn{padding:6px 13px;border-radius:7px;border:1px solid;font-size:12px;font-family:Sarabun,sans-serif;cursor:pointer;font-weight:500;transition:.15s}
-.pbtn:hover{opacity:.85}
-.pb-pdf{background:#15803d;border-color:#166534;color:#fff}
-.pb-close{background:#dc2626;border-color:#b91c1c;color:#fff}
-.pb-edit{background:transparent;border-color:#e2e8f0;color:#64748b}
+.tl-lbl{font-size:11px;font-weight:600;color:#0f2342}
+body.dark .tl-lbl{color:#38bdf8}
+.tl-desc{font-size:11px;color:#64748b}
+/* Panel footer */
+.panel-footer{display:flex;gap:7px;margin-top:12px;flex-wrap:wrap}
+.pfbtn{
+  padding:6px 13px;border-radius:7px;border:1px solid;
+  font-size:12px;font-family:'Sarabun',sans-serif;cursor:pointer;font-weight:500;
+  transition:.15s;
+}
+.pfbtn:hover{opacity:.85}
+.pfbtn-pdf{background:#15803d;border-color:#166534;color:#fff}
+.pfbtn-edit{background:transparent;border-color:#e2e8f0;color:#64748b}
+body.dark .pfbtn-edit{border-color:#334155;color:#94a3b8}
+.pfbtn-close{background:#dc2626;border-color:#b91c1c;color:#fff}
 
-/* ── MODAL ── */
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;display:flex;align-items:center;justify-content:center;padding:14px}
-.modal-bg.h{display:none}
-.modal-box{background:#fff;border-radius:14px;width:100%;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3)}
-.modal-hdr{background:linear-gradient(135deg,#0f2342,#1a3960);padding:14px 18px;display:flex;align-items:flex-start;justify-content:space-between}
-.mh-t{font-size:14px;font-weight:700;color:#fff}
-.mh-s{font-size:11px;color:rgba(255,255,255,.65);margin-top:2px}
-.mx{background:rgba(255,255,255,.14);border:none;color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:13px;flex-shrink:0}
+/* ─── MODAL ─── */
+.modal-wrap{
+  position:fixed;inset:0;background:rgba(0,0,0,.6);
+  z-index:500;display:flex;align-items:center;justify-content:center;
+  padding:14px;backdrop-filter:blur(4px);
+}
+.modal-wrap.hide{display:none}
+.modal-box{
+  background:#fff;border-radius:14px;width:100%;overflow:hidden;
+  box-shadow:0 20px 60px rgba(0,0,0,.3);animation:slideUp .25s ease;
+}
+body.dark .modal-box{background:#1e293b;border:1px solid #334155}
+.modal-hdr{
+  background:linear-gradient(135deg,#0f2342,#1a3960);
+  padding:14px 18px;display:flex;align-items:flex-start;justify-content:space-between;
+}
+.mhdr-t{font-size:14px;font-weight:700;color:#fff}
+.mhdr-s{font-size:11px;color:rgba(255,255,255,.6);margin-top:2px}
+.mhdr-x{
+  background:rgba(255,255,255,.14);border:none;color:#fff;
+  width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:13px;flex-shrink:0;
+}
 .modal-body{padding:18px}
 .mfield{margin-bottom:12px}
 .mlbl{font-size:12px;font-weight:600;color:#64748b;margin-bottom:3px}
-.minp{width:100%;border:1px solid #e2e8f0;border-radius:7px;padding:8px 11px;font-size:13px;font-family:Sarabun,sans-serif;background:transparent;color:inherit;outline:none}
+body.dark .mlbl{color:#94a3b8}
+.minp{
+  width:100%;border:1px solid #e2e8f0;border-radius:7px;
+  padding:9px 11px;font-size:13px;font-family:'Sarabun',sans-serif;
+  background:transparent;color:inherit;outline:none;
+}
+body.dark .minp{border-color:#334155}
 .minp:focus{border-color:#0891b2}
-.merr{color:#dc2626;font-size:12px;margin-top:3px;display:none}
-.modal-ft{padding:11px 18px;background:#f8fafc;display:flex;gap:7px;justify-content:flex-end;border-top:1px solid #e2e8f0}
-.mbtn{padding:7px 16px;border-radius:7px;border:1px solid;font-size:13px;font-family:Sarabun,sans-serif;cursor:pointer;font-weight:500;transition:.15s}
-.mb-cancel{background:transparent;border-color:#e2e8f0;color:#64748b}
-.mb-ok{background:#0891b2;border-color:#0e7490;color:#fff}
-.mb-ok:hover{background:#0e7490}
-
-/* ── IMPORT ── */
-.dz{border:2px dashed #e2e8f0;border-radius:10px;padding:28px;text-align:center;cursor:pointer;transition:.2s;margin-bottom:10px}
-.dz:hover,.dz.drag{border-color:#0891b2;background:rgba(8,145,178,.04)}
-.merge-smry{font-size:12px;font-weight:600;margin-bottom:5px}
+.merr{color:#dc2626;font-size:12px;margin-top:4px;display:none}
+.modal-footer{
+  padding:11px 18px;border-top:1px solid #e2e8f0;
+  display:flex;gap:7px;justify-content:flex-end;
+}
+body.dark .modal-footer{border-color:#334155;background:#162032}
+.mbtn{
+  padding:7px 16px;border-radius:7px;border:1px solid;
+  font-size:13px;font-family:'Sarabun',sans-serif;cursor:pointer;font-weight:500;
+}
+.mbtn-cancel{background:transparent;border-color:#e2e8f0;color:#64748b}
+body.dark .mbtn-cancel{border-color:#334155;color:#94a3b8}
+.mbtn-ok{background:#0891b2;border-color:#0e7490;color:#fff}
+.mbtn-ok:hover{background:#0e7490}
+/* Dropzone */
+.dzone{
+  border:2px dashed #e2e8f0;border-radius:10px;
+  padding:26px;text-align:center;cursor:pointer;transition:.2s;margin-bottom:10px;
+}
+body.dark .dzone{border-color:#334155}
+.dzone:hover,.dzone.drag{border-color:#0891b2;background:rgba(8,145,178,.04)}
+.dzone-ico{font-size:28px;margin-bottom:8px}
+.dzone-lbl{font-weight:600;margin-bottom:4px}
+.dzone-hint{font-size:11px;color:#94a3b8}
+/* Merge preview */
+.merge-smry{font-size:12px;font-weight:600;margin-bottom:6px}
 .merge-list{max-height:180px;overflow-y:auto}
-.mrow{display:flex;gap:5px;padding:3px 0;border-bottom:1px solid #f1f5f9;font-size:11px}
-.m-add{color:#16a34a}.m-upd{color:#2563eb}.m-skip{color:#94a3b8}
-
-/* ── UPLOAD LIST ── */
+.merge-row{display:flex;gap:5px;padding:3px 0;border-bottom:1px solid #f1f5f9;font-size:11px}
+body.dark .merge-row{border-color:#1e293b}
+.mr-add{color:#16a34a}.mr-upd{color:#2563eb}.mr-skip{color:#94a3b8}
+/* Upload list */
+.ul-scroll{max-height:150px;overflow-y:auto}
 .ul-item{display:flex;align-items:center;gap:7px;padding:5px 0;border-bottom:1px solid #f1f5f9;font-size:12px}
+body.dark .ul-item{border-color:#1e293b}
 .us{width:12px;height:12px;border-radius:50%;flex-shrink:0}
 .us-q{background:#e2e8f0}.us-ok{background:#16a34a}.us-err{background:#dc2626}
-.ul-scroll{max-height:140px;overflow-y:auto}
 
-/* ── PDF MODAL ── */
-.pdf-bg{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:600;flex-direction:column;align-items:center;justify-content:center;display:none}
-.pdf-bg.on{display:flex}
-.pdf-box{background:#1e293b;border-radius:12px;width:95vw;max-width:880px;height:90vh;display:flex;flex-direction:column;overflow:hidden}
-.pdf-hdr{background:linear-gradient(135deg,#16a34a,#15803d);padding:11px 18px;display:flex;align-items:center;gap:10px;flex-shrink:0}
-.pdf-title{font-size:13px;font-weight:700;color:#fff;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.pdf-x{background:rgba(255,255,255,.18);border:none;color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:13px}
-.pdf-body{flex:1;position:relative;overflow:hidden}
-.pdf-loading{position:absolute;inset:0;background:#0f172a;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;z-index:2}
-.pdf-spin{width:42px;height:42px;border:4px solid #334155;border-top-color:#38bdf8;border-radius:50%;animation:spin 1s linear infinite}
-.pdf-lt{color:#94a3b8;font-size:12px}
-.pdf-frame{width:100%;height:100%;border:none;display:block}
-.pdf-ft{padding:9px 18px;background:#1e293b;border-top:1px solid #334155;display:flex;justify-content:center;flex-shrink:0}
-.pdf-close{background:#dc2626;border:none;color:#fff;border-radius:7px;padding:7px 22px;font-size:13px;font-family:Sarabun,sans-serif;cursor:pointer;font-weight:600}
+/* ─── PDF VIEWER ─── */
+.pdf-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.9);
+  z-index:600;display:none;flex-direction:column;align-items:center;justify-content:center;
+  padding:16px;
+}
+.pdf-overlay.show{display:flex}
+.pdf-box{
+  background:#1e293b;border-radius:12px;
+  width:95vw;max-width:900px;height:90vh;
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.pdf-hdr{
+  background:linear-gradient(135deg,#16a34a,#15803d);
+  padding:10px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0;
+}
+.pdf-hdr-title{font-size:13px;font-weight:700;color:#fff;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pdf-hdr-x{background:rgba(255,255,255,.18);border:none;color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:13px}
+.pdf-content{flex:1;position:relative;overflow:hidden}
+.pdf-loader{
+  position:absolute;inset:0;background:#0f172a;
+  display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;
+}
+.pdf-spin{
+  width:44px;height:44px;border:4px solid #334155;
+  border-top-color:#38bdf8;border-radius:50%;animation:spin 1s linear infinite;
+}
+.pdf-loader-txt{color:#94a3b8;font-size:12px}
+.pdf-iframe{width:100%;height:100%;border:none;display:block}
+.pdf-footer{
+  padding:9px 16px;background:#162032;border-top:1px solid #334155;
+  display:flex;justify-content:center;flex-shrink:0;
+}
+.pdf-close-btn{
+  background:#dc2626;border:none;color:#fff;
+  border-radius:7px;padding:7px 22px;font-size:13px;font-family:'Sarabun',sans-serif;cursor:pointer;font-weight:600;
+}
 
-/* ── PROG ── */
-.prog{height:3px;background:transparent;position:fixed;top:0;left:0;right:0;z-index:999;display:none}
-.prog.on{display:block}
-.prog-fill{height:100%;background:#0891b2;transition:width .3s}
+/* ─── DARK MODE ─── */
+body.dark{background:#0f172a;color:#e2e8f0}
+body.dark .nav-flash{color:#34d399}
+
+/* ─── PROGRESS BAR ─── */
+.prog-bar{height:3px;position:fixed;top:0;left:0;right:0;z-index:999;display:none}
+.prog-bar.show{display:block}
+.prog-fill{height:100%;background:linear-gradient(90deg,#0891b2,#38bdf8);transition:width .3s}
 
 @keyframes spin{to{transform:rotate(360deg)}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-.row-card{animation:fadeUp .18s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.lic-item{animation:fadeUp .15s ease}
 </style>
 </head>
 <body>
 
-<!-- PROG BAR -->
-<div class="prog" id="prog"><div class="prog-fill" id="prog-fill" style="width:0"></div></div>
+<!-- ═══ LOADING SCREEN ═══ -->
+<div id="scr-loading">
+  <div class="ld-logo">🏥</div>
+  <div class="ld-title">FDA License Manager</div>
+  <div class="ld-sub">กำลังเชื่อมต่อระบบ...</div>
+  <div class="ld-bar"><div class="ld-fill" id="ld-fill"></div></div>
+  <div class="ld-msg" id="ld-msg">กำลังโหลด...</div>
+</div>
 
-<!-- ══ LOGIN ══ -->
-<div id="pg-login">
-  <div class="login-box">
-    <div class="login-logo">🏥</div>
-    <div class="login-t">FDA License Manager</div>
-    <div class="login-s">ระบบจัดการใบอนุญาตเครื่องมือแพทย์</div>
-    <input class="login-inp" id="lpw" type="password" placeholder="รหัสผ่าน" autocomplete="current-password">
-    <button class="login-btn" id="lbtn">🔐 เข้าสู่ระบบ</button>
-    <div class="login-err" id="lerr"></div>
+<!-- ═══ LOGIN SCREEN ═══ -->
+<div id="scr-login">
+  <div class="login-card">
+    <div class="lc-logo">🏥</div>
+    <div class="lc-title">FDA License Manager</div>
+    <div class="lc-sub">ระบบจัดการใบอนุญาตเครื่องมือแพทย์</div>
+    <input class="lc-inp" id="lc-pw" type="password" placeholder="รหัสผ่าน" autocomplete="current-password">
+    <button class="lc-btn" id="lc-btn">🔐 เข้าสู่ระบบ</button>
+    <div class="lc-err" id="lc-err"></div>
   </div>
 </div>
 
-<!-- ══ MAIN ══ -->
-<div id="pg-main" style="display:none">
+<!-- ═══ MAIN APP ═══ -->
+<div id="app">
+  <div class="prog-bar" id="prog"><div class="prog-fill" id="prog-fill" style="width:0"></div></div>
 
   <!-- NAV -->
   <nav class="nav">
-    <div class="brand"><div class="brand-ico">🏥</div>FDA License</div>
-    <div class="tabs">
-      <div class="tab on" id="t-dash" onclick="goPg('dash')">📊 Dashboard</div>
-      <div class="tab" id="t-lic" onclick="goPg('lic')">📋 ใบอนุญาต <span class="bdg" id="bdg">0</span></div>
+    <div class="nav-brand">
+      <div class="nav-logo">🏥</div>
+      FDA License
     </div>
-    <div class="nav-r">
-      <span class="flash" id="flash-msg"></span>
-      <button class="nbtn" id="btn-import" style="display:none" onclick="openModal('m-import')">📊 Import</button>
-      <button class="nbtn" id="btn-upload" style="display:none" onclick="openModal('m-upload')">📤 Upload</button>
-      <button class="nbtn" id="btn-sync"   style="display:none" onclick="doSync()">🔄 Sync</button>
-      <button class="nbtn" onclick="toggleDark()" id="btn-dk">🌙</button>
-      <button class="nbtn" onclick="doLogout()">ออก</button>
+    <div class="nav-tabs">
+      <div class="ntab on" id="t-dash" onclick="goPage('dash')">📊 Dashboard</div>
+      <div class="ntab" id="t-lic" onclick="goPage('lic')">📋 ใบอนุญาต <span class="cnt" id="lic-cnt">0</span></div>
+    </div>
+    <div class="nav-right">
+      <span class="nav-flash" id="nav-flash"></span>
+      <button class="nav-btn admin-only" id="nav-import" onclick="showModal('m-import')">📊 Import</button>
+      <button class="nav-btn admin-only" id="nav-upload" onclick="showModal('m-upload')">📤 Upload</button>
+      <button class="nav-btn admin-only" id="nav-sync" onclick="doSync()">🔄 Sync</button>
+      <button class="nav-btn admin-only" id="nav-drive" onclick="openDrive()">📂 Drive</button>
+      <button class="nav-btn" id="nav-dark" onclick="toggleDark()">🌙</button>
+      <button class="nav-btn" onclick="doLogout()">ออก</button>
     </div>
   </nav>
 
-  <!-- ROLE BAR -->
-  <div class="role-bar">
-    <span class="rbadge v" id="rbadge">👁 VIEWER</span>
-    <span class="role-info" id="rinfo">โหมดดูอย่างเดียว</span>
-    <button class="rsw" id="rsw">🔐 เข้า Admin</button>
+  <!-- INFO BAR -->
+  <div class="info-bar">
+    <span class="role-pill viewer" id="role-pill">👁 VIEWER</span>
+    <span class="info-text" id="info-text">โหมดดูอย่างเดียว</span>
+    <button class="switch-btn" id="switch-btn" onclick="clickSwitch()">🔐 เข้า Admin</button>
   </div>
 
-  <!-- SYNC BAR -->
-  <div class="sync-bar" id="sync-bar">
-    <span id="sync-txt">🔄 กำลังโหลดข้อมูล...</span>
-    <button onclick="loadData()">โหลดใหม่</button>
+  <!-- STATUS BAR -->
+  <div class="status-bar" id="status-bar">
+    <span id="status-txt">—</span>
+    <button class="status-refresh" onclick="loadData()">🔄 โหลดใหม่</button>
   </div>
 
-  <!-- DASHBOARD -->
-  <div class="pg on" id="pg-dash">
+  <!-- DASHBOARD PAGE -->
+  <div class="page on" id="page-dash">
     <div class="stats">
-      <div class="stat-card"><div class="stat-lbl">🔴 ด่วน &lt;60 วัน</div><div class="stat-n red" id="s-u">—</div><div class="stat-s">ใบอนุญาต</div></div>
-      <div class="stat-card"><div class="stat-lbl">🟡 แจ้งเตือน &lt;180 วัน</div><div class="stat-n yel" id="s-w">—</div><div class="stat-s">ใบอนุญาต</div></div>
-      <div class="stat-card"><div class="stat-lbl">🟢 ปกติ</div><div class="stat-n grn" id="s-o">—</div><div class="stat-s">ใบอนุญาต</div></div>
-      <div class="stat-card"><div class="stat-lbl">📋 ทั้งหมด</div><div class="stat-n nvy" id="s-t">—</div><div class="stat-s" id="s-p">—</div></div>
+      <div class="stat"><div class="stat-lbl">🔴 ด่วน &lt;60 วัน</div><div class="stat-n r" id="s-u">—</div><div class="stat-s">ใบอนุญาต</div></div>
+      <div class="stat"><div class="stat-lbl">🟡 แจ้งเตือน &lt;180 วัน</div><div class="stat-n y" id="s-w">—</div><div class="stat-s">ใบอนุญาต</div></div>
+      <div class="stat"><div class="stat-lbl">🟢 ปกติ</div><div class="stat-n g" id="s-o">—</div><div class="stat-s">ใบอนุญาต</div></div>
+      <div class="stat"><div class="stat-lbl">📋 ทั้งหมด</div><div class="stat-n b" id="s-t">—</div><div class="stat-s" id="s-p">—</div></div>
     </div>
     <div class="charts">
-      <div class="card"><h3>⚠️ ต้องดำเนินการด่วน</h3><div id="d-urg"></div></div>
-      <div class="card"><h3>🏭 ผู้ผลิต Top 10</h3><div id="d-mfr"></div></div>
+      <div class="card"><div class="card-title">⚠️ ต้องดำเนินการด่วน</div><div id="d-urg"><div class="prod-loading">กำลังโหลด...</div></div></div>
+      <div class="card"><div class="card-title">🏭 ผู้ผลิต Top 10</div><div id="d-mfr"></div></div>
     </div>
-    <div class="card" style="margin-bottom:20px"><h3>📅 แยกตามปีหมดอายุ (พ.ศ.)</h3><div id="d-yr"></div></div>
+    <div class="card"><div class="card-title">📅 ใบอนุญาตแยกตามปีหมดอายุ (พ.ศ.)</div><div id="d-yr"></div></div>
   </div>
 
-  <!-- LICENSE LIST -->
-  <div class="pg" id="pg-lic">
+  <!-- LICENSE PAGE -->
+  <div class="page" id="page-lic">
     <div class="ctrl">
-      <div class="srch-w">
+      <div class="srch-wrap">
         <span class="srch-ico">🔍</span>
         <input class="srch" id="srch" placeholder="ค้นหาเลขใบ, ผู้ผลิต, ประเทศ..." oninput="renderList()">
       </div>
-      <div class="fbs">
-        <button class="fb on" onclick="setF('all',this)">ทั้งหมด</button>
-        <button class="fb" onclick="setF('urgent',this)">ด่วน</button>
-        <button class="fb" onclick="setF('warn',this)">เตือน</button>
-        <button class="fb" onclick="setF('ok',this)">ปกติ</button>
-        <button class="fb" onclick="setF('expired',this)">หมดอายุ</button>
+      <div class="fbtn-group">
+        <button class="fbtn on" onclick="setFilter('all',this)">ทั้งหมด</button>
+        <button class="fbtn" onclick="setFilter('urgent',this)">ด่วน</button>
+        <button class="fbtn" onclick="setFilter('warn',this)">เตือน</button>
+        <button class="fbtn" onclick="setFilter('ok',this)">ปกติ</button>
+        <button class="fbtn" onclick="setFilter('expired',this)">หมดอายุ</button>
       </div>
-      <select class="srt" id="srt" onchange="renderList()">
+      <select class="sort-sel" id="srt" onchange="renderList()">
         <option value="exp">วันหมดอายุ</option>
         <option value="key">เลขใบ</option>
         <option value="mfr">ผู้ผลิต</option>
       </select>
-      <span class="cnt" id="cnt">—</span>
+      <span class="cnt-lbl" id="cnt-lbl">—</span>
     </div>
     <div id="lic-list"></div>
   </div>
-</div>
+</div><!-- /#app -->
 
-<!-- ══ MODALS ══ -->
+<!-- ═══ MODALS ═══ -->
 
-<!-- Admin Login -->
-<div class="modal-bg h" id="m-admin">
-  <div class="modal-box" style="max-width:380px">
-    <div class="modal-hdr"><div><div class="mh-t">🔐 เข้าสู่ระบบ Admin</div></div><button class="mx" onclick="closeModal('m-admin')">✕</button></div>
+<!-- Admin login -->
+<div class="modal-wrap hide" id="m-admin">
+  <div class="modal-box" style="max-width:360px">
+    <div class="modal-hdr"><div><div class="mhdr-t">🔐 เข้าสู่ระบบ Admin</div></div><button class="mhdr-x" onclick="hideModal('m-admin')">✕</button></div>
     <div class="modal-body">
-      <div class="mfield"><div class="mlbl">รหัสผ่าน Admin</div><input class="minp" type="password" id="apw" placeholder="••••••••"></div>
-      <div class="merr" id="aerr">❌ รหัสผ่านไม่ถูกต้อง</div>
+      <div class="mfield"><div class="mlbl">รหัสผ่าน Admin</div><input class="minp" type="password" id="adm-pw" placeholder="••••••••"></div>
+      <div class="merr" id="adm-err">❌ รหัสผ่านไม่ถูกต้อง</div>
     </div>
-    <div class="modal-ft"><button class="mbtn mb-cancel" onclick="closeModal('m-admin')">ยกเลิก</button><button class="mbtn mb-ok" id="a-ok">เข้าสู่ระบบ</button></div>
+    <div class="modal-footer"><button class="mbtn mbtn-cancel" onclick="hideModal('m-admin')">ยกเลิก</button><button class="mbtn mbtn-ok" id="adm-ok">เข้าสู่ระบบ</button></div>
   </div>
 </div>
 
-<!-- Edit Date -->
-<div class="modal-bg h" id="m-edit">
-  <div class="modal-box" style="max-width:380px">
-    <div class="modal-hdr"><div><div class="mh-t">📅 แก้วันหมดอายุ</div><div class="mh-s" id="edit-lbl">—</div></div><button class="mx" onclick="closeModal('m-edit')">✕</button></div>
+<!-- Edit date -->
+<div class="modal-wrap hide" id="m-edit">
+  <div class="modal-box" style="max-width:360px">
+    <div class="modal-hdr"><div><div class="mhdr-t">📅 แก้วันหมดอายุ</div><div class="mhdr-s" id="edit-sub">—</div></div><button class="mhdr-x" onclick="hideModal('m-edit')">✕</button></div>
     <div class="modal-body">
-      <div class="mfield"><div class="mlbl">วันหมดอายุใหม่</div><input class="minp" type="date" id="edit-date"></div>
+      <div class="mfield"><div class="mlbl">วันหมดอายุใหม่</div><input class="minp" type="date" id="edit-dt"></div>
     </div>
-    <div class="modal-ft"><button class="mbtn mb-cancel" onclick="closeModal('m-edit')">ยกเลิก</button><button class="mbtn mb-ok" id="edit-ok">💾 บันทึก</button></div>
+    <div class="modal-footer"><button class="mbtn mbtn-cancel" onclick="hideModal('m-edit')">ยกเลิก</button><button class="mbtn mbtn-ok" id="edit-ok">💾 บันทึก</button></div>
   </div>
 </div>
 
 <!-- Import Excel -->
-<div class="modal-bg h" id="m-import">
+<div class="modal-wrap hide" id="m-import">
   <div class="modal-box" style="max-width:560px">
     <div class="modal-hdr" style="background:linear-gradient(135deg,#16a34a,#15803d)">
-      <div><div class="mh-t">📊 Import Excel</div><div class="mh-s">อัพโหลด .xlsx เพื่ออัพเดทใบอนุญาต</div></div>
-      <button class="mx" onclick="closeModal('m-import')">✕</button>
+      <div><div class="mhdr-t">📊 Import Excel</div><div class="mhdr-s">อัพโหลด .xlsx เพื่ออัพเดทใบอนุญาต</div></div>
+      <button class="mhdr-x" onclick="hideModal('m-import')">✕</button>
     </div>
     <div class="modal-body">
-      <div class="dz" id="imp-dz">
-        <div style="font-size:28px">📊</div>
-        <div style="font-weight:600;margin:6px 0">คลิกหรือลากไฟล์ .xlsx มาวาง</div>
-        <div style="font-size:11px;color:#64748b">คอลัมน์: เลขใบ, ผู้ผลิต, ประเทศ, วันหมดอายุ, จำนวนสินค้า</div>
+      <div class="dzone" id="imp-dz">
+        <div class="dzone-ico">📊</div>
+        <div class="dzone-lbl">คลิกหรือลากไฟล์ .xlsx มาวาง</div>
+        <div class="dzone-hint">คอลัมน์: เลขใบ, ผู้ผลิต, ประเทศ, วันหมดอายุ ฯลฯ</div>
       </div>
       <input type="file" id="imp-fi" accept=".xlsx,.xls" style="display:none">
-      <div id="merge-wrap" style="display:none">
-        <div class="merge-smry" id="merge-smry"></div>
-        <div class="merge-list" id="merge-list"></div>
+      <div id="imp-preview" style="display:none">
+        <div class="merge-smry" id="imp-smry"></div>
+        <div class="merge-list" id="imp-list"></div>
       </div>
     </div>
-    <div class="modal-ft">
-      <button class="mbtn mb-cancel" onclick="closeModal('m-import')">ยกเลิก</button>
-      <button class="mbtn mb-ok" id="imp-ok" style="display:none" onclick="applyMerge()">✅ ยืนยัน Import</button>
+    <div class="modal-footer">
+      <button class="mbtn mbtn-cancel" onclick="hideModal('m-import')">ยกเลิก</button>
+      <button class="mbtn mbtn-ok" id="imp-ok" style="display:none" onclick="applyImport()">✅ ยืนยัน Import</button>
     </div>
   </div>
 </div>
 
 <!-- Upload PDF -->
-<div class="modal-bg h" id="m-upload">
+<div class="modal-wrap hide" id="m-upload">
   <div class="modal-box" style="max-width:500px">
     <div class="modal-hdr" style="background:linear-gradient(135deg,#7c3aed,#6d28d9)">
-      <div><div class="mh-t">📤 Upload PDF → Drive</div><div class="mh-s">ชื่อไฟล์ควรมีเลขใบ เช่น 65-2-2-0016910.pdf</div></div>
-      <button class="mx" onclick="closeModal('m-upload')">✕</button>
+      <div><div class="mhdr-t">📤 Upload PDF → Drive</div><div class="mhdr-s">ชื่อไฟล์ควรมีเลขใบ เช่น 65-2-2-0016910.pdf</div></div>
+      <button class="mhdr-x" onclick="hideModal('m-upload')">✕</button>
     </div>
     <div class="modal-body">
-      <div class="dz" id="up-dz"><div style="font-size:28px">📄</div><div style="font-weight:600;margin:6px 0">คลิกหรือลากไฟล์ PDF</div></div>
+      <div class="dzone" id="up-dz"><div class="dzone-ico">📄</div><div class="dzone-lbl">คลิกหรือลากไฟล์ PDF มาวาง</div></div>
       <input type="file" id="up-fi" accept=".pdf" multiple style="display:none">
       <div class="ul-scroll" id="ul-list"></div>
     </div>
-    <div class="modal-ft">
-      <button class="mbtn mb-cancel" onclick="closeModal('m-upload')">ปิด</button>
-      <button class="mbtn mb-ok" id="up-ok" style="display:none;background:#7c3aed;border-color:#6d28d9" onclick="startUpload()">📤 อัพโหลด</button>
+    <div class="modal-footer">
+      <button class="mbtn mbtn-cancel" onclick="hideModal('m-upload')">ปิด</button>
+      <button class="mbtn mbtn-ok" id="up-ok" style="display:none;background:#7c3aed;border-color:#6d28d9" onclick="startUpload()">📤 อัพโหลด</button>
     </div>
   </div>
 </div>
 
 <!-- PDF Viewer -->
-<div class="pdf-bg" id="pdf-bg">
+<div class="pdf-overlay" id="pdf-overlay">
   <div class="pdf-box">
     <div class="pdf-hdr">
-      <span style="font-size:15px">📄</span>
-      <span class="pdf-title" id="pdf-title">—</span>
-      <button class="pdf-x" onclick="closePDF()">✕</button>
+      <span>📄</span>
+      <span class="pdf-hdr-title" id="pdf-title">—</span>
+      <button class="pdf-hdr-x" onclick="closePDF()">✕</button>
     </div>
-    <div class="pdf-body">
-      <div class="pdf-loading" id="pdf-load"><div class="pdf-spin"></div><div class="pdf-lt">กำลังโหลด PDF...</div></div>
-      <iframe class="pdf-frame" id="pdf-frame" src="about:blank" allowfullscreen></iframe>
+    <div class="pdf-content">
+      <div class="pdf-loader" id="pdf-loader"><div class="pdf-spin"></div><div class="pdf-loader-txt">กำลังโหลด PDF...</div></div>
+      <iframe class="pdf-iframe" id="pdf-iframe" src="about:blank"></iframe>
     </div>
-    <div class="pdf-ft"><button class="pdf-close" onclick="closePDF()">✕ ปิด PDF</button></div>
+    <div class="pdf-footer"><button class="pdf-close-btn" onclick="closePDF()">✕ ปิด PDF</button></div>
   </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-// ══════════════════════════════════════════
+'use strict';
+// ════════════════════════════════════════════
 // CONFIG
-// ══════════════════════════════════════════
-var GAS = 'https://script.google.com/macros/s/AKfycbxEln9oOk5JT-Nhj4-bn_UGnjxcBfeulmBifQA-8xaq2wl_pw7XnWfAQDeS97Uy8dQd/exec';
-var FOLDER_ID = '1pZN6e7oH-kMGOs8lNwWX2fCTf_RTQBvc';
-var DRIVE_URL = 'https://drive.google.com/drive/folders/' + FOLDER_ID;
-var K = { tok:'fda12_tok', role:'fda12_role', exp:'fda12_exp', lics:'fda12_lics' };
+// ════════════════════════════════════════════
+var GAS   = 'https://script.google.com/macros/s/AKfycbxEln9oOk5JT-Nhj4-bn_UGnjxcBfeulmBifQA-8xaq2wl_pw7XnWfAQDeS97Uy8dQd/exec';
+var DRIVE = 'https://drive.google.com/drive/folders/1pZN6e7oH-kMGOs8lNwWX2fCTf_RTQBvc';
+
+// localStorage keys — ใหม่ทั้งหมด ไม่ซ้ำกับเวอร์ชันเก่า
+var SK = {
+  tok:'fda13_t', role:'fda13_r', exp:'fda13_e',
+  lics:'fda13_l', dark:'fda13_d'
+};
 
 var DOCS = [
   'แบบคำขอต่ออายุ (อ.14)',
-  'หนังสือรับรองบริษัท (อายุไม่เกิน 6 เดือน)',
+  'หนังสือรับรองบริษัท (ไม่เกิน 6 เดือน)',
   'สำเนาใบอนุญาตฉบับเดิม',
   'Certificate of Free Sale / CE Mark',
   'รายชื่อสินค้าที่ขอต่ออายุ',
@@ -416,431 +644,464 @@ var DOCS = [
   'หลักฐานการชำระค่าธรรมเนียม',
 ];
 
-// ══════════════════════════════════════════
+// ════════════════════════════════════════════
 // STATE
-// ══════════════════════════════════════════
-var LICS=[], TOK='', ROLE='', EXP=0, ADMIN=false;
-var FILTER='all', OPEN=null, EDIT_K=null, PENDING=null, UP_FILES=[];
-var g = function(id){ return document.getElementById(id); };
+// ════════════════════════════════════════════
+var LICS=[], TOK='', ROLE='', EXP=0, IS_ADMIN=false;
+var CUR_F='all', OPEN_KEY=null, EDIT_KEY=null, PENDING=null, UP_FILES=[];
 
-// ══════════════════════════════════════════
-// DARK MODE — global เพื่อ onclick
-// ══════════════════════════════════════════
-function toggleDark(){
-  var on = document.body.classList.toggle('dark');
-  localStorage.setItem('fda12_dark', on?'1':'0');
-  g('btn-dk').textContent = on?'☀️':'🌙';
-}
-if(localStorage.getItem('fda12_dark')==='1'){
-  document.body.classList.add('dark');
-  document.addEventListener('DOMContentLoaded',function(){ var b=g('btn-dk'); if(b)b.textContent='☀️'; });
-}
+// ════════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════════
+function $  (id){ return document.getElementById(id); }
+function sv (k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
+function ld (k)  { try{ var r=localStorage.getItem(k); return r?JSON.parse(r):null; }catch(e){ return null; } }
 
-// ══════════════════════════════════════════
-// UTILS
-// ══════════════════════════════════════════
-function save(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
-function load(k){ try{ var r=localStorage.getItem(k); return r?JSON.parse(r):null; }catch(e){ return null; } }
-
-function daysLeft(iso){
+function dLeft(iso){
   if(!iso||iso==='') return null;
   var d=new Date(iso); if(isNaN(d)) return null;
   return Math.ceil((d-new Date())/86400000);
 }
 function urg(iso){
-  var d=daysLeft(iso);
+  var d=dLeft(iso);
   if(d===null) return 'ok';
-  if(d<0) return 'expired'; if(d<=60) return 'urgent'; if(d<=180) return 'warn'; return 'ok';
+  if(d<0) return 'expired';
+  if(d<=60) return 'urgent';
+  if(d<=180) return 'warn';
+  return 'ok';
 }
-function thDate(iso){
+function thd(iso){
   if(!iso||iso==='') return '—';
   var p=iso.split('-');
   if(p.length===3&&p[0].length===4) return p[2]+'/'+p[1]+'/'+(+p[0]+543);
   return iso;
 }
-function flash(msg,t){
-  var el=g('flash-msg'); el.textContent=msg;
-  clearTimeout(el._t); el._t=setTimeout(function(){ el.textContent=''; },t||4000);
-}
-function prog(pct){
-  var p=g('prog'),f=g('prog-fill');
-  if(pct>=100){ p.classList.add('on'); f.style.width='100%'; setTimeout(function(){ p.classList.remove('on'); f.style.width='0'; },500); }
-  else{ p.classList.add('on'); f.style.width=pct+'%'; }
-}
-function openModal(id){ g(id).classList.remove('h'); }
-function closeModal(id){ g(id).classList.add('h'); }
-function escQ(s){ return (s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
+function escQ(s){ return(s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
 
-// ══════════════════════════════════════════
+function flash(msg,ms){
+  var el=$('nav-flash'); el.textContent=msg;
+  clearTimeout(el._t); el._t=setTimeout(function(){ el.textContent=''; },ms||4000);
+}
+function setStatus(state,msg){
+  var bar=$('status-bar'), txt=$('status-txt');
+  bar.className='status-bar '+state+' show';
+  txt.textContent=msg;
+}
+function hideStatus(delay){
+  setTimeout(function(){ $('status-bar').classList.remove('show'); },delay||0);
+}
+function setProg(pct){
+  var p=$('prog'),f=$('prog-fill');
+  p.classList.add('show'); f.style.width=pct+'%';
+  if(pct>=100){ setTimeout(function(){ p.classList.remove('show'); f.style.width='0'; },500); }
+}
+function showModal(id){ $(id).classList.remove('hide'); }
+function hideModal(id){ $(id).classList.add('hide'); }
+
+// ════════════════════════════════════════════
+// DARK MODE — global scope for onclick
+// ════════════════════════════════════════════
+function toggleDark(){
+  var on=document.body.classList.toggle('dark');
+  sv(SK.dark,on);
+  $('nav-dark').textContent=on?'☀️':'🌙';
+}
+(function(){
+  if(ld(SK.dark)){
+    document.body.classList.add('dark');
+    document.addEventListener('DOMContentLoaded',function(){
+      var b=$('nav-dark'); if(b) b.textContent='☀️';
+    });
+  }
+})();
+
+// ════════════════════════════════════════════
 // AUTH
-// ══════════════════════════════════════════
+// ════════════════════════════════════════════
 function doLogin(){
-  var pw=g('lpw').value.trim();
+  var pw=$('lc-pw').value.trim();
   if(!pw) return;
-  g('lbtn').disabled=true; g('lbtn').textContent='⏳ กำลังตรวจสอบ...'; g('lerr').textContent='';
+  $('lc-btn').disabled=true; $('lc-btn').textContent='⏳ กำลังตรวจสอบ...';
+  $('lc-err').textContent='';
+
   fetch(GAS+'?action=login&pw='+encodeURIComponent(pw))
     .then(function(r){ return r.json(); })
     .then(function(d){
-      g('lbtn').disabled=false; g('lbtn').textContent='🔐 เข้าสู่ระบบ';
+      $('lc-btn').disabled=false; $('lc-btn').textContent='🔐 เข้าสู่ระบบ';
       if(d.token){
         TOK=d.token; ROLE=d.role; EXP=Date.now()+(d.ttl||28800000);
-        save(K.tok,TOK); save(K.role,ROLE); save(K.exp,EXP);
-        afterLogin();
+        sv(SK.tok,TOK); sv(SK.role,ROLE); sv(SK.exp,EXP);
+        enterApp();
       } else {
-        g('lerr').textContent='❌ '+(d.error||'รหัสผ่านไม่ถูกต้อง');
+        $('lc-err').textContent='❌ '+(d.error||'รหัสผ่านไม่ถูกต้อง');
       }
     })
     .catch(function(e){
-      g('lbtn').disabled=false; g('lbtn').textContent='🔐 เข้าสู่ระบบ';
-      g('lerr').textContent='❌ เชื่อมต่อไม่ได้: '+e.message;
+      $('lc-btn').disabled=false; $('lc-btn').textContent='🔐 เข้าสู่ระบบ';
+      $('lc-err').textContent='❌ เชื่อมต่อไม่ได้: '+e.message;
     });
 }
 
 function doLogout(){
-  TOK=''; ROLE=''; EXP=0; ADMIN=false; LICS=[];
-  save(K.tok,''); save(K.role,''); save(K.exp,0); save(K.lics,[]);
-  g('pg-main').style.display='none';
-  g('pg-login').style.display='flex';
-  g('lpw').value=''; g('lerr').textContent='';
+  TOK=''; ROLE=''; EXP=0; IS_ADMIN=false; LICS=[];
+  sv(SK.tok,''); sv(SK.role,''); sv(SK.exp,0); sv(SK.lics,[]);
+  $('app').style.display='none';
+  $('scr-login').style.display='flex';
+  $('lc-pw').value=''; $('lc-err').textContent='';
+  OPEN_KEY=null;
 }
 
-function afterLogin(){
-  g('pg-login').style.display='none';
-  g('pg-main').style.display='block';
+function enterApp(){
+  $('scr-login').style.display='none';
+  $('app').style.display='block';
   setRole(ROLE==='admin');
   loadData();
 }
 
 function setRole(isAdmin){
-  ADMIN=isAdmin;
-  var badge=g('rbadge'), info=g('rinfo'), sw=g('rsw');
+  IS_ADMIN=isAdmin;
+  var pill=$('role-pill'), info=$('info-text'), sw=$('switch-btn');
   if(isAdmin){
-    badge.className='rbadge a'; badge.textContent='⚙️ ADMIN';
-    info.textContent='โหมดแก้ไข — Import / Upload / Sync ได้';
-    sw.textContent='🔓 ออกจาก Admin'; sw.onclick=downgrade;
-    g('btn-import').style.display='';
-    g('btn-upload').style.display='';
-    g('btn-sync').style.display='';
-    if(!g('btn-drive')){
-      var btn=document.createElement('button');
-      btn.className='nbtn'; btn.id='btn-drive';
-      btn.textContent='📂 Drive';
-      btn.onclick=function(){ window.open(DRIVE_URL,'_blank'); };
-      g('btn-sync').insertAdjacentElement('afterend',btn);
-    }
+    pill.className='role-pill admin'; pill.textContent='⚙️ ADMIN';
+    info.textContent='โหมดแก้ไข — สามารถ Import, Upload, Sync ได้';
+    sw.textContent='🔓 ออกจาก Admin';
+    document.querySelectorAll('.admin-only').forEach(function(e){ e.style.display=''; });
   } else {
-    badge.className='rbadge v'; badge.textContent='👁 VIEWER';
+    pill.className='role-pill viewer'; pill.textContent='👁 VIEWER';
     info.textContent='โหมดดูอย่างเดียว';
-    sw.textContent='🔐 เข้า Admin'; sw.onclick=function(){ openModal('m-admin'); };
-    g('btn-import').style.display='none';
-    g('btn-upload').style.display='none';
-    g('btn-sync').style.display='none';
-    var dr=g('btn-drive'); if(dr) dr.remove();
+    sw.textContent='🔐 เข้า Admin';
+    document.querySelectorAll('.admin-only').forEach(function(e){ e.style.display='none'; });
   }
   renderList();
 }
 
-function downgrade(){
-  ADMIN=false; ROLE='viewer'; save(K.role,'viewer'); setRole(false);
+function clickSwitch(){
+  if(IS_ADMIN){ IS_ADMIN=false; ROLE='viewer'; sv(SK.role,'viewer'); setRole(false); }
+  else showModal('m-admin');
 }
+function openDrive(){ window.open(DRIVE,'_blank'); }
 
 // Admin modal
-g('a-ok').onclick=function(){
-  var pw=g('apw').value.trim(); g('aerr').style.display='none';
+$('adm-ok').onclick=function(){
+  var pw=$('adm-pw').value.trim(); $('adm-err').style.display='none';
   fetch(GAS+'?action=login&pw='+encodeURIComponent(pw))
     .then(function(r){ return r.json(); })
     .then(function(d){
       if(d.token&&d.role==='admin'){
         TOK=d.token; ROLE='admin'; EXP=Date.now()+(d.ttl||28800000);
-        save(K.tok,TOK); save(K.role,ROLE); save(K.exp,EXP);
-        closeModal('m-admin'); g('apw').value='';
+        sv(SK.tok,TOK); sv(SK.role,ROLE); sv(SK.exp,EXP);
+        hideModal('m-admin'); $('adm-pw').value='';
         setRole(true); flash('✅ เข้าสู่ระบบ Admin แล้ว');
-      } else { g('aerr').style.display='block'; }
-    }).catch(function(){ g('aerr').style.display='block'; });
+      } else { $('adm-err').style.display='block'; }
+    }).catch(function(){ $('adm-err').style.display='block'; });
 };
-g('apw').addEventListener('keypress',function(e){ if(e.key==='Enter') g('a-ok').click(); });
+$('adm-pw').addEventListener('keypress',function(e){ if(e.key==='Enter') $('adm-ok').click(); });
 
-// ══════════════════════════════════════════
+// ════════════════════════════════════════════
 // LOAD DATA FROM SHEETS
-// ══════════════════════════════════════════
+// ════════════════════════════════════════════
 function loadData(){
   if(!TOK||Date.now()>EXP){ doLogout(); return; }
-  var bar=g('sync-bar'), txt=g('sync-txt');
-  bar.classList.add('on'); txt.textContent='🔄 กำลังโหลดข้อมูลจาก Sheets...';
-  prog(30);
+  setStatus('loading','🔄 กำลังโหลดข้อมูลจาก Google Sheets...');
+  setProg(20);
 
   fetch(GAS+'?action=getLicenses&token='+encodeURIComponent(TOK))
     .then(function(r){ return r.json(); })
     .then(function(d){
-      prog(100);
+      setProg(80);
       if(d.code===401){ doLogout(); return; }
-      if(d.licenses && Array.isArray(d.licenses)){
-        LICS=d.licenses;
-        save(K.lics, LICS);
-        txt.textContent='✅ โหลดแล้ว '+LICS.length+' ใบ';
-        setTimeout(function(){ bar.classList.remove('on'); },3000);
-        buildDash(); renderList();
-        flash('✅ โหลดข้อมูล '+LICS.length+' ใบจาก Sheets');
-      } else {
-        throw new Error(d.error||'ไม่พบข้อมูล');
-      }
+      if(!d.licenses||!Array.isArray(d.licenses)) throw new Error(d.error||'ไม่ได้รับข้อมูล');
+      LICS=d.licenses;
+      sv(SK.lics,LICS);
+      setProg(100);
+      setStatus('success','✅ โหลดสำเร็จ — ข้อมูล '+LICS.length+' ใบ');
+      hideStatus(4000);
+      buildDash(); renderList();
+      flash('✅ โหลด '+LICS.length+' ใบจาก Sheets');
     })
     .catch(function(e){
-      prog(100);
-      var cached=load(K.lics);
+      setProg(100);
+      var cached=ld(SK.lics);
       if(cached&&cached.length){
         LICS=cached;
-        txt.textContent='⚠️ ใช้ Cache ('+LICS.length+' ใบ) — '+e.message;
-        setTimeout(function(){ bar.classList.remove('on'); },5000);
+        setStatus('warn','⚠️ ใช้ข้อมูล Cache ('+LICS.length+' ใบ) — '+e.message);
+        hideStatus(6000);
         buildDash(); renderList();
-        flash('⚠️ Sheets ไม่ตอบสนอง ใช้ข้อมูล Cache');
       } else {
-        txt.textContent='❌ โหลดไม่ได้: '+e.message;
-        flash('❌ '+e.message);
+        setStatus('error','❌ โหลดไม่ได้: '+e.message);
       }
     });
 }
 
-// ══════════════════════════════════════════
+// ════════════════════════════════════════════
 // DASHBOARD
-// ══════════════════════════════════════════
+// ════════════════════════════════════════════
 function buildDash(){
   var u=0,w=0,o=0,ex=0,pr=0;
   LICS.forEach(function(l){
     var s=urg(l.e);
-    if(s==='urgent')u++; else if(s==='warn')w++; else if(s==='expired')ex++; else o++;
+    if(s==='urgent')u++;else if(s==='warn')w++;else if(s==='expired')ex++;else o++;
     pr+=(+l.n||0);
   });
-  g('s-u').textContent=u; g('s-w').textContent=w;
-  g('s-o').textContent=o+(ex?' (หมด:'+ex+')':'');
-  g('s-t').textContent=LICS.length; g('s-p').textContent=pr.toLocaleString()+' รายการสินค้า';
-  g('bdg').textContent=LICS.length;
+  $('s-u').textContent=u; $('s-w').textContent=w;
+  $('s-o').textContent=o+(ex?' (+หมด:'+ex+')':'');
+  $('s-t').textContent=LICS.length; $('s-p').textContent=pr.toLocaleString()+' รายการสินค้า';
+  $('lic-cnt').textContent=LICS.length;
 
   // Urgent
   var ul=LICS.filter(function(l){ return urg(l.e)==='urgent'; })
-    .sort(function(a,b){ return daysLeft(a.e)-daysLeft(b.e); }).slice(0,6);
-  g('d-urg').innerHTML=ul.length
-    ? ul.map(function(l){ var d=daysLeft(l.e);
-        return '<div class="urg-item"><span class="urg-key">'+l.k+'</span><span class="urg-name">'+l.m+'</span><span class="urg-days">'+(d<0?'หมดแล้ว':d+' วัน')+'</span></div>'; }).join('')
+    .sort(function(a,b){ return dLeft(a.e)-dLeft(b.e); }).slice(0,6);
+  $('d-urg').innerHTML=ul.length
+    ? ul.map(function(l){ var d=dLeft(l.e);
+        return '<div class="urg-item"><span class="urg-key">'+l.k+'</span>'
+          +'<span class="urg-name">'+l.m+'</span>'
+          +'<span class="urg-days">'+(d<0?'หมดแล้ว':d+' วัน')+'</span></div>'; }).join('')
     : '<div style="text-align:center;padding:18px;color:#94a3b8">✅ ไม่มีด่วน</div>';
 
-  // Mfr
+  // Mfr top10
   var mfr={};
   LICS.forEach(function(l){ mfr[l.m]=(mfr[l.m]||0)+(+l.n||1); });
   var top=Object.entries(mfr).sort(function(a,b){ return b[1]-a[1]; }).slice(0,10);
-  var mx=top[0]?top[0][1]:1;
-  g('d-mfr').innerHTML=top.map(function(x){
-    return '<div class="br"><div class="br-lbl" title="'+x[0]+'">'+x[0]+'</div><div class="br-trk"><div class="br-fill" style="width:'+(x[1]/mx*100)+'%"></div></div><div class="br-n">'+x[1]+'</div></div>'; }).join('');
+  var mx=top.length?top[0][1]:1;
+  $('d-mfr').innerHTML=top.map(function(x){
+    return '<div class="brow"><div class="brow-lbl" title="'+x[0]+'">'+x[0]+'</div>'
+      +'<div class="brow-trk"><div class="brow-fill" style="width:'+(x[1]/mx*100)+'%"></div></div>'
+      +'<div class="brow-n">'+x[1]+'</div></div>';
+  }).join('');
 
   // Year
   var yr={};
   LICS.forEach(function(l){ if(l.e){ var y=+l.e.split('-')[0]+543; yr[y]=(yr[y]||0)+1; } });
-  var ys=Object.entries(yr).sort(function(a,b){ return a[0]-b[0]; });
+  var ys=Object.entries(yr).sort(function(a,b){ return +a[0]-+b[0]; });
   var ym=ys.reduce(function(m,x){ return Math.max(m,x[1]); },1);
-  g('d-yr').innerHTML=ys.map(function(x){
-    return '<div class="br"><div class="br-lbl">'+x[0]+'</div><div class="br-trk"><div class="br-fill" style="width:'+(x[1]/ym*100)+'%"></div></div><div class="br-n">'+x[1]+'</div></div>'; }).join('');
+  $('d-yr').innerHTML=ys.map(function(x){
+    return '<div class="brow"><div class="brow-lbl">'+x[0]+'</div>'
+      +'<div class="brow-trk"><div class="brow-fill" style="width:'+(x[1]/ym*100)+'%"></div></div>'
+      +'<div class="brow-n">'+x[1]+'</div></div>';
+  }).join('');
 }
 
-// ══════════════════════════════════════════
-// LIST
-// ══════════════════════════════════════════
-function goPg(p){
-  g('pg-dash').classList.toggle('on',p==='dash');
-  g('pg-lic').classList.toggle('on',p==='lic');
-  g('t-dash').classList.toggle('on',p==='dash');
-  g('t-lic').classList.toggle('on',p==='lic');
+// ════════════════════════════════════════════
+// LICENSE LIST
+// ════════════════════════════════════════════
+function goPage(p){
+  $('page-dash').classList.toggle('on',p==='dash');
+  $('page-lic').classList.toggle('on',p==='lic');
+  $('t-dash').classList.toggle('on',p==='dash');
+  $('t-lic').classList.toggle('on',p==='lic');
 }
-function setF(f,btn){
-  FILTER=f;
-  document.querySelectorAll('.fb').forEach(function(b){ b.classList.toggle('on',b===btn); });
+function setFilter(f,btn){
+  CUR_F=f;
+  document.querySelectorAll('.fbtn').forEach(function(b){ b.classList.toggle('on',b===btn); });
   renderList();
 }
 function renderList(){
-  var q=(g('srch').value||'').toLowerCase(), srt=g('srt').value;
+  var q=($('srch').value||'').toLowerCase(), srt=$('srt').value;
   var list=LICS.filter(function(l){
-    if(FILTER!=='all'&&urg(l.e)!==FILTER) return false;
-    if(q&&!l.k.toLowerCase().includes(q)&&!l.m.toLowerCase().includes(q)&&!(l.c||'').toLowerCase().includes(q)) return false;
+    if(CUR_F!=='all'&&urg(l.e)!==CUR_F) return false;
+    if(q&&!l.k.toLowerCase().includes(q)
+       &&!l.m.toLowerCase().includes(q)
+       &&!(l.c||'').toLowerCase().includes(q)) return false;
     return true;
   }).sort(function(a,b){
-    if(srt==='exp') return (daysLeft(a.e)??9999)-(daysLeft(b.e)??9999);
+    if(srt==='exp') return (dLeft(a.e)??9999)-(dLeft(b.e)??9999);
     if(srt==='key') return a.k.localeCompare(b.k);
     return (a.m||'').localeCompare(b.m||'');
   });
-  g('cnt').textContent='แสดง '+list.length+'/'+LICS.length;
-  g('lic-list').innerHTML=list.map(rowHTML).join('');
+  $('cnt-lbl').textContent='แสดง '+list.length+' / '+LICS.length+' ใบ';
+  $('lic-list').innerHTML=list.map(licRow).join('');
 }
 
-function rowHTML(l){
-  var u=urg(l.e), d=daysLeft(l.e);
+function licRow(l){
+  var u=urg(l.e), d=dLeft(l.e);
   var dc={urgent:'color:#dc2626',warn:'color:#d97706',expired:'color:#94a3b8',ok:'color:#16a34a'}[u];
   var ds=d===null?'—':d<0?'หมดอายุแล้ว':'เหลือ '+d+' วัน';
-  var pdf=l.url
-    ?'<button class="abtn pdf-on" onclick="event.stopPropagation();openPDF(\''+escQ(l.url)+'\',\''+escQ(l.k)+'\')">📄 PDF</button>'
-    :'<button class="abtn pdf-off" disabled>📄 PDF</button>';
-  var edt=ADMIN?'<button class="abtn" style="background:transparent;border-color:#e2e8f0;color:#64748b" onclick="event.stopPropagation();openEdit(\''+escQ(l.k)+'\')">📅</button>':'';
-  return '<div class="row-card '+u+'" data-k="'+escQ(l.k)+'">'
-    +'<div class="row-hdr" onclick="toggle(\''+escQ(l.k)+'\')">'
-    +'<div class="dot d-'+u[0]+'"></div>'
-    +'<div class="row-key">'+l.k+'</div>'
-    +'<div class="row-info"><div class="row-mfr">'+l.m+'</div><div class="row-ctry">'+( l.c||'—' )+'</div></div>'
-    +'<div class="row-exp"><div class="row-date">'+thDate(l.e)+'</div><div class="row-days" style="'+dc+'">'+ds+'</div></div>'
-    +'<div class="row-acts">'+pdf+edt+'</div>'
-    +'<div class="chv">▼</div>'
+  var pdfBtn=l.url
+    ? '<button class="act-btn btn-pdf" onclick="event.stopPropagation();openPDF(\''+escQ(l.url)+'\',\''+escQ(l.k)+'\')">📄 PDF</button>'
+    : '<button class="act-btn btn-pdf none" disabled>📄 PDF</button>';
+  var editBtn=IS_ADMIN
+    ? '<button class="act-btn btn-edit" onclick="event.stopPropagation();openEdit(\''+escQ(l.k)+'\')">📅</button>'
+    : '';
+  return '<div class="lic-item '+u+'" data-k="'+escQ(l.k)+'">'
+    +'<div class="lic-hdr" onclick="toggleRow(\''+escQ(l.k)+'\')">'
+    +'<div class="lic-dot dot-'+u+'"></div>'
+    +'<div class="lic-key">'+l.k+'</div>'
+    +'<div class="lic-info"><div class="lic-mfr">'+l.m+'</div><div class="lic-ctry">'+(l.c||'—')+'</div></div>'
+    +'<div class="lic-exp-wrap"><div class="lic-date">'+thd(l.e)+'</div><div class="lic-days" style="'+dc+'">'+ds+'</div></div>'
+    +'<div class="lic-actions">'+pdfBtn+editBtn+'</div>'
+    +'<div class="lic-chv">▼</div>'
     +'</div>'
-    +'<div class="panel-wrap" id="pw_'+l.k.replace(/[^a-z0-9]/gi,'_')+'"></div>'
+    +'<div class="lic-panel" id="lp_'+l.k.replace(/[^a-z0-9]/gi,'_')+'"></div>'
     +'</div>';
 }
 
-function toggle(key){
-  var card=document.querySelector('[data-k="'+key+'"]');
+function toggleRow(key){
   var sid=key.replace(/[^a-z0-9]/gi,'_');
-  var pw=g('pw_'+sid);
-  if(!card||!pw) return;
+  var card=document.querySelector('[data-k="'+key+'"]');
+  var panel=$('lp_'+sid);
+  if(!card||!panel) return;
 
-  if(OPEN===key){
-    card.classList.remove('open'); pw.innerHTML=''; OPEN=null; return;
+  if(OPEN_KEY===key){
+    card.classList.remove('open'); panel.innerHTML=''; OPEN_KEY=null; return;
   }
-  if(OPEN){
-    var oc=document.querySelector('[data-k="'+OPEN+'"]');
-    var op=g('pw_'+OPEN.replace(/[^a-z0-9]/gi,'_'));
+  // ปิดอันเก่า
+  if(OPEN_KEY){
+    var oc=document.querySelector('[data-k="'+OPEN_KEY+'"]');
+    var op=$('lp_'+OPEN_KEY.replace(/[^a-z0-9]/gi,'_'));
     if(oc) oc.classList.remove('open');
     if(op) op.innerHTML='';
   }
-  OPEN=key; card.classList.add('open');
+  OPEN_KEY=key;
+  card.classList.add('open');
+
   var l=LICS.find(function(x){ return x.k===key; });
   if(!l) return;
-  pw.innerHTML=buildPanel(l);
+  panel.innerHTML=buildPanel(l);
 
-  // lazy load prods
+  // lazy load prods ถ้าไม่มี
   if((!l.prods||!l.prods.length)&&TOK){
     fetch(GAS+'?action=getProds&token='+encodeURIComponent(TOK)+'&key='+encodeURIComponent(key))
       .then(function(r){ return r.json(); })
       .then(function(d){
-        if(d.prods&&d.prods.length){ l.prods=d.prods; if(OPEN===key) pw.innerHTML=buildPanel(l); }
-      }).catch(function(){});
+        if(d.prods&&d.prods.length){
+          l.prods=d.prods;
+          if(OPEN_KEY===key) panel.innerHTML=buildPanel(l);
+        } else {
+          // แสดง "ไม่มีสินค้า"
+          var el=$('prod-wrap_'+sid);
+          if(el) el.innerHTML='<div class="prod-loading">ไม่มีข้อมูลสินค้า</div>';
+        }
+      }).catch(function(){
+        var el=$('prod-wrap_'+sid);
+        if(el) el.innerHTML='<div class="prod-loading">⚠️ โหลดสินค้าไม่ได้</div>';
+      });
   }
   card.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
 function buildPanel(l){
-  var chks=load('chk_'+l.k)||new Array(DOCS.length).fill(false);
-  var done=chks.filter(Boolean).length;
-  var d=daysLeft(l.e);
   var sid=l.k.replace(/[^a-z0-9]/gi,'_');
+  var d=dLeft(l.e);
+  var chks=ld('ck_'+l.k)||new Array(DOCS.length).fill(false);
+  var done=chks.filter(Boolean).length;
 
-  var prodsH='';
+  // prods
+  var prodsH='<div id="prod-wrap_'+sid+'">';
   if(l.prods&&l.prods.length){
-    prodsH='<input class="prod-srch" placeholder="ค้นหา..." oninput="fprod(this,\'pt_'+sid+'\')">'
-      +'<div class="prod-scroll"><table class="prod-tbl" id="pt_'+sid+'">'
+    prodsH+='<input class="prod-srch-inp" placeholder="ค้นหาสินค้า..." oninput="fprod(this,\'ptbl_'+sid+'\')">'
+      +'<div class="prod-scroll"><table class="prod-tbl" id="ptbl_'+sid+'">'
       +'<thead><tr><th>รหัส</th><th>ทางค้า</th><th>ผลิตภัณฑ์</th><th>รายละเอียด</th></tr></thead><tbody>'
       +l.prods.map(function(p){
-        return '<tr><td style="color:#64748b">'+(p[0]||'—')+'</td><td>'+(p[1]||'—')+'</td><td>'+(p[2]||'—')+'</td><td style="color:#94a3b8;font-size:10px">'+(p[3]||'')+'</td></tr>';
+        return '<tr><td style="color:#94a3b8">'+(p[0]||'—')+'</td><td>'+(p[1]||'—')+'</td>'
+          +'<td>'+(p[2]||'—')+'</td><td style="color:#94a3b8;font-size:10px">'+(p[3]||'')+'</td></tr>';
       }).join('')+'</tbody></table></div>';
   } else {
-    prodsH='<div style="text-align:center;color:#94a3b8;padding:12px;font-size:12px">⏳ กำลังโหลดสินค้า...</div>';
+    prodsH+='<div class="prod-loading">⏳ กำลังโหลดสินค้า...</div>';
   }
+  prodsH+='</div>';
 
-  var tls=[
-    {days:90,lbl:'เตรียมเอกสาร ติดต่อผู้ผลิต'},
-    {days:60,lbl:'ยื่นคำขอต่ออายุ อย.'},
-    {days:30,lbl:'ติดตามผลการพิจารณา'},
-  ];
+  // timeline steps
+  var steps=[{d:90,t:'เตรียมเอกสาร ติดต่อผู้ผลิต'},{d:60,t:'ยื่นคำขอต่ออายุ อย.'},{d:30,t:'ติดตามผลการพิจารณา'}];
+  var tlH=steps.map(function(s){
+    var c=d!==null&&d<=s.d?'#dc2626':'#0891b2';
+    return '<div class="tl-item"><div class="tl-dot" style="background:'+c+'"></div>'
+      +'<div><div class="tl-lbl">ก่อน '+s.d+' วัน</div><div class="tl-desc">'+s.t+'</div></div></div>';
+  }).join('');
+  tlH+='<div class="tl-item"><div class="tl-dot" style="background:'+(d!==null&&d<0?'#94a3b8':'#d97706')+'"></div>'
+    +'<div><div class="tl-lbl">หมดอายุ</div><div class="tl-desc">'+thd(l.e)+'</div></div></div>';
 
   return '<div class="panel-grid">'
     +'<div>'
-      +'<div class="psec"><h4>📋 ข้อมูล</h4>'
-        +'<div class="irow"><span class="info-lbl">เลขใบอนุญาต</span><span class="info-val" style="color:#0891b2;font-weight:700">'+l.k+'</span></div>'
-        +'<div class="irow"><span class="info-lbl">ผู้ผลิต</span><span class="info-val">'+l.m+'</span></div>'
-        +'<div class="irow"><span class="info-lbl">ประเทศ</span><span class="info-val">'+(l.c||'—')+'</span></div>'
-        +'<div class="irow"><span class="info-lbl">วันหมดอายุ</span><span class="info-val">'+thDate(l.e)+'</span></div>'
-        +'<div class="irow"><span class="info-lbl">จำนวนสินค้า</span><span class="info-val">'+(l.n||0)+' รายการ</span></div>'
+      +'<div class="psec"><div class="psec-title">📋 ข้อมูลใบอนุญาต</div>'
+        +'<div class="info-row"><span class="inf-lbl">เลขใบอนุญาต</span><span class="inf-val" style="color:#0891b2;font-weight:700">'+l.k+'</span></div>'
+        +'<div class="info-row"><span class="inf-lbl">ผู้ผลิต</span><span class="inf-val">'+l.m+'</span></div>'
+        +'<div class="info-row"><span class="inf-lbl">ประเทศ</span><span class="inf-val">'+(l.c||'—')+'</span></div>'
+        +'<div class="info-row"><span class="inf-lbl">วันหมดอายุ</span><span class="inf-val">'+thd(l.e)+'</span></div>'
+        +'<div class="info-row"><span class="inf-lbl">จำนวนสินค้า</span><span class="inf-val">'+(l.n||0)+' รายการ</span></div>'
       +'</div>'
-      +'<div class="psec" style="margin-top:10px"><h4>📝 เอกสาร ('+done+'/'+DOCS.length+')</h4>'
+      +'<div class="psec"><div class="psec-title">📝 เอกสารที่ต้องเตรียม ('+done+'/'+DOCS.length+')</div>'
         +'<ul class="chklist">'+DOCS.map(function(doc,i){
           return '<li class="'+(chks[i]?'done':'')+'"><input type="checkbox"'+(chks[i]?' checked':'')
-            +' onchange="chk(\''+escQ(l.k)+'\','+i+',this.checked)"><span>'+doc+'</span></li>';
+            +' onchange="saveChk(\''+escQ(l.k)+'\','+i+',this.checked)"><span>'+doc+'</span></li>';
         }).join('')+'</ul>'
       +'</div>'
     +'</div>'
     +'<div>'
-      +'<div class="psec"><h4>📦 สินค้า ('+(l.prods?l.prods.length:0)+')</h4>'+prodsH+'</div>'
-      +'<div class="psec" style="margin-top:10px"><h4>⏰ ขั้นตอนต่ออายุ</h4>'
-        +tls.map(function(t){
-          var c=d!==null&&d<=t.days?'#dc2626':'#0891b2';
-          return '<div class="tl-item"><div class="tl-dot" style="background:'+c+'"></div><div><div class="tl-when">ก่อน '+t.days+' วัน</div><div class="tl-desc">'+t.lbl+'</div></div></div>';
-        }).join('')
-        +'<div class="tl-item"><div class="tl-dot" style="background:'+(d!==null&&d<0?'#94a3b8':'#d97706')+'"></div><div><div class="tl-when">หมดอายุ</div><div class="tl-desc">'+thDate(l.e)+'</div></div></div>'
-      +'</div>'
+      +'<div class="psec"><div class="psec-title">📦 รายการสินค้า ('+(l.prods?l.prods.length:0)+')</div>'+prodsH+'</div>'
+      +'<div class="psec"><div class="psec-title">⏰ ขั้นตอนต่ออายุ</div>'+tlH+'</div>'
     +'</div>'
   +'</div>'
-  +'<div class="p-acts">'
-    +(l.url?'<button class="pbtn pb-pdf" onclick="openPDF(\''+escQ(l.url)+'\',\''+escQ(l.k)+'\')">📄 เปิด PDF</button>':'')
-    +(ADMIN?'<button class="pbtn pb-edit" onclick="openEdit(\''+escQ(l.k)+'\')">📅 แก้วัน</button>':'')
-    +'<button class="pbtn pb-close" onclick="toggle(\''+escQ(l.k)+'\')">✕ ปิด</button>'
+  +'<div class="panel-footer">'
+    +(l.url?'<button class="pfbtn pfbtn-pdf" onclick="openPDF(\''+escQ(l.url)+'\',\''+escQ(l.k)+'\')">📄 เปิด PDF</button>':'')
+    +(IS_ADMIN?'<button class="pfbtn pfbtn-edit" onclick="openEdit(\''+escQ(l.k)+'\')">📅 แก้วัน</button>':'')
+    +'<button class="pfbtn pfbtn-close" onclick="toggleRow(\''+escQ(l.k)+'\')">✕ ปิด</button>'
   +'</div>';
 }
 
-function fprod(inp,tid){ var q=inp.value.toLowerCase(); var t=g(tid); if(!t) return; t.querySelectorAll('tbody tr').forEach(function(r){ r.style.display=r.textContent.toLowerCase().includes(q)?'':'none'; }); }
-function chk(key,i,v){ var arr=load('chk_'+key)||new Array(DOCS.length).fill(false); arr[i]=v; save('chk_'+key,arr); }
+function fprod(inp,tid){
+  var q=inp.value.toLowerCase(), t=$(tid);
+  if(t) t.querySelectorAll('tbody tr').forEach(function(r){
+    r.style.display=r.textContent.toLowerCase().includes(q)?'':'none';
+  });
+}
+function saveChk(k,i,v){ var a=ld('ck_'+k)||new Array(DOCS.length).fill(false); a[i]=v; sv('ck_'+k,a); }
 
-// ══════════════════════════════════════════
-// PDF VIEWER — ใช้ Drive embed URL ตรง (ไม่ผ่าน base64)
-// ══════════════════════════════════════════
-function openPDF(urlRaw, name){
-  var url=urlRaw;
-  var m=url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+// ════════════════════════════════════════════
+// PDF VIEWER
+// ════════════════════════════════════════════
+function openPDF(rawUrl,name){
+  var m=rawUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
   if(!m){ flash('❌ ไม่พบ Drive File ID'); return; }
-  var embedUrl='https://drive.google.com/file/d/'+m[1]+'/preview';
-  g('pdf-title').textContent=name||'';
-  g('pdf-load').style.display='flex';
-  g('pdf-frame').src='about:blank';
-  g('pdf-bg').classList.add('on');
-  setTimeout(function(){ g('pdf-frame').src=embedUrl; },80);
-  g('pdf-frame').onload=function(){ g('pdf-load').style.display='none'; };
+  $('pdf-title').textContent=name||rawUrl;
+  $('pdf-loader').style.display='flex';
+  $('pdf-iframe').src='about:blank';
+  $('pdf-overlay').classList.add('show');
+  var embed='https://drive.google.com/file/d/'+m[1]+'/preview';
+  setTimeout(function(){ $('pdf-iframe').src=embed; },80);
+  $('pdf-iframe').onload=function(){ $('pdf-loader').style.display='none'; };
 }
 function closePDF(){
-  g('pdf-bg').classList.remove('on');
-  g('pdf-frame').src='about:blank';
+  $('pdf-overlay').classList.remove('show');
+  $('pdf-iframe').src='about:blank';
 }
 document.addEventListener('keydown',function(e){ if(e.key==='Escape') closePDF(); });
-g('pdf-bg').addEventListener('click',function(e){ if(e.target===this) closePDF(); });
+$('pdf-overlay').addEventListener('click',function(e){ if(e.target===this) closePDF(); });
 
-// ══════════════════════════════════════════
+// ════════════════════════════════════════════
 // EDIT DATE
-// ══════════════════════════════════════════
+// ════════════════════════════════════════════
 function openEdit(key){
-  if(!ADMIN) return;
-  EDIT_K=key;
+  if(!IS_ADMIN) return;
+  EDIT_KEY=key;
   var l=LICS.find(function(x){ return x.k===key; });
-  g('edit-lbl').textContent=key+(l?' — '+l.m:'');
-  g('edit-date').value=l?(l.e||''):'';
-  openModal('m-edit');
+  $('edit-sub').textContent=key+(l?' — '+l.m:'');
+  $('edit-dt').value=l?(l.e||''):'';
+  showModal('m-edit');
 }
-g('edit-ok').onclick=function(){
-  if(!EDIT_K) return;
-  var nd=g('edit-date').value; if(!nd) return;
-  var l=LICS.find(function(x){ return x.k===EDIT_K; });
-  if(l){ l.e=nd; save(K.lics,LICS); }
-  closeModal('m-edit');
+$('edit-ok').onclick=function(){
+  if(!EDIT_KEY) return;
+  var nd=$('edit-dt').value; if(!nd) return;
+  var l=LICS.find(function(x){ return x.k===EDIT_KEY; });
+  if(l){ l.e=nd; sv(SK.lics,LICS); }
+  hideModal('m-edit');
   renderList(); buildDash();
-  // บันทึกใน Sheets
   fetch(GAS,{method:'POST',headers:{'Content-Type':'text/plain'},
-    body:JSON.stringify({action:'updateDate',token:TOK,key:EDIT_K,date:nd})})
+    body:JSON.stringify({action:'updateDate',token:TOK,key:EDIT_KEY,date:nd})})
     .then(function(r){ return r.json(); })
-    .then(function(d){ flash(d.success?'✅ แก้วันหมดอายุแล้ว':'❌ บันทึกไม่ได้'); })
+    .then(function(d){ flash(d.success?'✅ แก้วันแล้ว':'❌ บันทึกไม่ได้'); })
     .catch(function(e){ flash('❌ '+e.message); });
 };
 
-// ══════════════════════════════════════════
+// ════════════════════════════════════════════
 // IMPORT EXCEL
-// ══════════════════════════════════════════
-g('imp-dz').onclick=function(){ g('imp-fi').click(); };
-g('imp-fi').onchange=function(){ if(this.files[0]) parseXlsx(this.files[0]); this.value=''; };
-g('imp-dz').ondragover=function(e){ e.preventDefault(); this.classList.add('drag'); };
-g('imp-dz').ondragleave=function(){ this.classList.remove('drag'); };
-g('imp-dz').ondrop=function(e){ e.preventDefault(); this.classList.remove('drag'); if(e.dataTransfer.files[0]) parseXlsx(e.dataTransfer.files[0]); };
+// ════════════════════════════════════════════
+$('imp-dz').onclick=function(){ $('imp-fi').click(); };
+$('imp-fi').onchange=function(){ if(this.files[0]) parseExcel(this.files[0]); this.value=''; };
+$('imp-dz').ondragover=function(e){ e.preventDefault(); this.classList.add('drag'); };
+$('imp-dz').ondragleave=function(){ this.classList.remove('drag'); };
+$('imp-dz').ondrop=function(e){ e.preventDefault(); this.classList.remove('drag'); if(e.dataTransfer.files[0]) parseExcel(e.dataTransfer.files[0]); };
 
-function parseXlsx(file){
+function parseExcel(file){
   var reader=new FileReader();
   reader.onload=function(e){
     try{
@@ -880,17 +1141,17 @@ function showPreview(){
     else if(n.e!==om[n.k].e) updated.push(n);
     else skipped.push(n);
   });
-  g('merge-smry').textContent='➕ เพิ่ม: '+added.length+' | 🔄 อัพเดท: '+updated.length+' | ⏭ เหมือนเดิม: '+skipped.length;
+  $('imp-smry').textContent='➕ เพิ่ม: '+added.length+' | 🔄 อัพเดท: '+updated.length+' | ⏭ เหมือนเดิม: '+skipped.length;
   var html='';
-  added.slice(0,8).forEach(function(l){ html+='<div class="mrow m-add">➕ '+l.k+' — '+l.m+'</div>'; });
-  updated.slice(0,8).forEach(function(l){ html+='<div class="mrow m-upd">🔄 '+l.k+' — '+thDate(l.e)+'</div>'; });
-  if(added.length+updated.length>16) html+='<div class="mrow m-skip">... อีก '+(added.length+updated.length-16)+' รายการ</div>';
-  g('merge-list').innerHTML=html||'<div class="mrow m-skip">ไม่มีการเปลี่ยนแปลง</div>';
-  g('merge-wrap').style.display='block';
-  g('imp-ok').style.display=(added.length+updated.length>0)?'':'none';
+  added.slice(0,8).forEach(function(l){ html+='<div class="merge-row mr-add">➕ '+l.k+' — '+l.m+'</div>'; });
+  updated.slice(0,8).forEach(function(l){ html+='<div class="merge-row mr-upd">🔄 '+l.k+' ('+thd(l.e)+')</div>'; });
+  if(added.length+updated.length>16) html+='<div class="merge-row mr-skip">... อีก '+(added.length+updated.length-16)+' รายการ</div>';
+  $('imp-list').innerHTML=html||'<div class="merge-row mr-skip">ไม่มีการเปลี่ยนแปลง</div>';
+  $('imp-preview').style.display='block';
+  $('imp-ok').style.display=(added.length+updated.length>0)?'':'none';
 }
 
-function applyMerge(){
+function applyImport(){
   if(!PENDING) return;
   var om={}; LICS.forEach(function(l){ om[l.k]=l; });
   var changed=[];
@@ -906,9 +1167,9 @@ function applyMerge(){
       if(c) changed.push(o);
     }
   });
-  closeModal('m-import');
-  g('imp-ok').style.display='none'; g('merge-wrap').style.display='none'; PENDING=null;
-  save(K.lics,LICS); buildDash(); renderList();
+  hideModal('m-import');
+  $('imp-ok').style.display='none'; $('imp-preview').style.display='none'; PENDING=null;
+  sv(SK.lics,LICS); buildDash(); renderList();
   if(!changed.length){ flash('✅ ไม่มีการเปลี่ยนแปลง'); return; }
   flash('⏳ กำลังบันทึก '+changed.length+' ใบ...');
   sendBatch(changed,0);
@@ -916,40 +1177,45 @@ function applyMerge(){
 
 function sendBatch(all,offset){
   var CHUNK=30, chunk=all.slice(offset,offset+CHUNK);
-  if(!chunk.length){ flash('✅ บันทึกลง Sheets ครบ '+all.length+' ใบ'); return; }
+  if(!chunk.length){ flash('✅ บันทึก Sheets สำเร็จ '+all.length+' ใบ'); return; }
   fetch(GAS,{method:'POST',headers:{'Content-Type':'text/plain'},
     body:JSON.stringify({action:'upsertLicenses',token:TOK,licenses:chunk})})
     .then(function(r){ return r.json(); })
     .then(function(d){
-      if(!d.success){ flash('❌ บันทึกไม่ได้ batch '+(offset/CHUNK+1)); return; }
+      if(!d.success){ flash('❌ บันทึกไม่ได้'); return; }
       setTimeout(function(){ sendBatch(all,offset+CHUNK); },200);
     }).catch(function(e){ flash('❌ '+e.message); });
 }
 
-// ══════════════════════════════════════════
+// ════════════════════════════════════════════
 // UPLOAD PDF
-// ══════════════════════════════════════════
-g('up-dz').onclick=function(){ g('up-fi').click(); };
-g('up-fi').onchange=function(){ addFiles(this.files); this.value=''; };
-g('up-dz').ondragover=function(e){ e.preventDefault(); this.classList.add('drag'); };
-g('up-dz').ondragleave=function(){ this.classList.remove('drag'); };
-g('up-dz').ondrop=function(e){ e.preventDefault(); this.classList.remove('drag'); addFiles(e.dataTransfer.files); };
+// ════════════════════════════════════════════
+$('up-dz').onclick=function(){ $('up-fi').click(); };
+$('up-fi').onchange=function(){ addUpFiles(this.files); this.value=''; };
+$('up-dz').ondragover=function(e){ e.preventDefault(); this.classList.add('drag'); };
+$('up-dz').ondragleave=function(){ this.classList.remove('drag'); };
+$('up-dz').ondrop=function(e){ e.preventDefault(); this.classList.remove('drag'); addUpFiles(e.dataTransfer.files); };
 
-function addFiles(files){
+function addUpFiles(files){
   UP_FILES=Array.from(files);
-  g('ul-list').innerHTML=UP_FILES.map(function(f){
+  $('ul-list').innerHTML=UP_FILES.map(function(f){
     return '<div class="ul-item"><div class="us us-q"></div><span>'+f.name+'</span></div>';
   }).join('');
-  g('up-ok').style.display=UP_FILES.length?'':'none';
+  $('up-ok').style.display=UP_FILES.length?'':'none';
 }
 
 function startUpload(){
   if(!UP_FILES.length) return;
-  g('up-ok').disabled=true;
-  var items=g('ul-list').querySelectorAll('.ul-item');
+  $('up-ok').disabled=true;
+  var items=$('ul-list').querySelectorAll('.ul-item');
   var idx=0;
   function next(){
-    if(idx>=UP_FILES.length){ g('up-ok').disabled=false; flash('✅ อัพโหลดเสร็จ'); setTimeout(doSync,1500); return; }
+    if(idx>=UP_FILES.length){
+      $('up-ok').disabled=false;
+      flash('✅ อัพโหลดเสร็จ '+UP_FILES.length+' ไฟล์');
+      setTimeout(doSync,1500);
+      return;
+    }
     var f=UP_FILES[idx], dot=items[idx].querySelector('.us');
     var reader=new FileReader();
     reader.onload=function(e){
@@ -965,57 +1231,84 @@ function startUpload(){
   next();
 }
 
-// ══════════════════════════════════════════
-// SYNC
-// ══════════════════════════════════════════
+// ════════════════════════════════════════════
+// SYNC PDF FROM DRIVE
+// ════════════════════════════════════════════
 function doSync(){
-  flash('🔄 กำลัง Sync PDF จาก Drive...');
+  flash('🔄 Sync PDF จาก Drive...');
+  setStatus('loading','🔄 กำลัง Sync PDF จาก Google Drive...');
   fetch(GAS+'?action=syncPDF&token='+encodeURIComponent(TOK))
     .then(function(r){ return r.json(); })
     .then(function(d){
-      if(!d.files){ flash('⚠️ Sync ผิดพลาด'); return; }
+      if(!d.files) throw new Error(d.error||'ไม่ได้รับข้อมูล');
       var hit=0;
       d.files.forEach(function(f){
         if(!f.licKey) return;
         var l=LICS.find(function(x){ return x.k===f.licKey; });
         if(l){ l.url=f.url; hit++; }
       });
-      save(K.lics,LICS); renderList();
-      flash('✅ Sync แล้ว — PDF: '+d.files.length+' ไฟล์ (match: '+hit+')');
-      if(hit>0) saveUrls();
-    }).catch(function(e){ flash('❌ '+e.message); });
+      sv(SK.lics,LICS); renderList();
+      setStatus('success','✅ Sync แล้ว — PDF: '+d.files.length+' ไฟล์, match: '+hit+' ใบ');
+      hideStatus(5000);
+      flash('✅ Sync แล้ว: '+d.files.length+' PDF, match: '+hit);
+      if(hit>0) savePDFUrls();
+    }).catch(function(e){
+      setStatus('error','❌ Sync ไม่ได้: '+e.message);
+      flash('❌ Sync ไม่ได้: '+e.message);
+    });
 }
 
-function saveUrls(){
-  var toSave=LICS.filter(function(l){ return l.url; })
+function savePDFUrls(){
+  var urls=LICS.filter(function(l){ return l.url; })
     .map(function(l){ return {k:l.k,url:l.url}; });
-  if(!toSave.length) return;
+  if(!urls.length) return;
   fetch(GAS,{method:'POST',headers:{'Content-Type':'text/plain'},
-    body:JSON.stringify({action:'saveUrls',token:TOK,licenses:toSave})}).catch(function(){});
+    body:JSON.stringify({action:'saveUrls',token:TOK,licenses:urls})})
+    .catch(function(){});
 }
 
-// ══════════════════════════════════════════
-// INIT — เข้าใหม่ทุกครั้งต้อง login เสมอ ยกเว้น session ยังมีอยู่
-// ══════════════════════════════════════════
+// ════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════
 (function init(){
-  // restore session ถ้ายังไม่หมดอายุ
-  var savedTok = load(K.tok) || '';
-  var savedRole= load(K.role) || '';
-  var savedExp = load(K.exp)  || 0;
+  var ldFill=$('ld-fill'), ldMsg=$('ld-msg');
+  var steps=[
+    {pct:15,msg:'กำลังตรวจสอบ Session...'},
+    {pct:40,msg:'กำลังเชื่อมต่อ Apps Script...'},
+    {pct:70,msg:'กำลังเตรียมระบบ...'},
+    {pct:90,msg:'เกือบเสร็จแล้ว...'},
+  ];
+  var si=0;
+  var iv=setInterval(function(){
+    if(si>=steps.length){ clearInterval(iv); return; }
+    ldFill.style.width=steps[si].pct+'%';
+    ldMsg.textContent=steps[si].msg;
+    si++;
+  },300);
 
-  if(savedTok && savedExp && Date.now() < savedExp){
-    // session ยังอยู่ — ข้าม login แต่โหลดข้อมูลใหม่เสมอ
-    TOK=savedTok; ROLE=savedRole; EXP=savedExp;
-    afterLogin();
-  } else {
-    // หมดอายุ หรือไม่มี — แสดง login
-    save(K.tok,''); save(K.role,''); save(K.exp,0);
-    g('pg-login').style.display='flex';
-    g('pg-main').style.display='none';
-  }
+  // ตรวจ session หลัง 1.3 วินาที
+  setTimeout(function(){
+    clearInterval(iv); ldFill.style.width='100%'; ldMsg.textContent='พร้อมแล้ว!';
 
-  g('lbtn').onclick=doLogin;
-  g('lpw').addEventListener('keypress',function(e){ if(e.key==='Enter') doLogin(); });
+    var savedTok=ld(SK.tok)||'';
+    var savedRole=ld(SK.role)||'';
+    var savedExp=ld(SK.exp)||0;
+
+    setTimeout(function(){
+      $('scr-loading').style.display='none';
+      if(savedTok&&savedExp&&Date.now()<savedExp){
+        // session ยังอยู่
+        TOK=savedTok; ROLE=savedRole; EXP=savedExp;
+        enterApp();
+      } else {
+        // ล้าง session เก่า แสดงหน้า login
+        sv(SK.tok,''); sv(SK.role,''); sv(SK.exp,0);
+        $('scr-login').style.display='flex';
+      }
+      $('lc-btn').onclick=doLogin;
+      $('lc-pw').addEventListener('keypress',function(e){ if(e.key==='Enter') doLogin(); });
+    },200);
+  },1300);
 })();
 </script>
 </body>
