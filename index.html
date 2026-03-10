@@ -758,6 +758,16 @@ function urg(iso){
 function thd(iso){
   if(!iso||iso==='') return '—';
   var p=iso.split('-');
+  if(p.length===3&&p[0].length===4){
+    var yy=((+p[0]+543)+'').slice(-2); // พ.ศ. 2 หลัก
+    return p[2]+'/'+p[1]+'/'+yy;
+  }
+  return iso;
+}
+
+function thdFull(iso){
+  if(!iso||iso==='') return '—';
+  var p=iso.split('-');
   if(p.length===3&&p[0].length===4) return p[2]+'/'+p[1]+'/'+(+p[0]+543);
   return iso;
 }
@@ -1197,7 +1207,9 @@ function licRow(l){
   var ds=d===null?'—':d<0?'หมดอายุแล้ว':'เหลือ '+d+' วัน';
   var pdfBtn=l.url
     ? '<button class="act-btn btn-pdf" onclick="event.stopPropagation();openPDF(\''+escQ(l.url)+'\',\''+escQ(l.k)+'\')">📄 PDF</button>'
-    : '<button class="act-btn btn-pdf none" disabled>📄 PDF</button>';
+    : (IS_ADMIN
+      ? '<button class="act-btn btn-pdf" style="opacity:0.45" title="ยังไม่มี PDF — กด Sync" onclick="event.stopPropagation();flash(\'⚠️ ยังไม่มี PDF ลองกด Sync ก่อนครับ\')">📄 PDF</button>'
+      : '');
   var editBtn=IS_ADMIN
     ? '<button class="act-btn btn-edit" onclick="event.stopPropagation();openEdit(\''+escQ(l.k)+'\')">📅</button>'
     : '';
