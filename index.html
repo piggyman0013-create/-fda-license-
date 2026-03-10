@@ -1287,7 +1287,9 @@ function sendBatch(all,offset,isFirst){
   setStatus('loading','⏳ กำลังบันทึก '+(offset+chunk.length)+' / '+all.length+' ใบ...');
   fetch(GAS,{method:'POST',headers:{'Content-Type':'text/plain'},
     body:JSON.stringify({action:action,token:TOK,licenses:chunk.map(function(l){
-      return {k:l.k,m:l.m,c:l.c,e:l.e,n:l.n,cat:l.cat||'',url:l.url||''};
+      // ส่ง prods ด้วยเพื่อให้ GAS เขียนลง PRODUCTS sheet
+      var prods = l.prods && l.prods.length ? l.prods : (ld('pd_'+l.k)||[]);
+      return {k:l.k,m:l.m,c:l.c,e:l.e,n:l.n,cat:l.cat||'',url:l.url||'',prods:prods};
     })})})
     .then(function(r){ return r.json(); })
     .then(function(d){
