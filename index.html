@@ -1034,29 +1034,35 @@ function toggleRow(key){
   if(!l) return;
   panel.innerHTML=buildPanel(l);
 
-  // lazy load prods — ดูจาก localStorage ก่อน ถ้าไม่มีค่อย fetch GAS
+  // lazy load prods — ดึงจาก GAS เสมอ (sync ทุกเครื่อง)
+  // ถ้ามีใน memory แล้วใช้ได้เลย แต่ยังดึง GAS ในพื้นหลังเพื่ออัพเดท
   if(!l.prods||!l.prods.length){
+    // fallback: ดู localStorage ก่อนระหว่างรอ GAS
     var cached=ld('pd_'+key);
     if(cached&&cached.length){
       l.prods=cached;
       if(OPEN_KEY===key) panel.innerHTML=buildPanel(l);
-    } else if(TOK){
+    }
+  }
+  // ดึงจาก GAS เสมอ (ทุกเครื่องเห็นข้อมูลเดียวกัน)
+  if(TOK){
     fetch(GAS+'?action=getProds&token='+encodeURIComponent(TOK)+'&key='+encodeURIComponent(key))
       .then(function(r){ return r.json(); })
       .then(function(d){
         if(d.prods&&d.prods.length){
           l.prods=d.prods;
+          sv('pd_'+key, d.prods); // save ลง localStorage เป็น cache
           if(OPEN_KEY===key) panel.innerHTML=buildPanel(l);
-        } else {
-          // แสดง "ไม่มีสินค้า"
+        } else if(!l.prods||!l.prods.length){
           var el=$('prod-wrap_'+sid);
           if(el) el.innerHTML='<div class="prod-loading">ไม่มีข้อมูลสินค้า</div>';
         }
       }).catch(function(){
-        var el=$('prod-wrap_'+sid);
-        if(el) el.innerHTML='<div class="prod-loading">⚠️ โหลดสินค้าไม่ได้</div>';
+        if(!l.prods||!l.prods.length){
+          var el=$('prod-wrap_'+sid);
+          if(el) el.innerHTML='<div class="prod-loading">⚠️ โหลดสินค้าไม่ได้</div>';
+        }
       });
-    } // end else if(TOK)
   }
   card.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
