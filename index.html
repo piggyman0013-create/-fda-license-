@@ -451,6 +451,7 @@ body.dark .nav-flash{color:#34d399}
     <div class="lc-logo">🏥</div>
     <div class="lc-title">FDA License Manager</div>
     <div class="lc-sub">ระบบจัดการใบอนุญาตเครื่องมือแพทย์</div>
+    <input class="lc-inp" id="lc-user" type="text" placeholder="ชื่อผู้ใช้ (Username)" autocomplete="username">
     <input class="lc-inp" id="lc-pw" type="password" placeholder="รหัสผ่าน" autocomplete="current-password">
     <button class="lc-btn" id="lc-btn">🔐 เข้าสู่ระบบ</button>
     <div class="lc-err" id="lc-err"></div>
@@ -470,6 +471,7 @@ body.dark .nav-flash{color:#34d399}
     <div class="nav-tabs">
       <div class="ntab on" id="t-dash" onclick="goPage('dash')">📊 Dashboard</div>
       <div class="ntab" id="t-lic" onclick="goPage('lic')">📋 ใบอนุญาต <span class="cnt" id="lic-cnt">0</span></div>
+      <div class="ntab admin-only" id="t-users" onclick="goPage('users')" style="display:none">👥 Users</div>
     </div>
     <div class="nav-right">
       <span class="nav-flash" id="nav-flash"></span>
@@ -534,6 +536,52 @@ body.dark .nav-flash{color:#34d399}
     </div>
     <div id="lic-list"></div>
   </div>
+  <!-- USERS PAGE -->
+  <div class="page" id="page-users">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+
+      <!-- User List -->
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div class="card-title" style="margin:0">👥 รายชื่อผู้ใช้งาน</div>
+          <button class="nav-btn" style="background:#16a34a;border-color:#15803d;color:#fff;padding:5px 12px" onclick="showModal('m-adduser')">+ เพิ่ม User</button>
+        </div>
+        <div id="user-list"><div class="prod-loading">กำลังโหลด...</div></div>
+      </div>
+
+      <!-- Admin Settings -->
+      <div class="card">
+        <div class="card-title">⚙️ ตั้งค่า Admin</div>
+        <div class="mfield" style="margin-bottom:10px">
+          <div class="mlbl">เปลี่ยนรหัสผ่าน Admin</div>
+          <input class="minp" type="password" id="adm-new-pw1" placeholder="รหัสผ่านใหม่">
+          <input class="minp" type="password" id="adm-new-pw2" placeholder="ยืนยันรหัสผ่านใหม่" style="margin-top:6px">
+          <button class="mbtn mbtn-ok" style="margin-top:8px;width:100%" onclick="changeAdminPw()">💾 บันทึกรหัสผ่าน Admin</button>
+          <div id="adm-pw-msg" style="font-size:12px;margin-top:6px"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Activity Log -->
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div class="card-title" style="margin:0">📋 Activity Log</div>
+        <button class="nav-btn" onclick="loadActivityLog()">🔄 รีเฟรช</button>
+      </div>
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:12px" id="log-tbl">
+          <thead><tr style="background:#f1f5f9">
+            <th style="padding:6px 10px;text-align:left;color:#0f2342;border-bottom:2px solid #e2e8f0">เวลา</th>
+            <th style="padding:6px 10px;text-align:left;color:#0f2342;border-bottom:2px solid #e2e8f0">Username</th>
+            <th style="padding:6px 10px;text-align:left;color:#0f2342;border-bottom:2px solid #e2e8f0">ชื่อ</th>
+            <th style="padding:6px 10px;text-align:left;color:#0f2342;border-bottom:2px solid #e2e8f0">Action</th>
+          </tr></thead>
+          <tbody id="log-body"><tr><td colspan="4" style="padding:16px;text-align:center;color:#94a3b8">กำลังโหลด...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
 </div><!-- /#app -->
 
 <!-- ═══ MODALS ═══ -->
@@ -606,6 +654,40 @@ body.dark .nav-flash{color:#34d399}
   </div>
 </div>
 
+<!-- Add User Modal -->
+<div class="modal-wrap hide" id="m-adduser">
+  <div class="modal-box" style="max-width:400px">
+    <div class="modal-hdr" style="background:linear-gradient(135deg,#16a34a,#15803d)">
+      <div><div class="mhdr-t">👤 เพิ่มผู้ใช้ใหม่</div></div>
+      <button class="mhdr-x" onclick="hideModal('m-adduser')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="mfield"><div class="mlbl">Username</div><input class="minp" id="nu-user" placeholder="เช่น somchai"></div>
+      <div class="mfield"><div class="mlbl">ชื่อแสดง</div><input class="minp" id="nu-name" placeholder="เช่น สมชาย"></div>
+      <div class="mfield"><div class="mlbl">รหัสผ่าน</div><input class="minp" type="password" id="nu-pw" placeholder="รหัสผ่าน"></div>
+      <div id="nu-err" style="color:#dc2626;font-size:12px;display:none"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="mbtn mbtn-cancel" onclick="hideModal('m-adduser')">ยกเลิก</button>
+      <button class="mbtn mbtn-ok" onclick="doAddUser()">✅ เพิ่ม User</button>
+    </div>
+  </div>
+</div>
+
+<!-- Reset Password Modal -->
+<div class="modal-wrap hide" id="m-resetpw">
+  <div class="modal-box" style="max-width:360px">
+    <div class="modal-hdr"><div><div class="mhdr-t">🔑 Reset รหัสผ่าน</div><div class="mhdr-s" id="reset-sub">—</div></div><button class="mhdr-x" onclick="hideModal('m-resetpw')">✕</button></div>
+    <div class="modal-body">
+      <div class="mfield"><div class="mlbl">รหัสผ่านใหม่</div><input class="minp" type="password" id="reset-pw" placeholder="รหัสผ่านใหม่"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="mbtn mbtn-cancel" onclick="hideModal('m-resetpw')">ยกเลิก</button>
+      <button class="mbtn mbtn-ok" onclick="doResetPw()">💾 บันทึก</button>
+    </div>
+  </div>
+</div>
+
 <!-- PDF Viewer -->
 <div class="pdf-overlay" id="pdf-overlay">
   <div class="pdf-box">
@@ -628,7 +710,7 @@ body.dark .nav-flash{color:#34d399}
 // ════════════════════════════════════════════
 // CONFIG
 // ════════════════════════════════════════════
-var GAS   = 'https://script.google.com/macros/s/AKfycbzK9Z9Lp8zYqd2ABQRSeX4mzLVhURq3ElzZqciFuZ2L0hKbHmUrx_mGMwUgfJ8BOGoV/exec';
+var GAS   = 'https://script.google.com/macros/s/AKfycbwTqJ3CgR0HjD_l-YQRpdHxz0s6n6AwWhpLWcE6jxAAhU7HFqNGJ5VUZCrfgA04KitX/exec';
 var DRIVE = 'https://drive.google.com/drive/folders/1pZN6e7oH-kMGOs8lNwWX2fCTf_RTQBvc';
 
 // localStorage keys — ใหม่ทั้งหมด ไม่ซ้ำกับเวอร์ชันเก่า
@@ -722,12 +804,13 @@ function toggleDark(){
 // AUTH
 // ════════════════════════════════════════════
 function doLogin(){
+  var user=$('lc-user').value.trim();
   var pw=$('lc-pw').value.trim();
-  if(!pw) return;
+  if(!user||!pw){ $('lc-err').textContent='❌ กรุณากรอก Username และ Password'; return; }
   $('lc-btn').disabled=true; $('lc-btn').textContent='⏳ กำลังตรวจสอบ...';
   $('lc-err').textContent='';
 
-  fetch(GAS+'?action=login&pw='+encodeURIComponent(pw))
+  fetch(GAS+'?action=login&user='+encodeURIComponent(user)+'&pw='+encodeURIComponent(pw))
     .then(function(r){ return r.json(); })
     .then(function(d){
       $('lc-btn').disabled=false; $('lc-btn').textContent='🔐 เข้าสู่ระบบ';
@@ -754,11 +837,13 @@ function doLogout(){
   OPEN_KEY=null;
 }
 
+var USERNAME='';
 function enterApp(){
   $('scr-login').style.display='none';
   $('app').style.display='block';
   setRole(ROLE==='admin');
   loadData();
+  if(ROLE==='admin') loadUsers();
 }
 
 function setRole(isAdmin){
@@ -776,6 +861,123 @@ function setRole(isAdmin){
     document.querySelectorAll('.admin-only').forEach(function(e){ e.style.display='none'; });
   }
   renderList();
+}
+
+// ════════════════════════════════════════════
+// USER MANAGEMENT
+// ════════════════════════════════════════════
+var RESET_USER='';
+
+function loadUsers(){
+  if(!IS_ADMIN) return;
+  fetch(GAS+'?action=getUsers&token='+encodeURIComponent(TOK))
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if(!d.users){ return; }
+      var html=d.users.map(function(u){
+        var lastLogin=u.lastLogin?new Date(u.lastLogin).toLocaleString('th-TH'):'ยังไม่เคย';
+        return '<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #f1f5f9">'
+          +'<div style="width:32px;height:32px;border-radius:50%;background:#0891b2;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px;flex-shrink:0">'
+          +(u.displayName||u.username).charAt(0).toUpperCase()+'</div>'
+          +'<div style="flex:1;min-width:0">'
+          +'<div style="font-weight:600;font-size:13px">'+u.displayName+'</div>'
+          +'<div style="font-size:11px;color:#94a3b8">@'+u.username+' • เข้าล่าสุด: '+lastLogin+'</div>'
+          +'</div>'
+          +'<button onclick="openResetPw(this)" data-u="'+u.username+'" data-n="'+u.displayName+'" class="act-btn btn-edit" style="font-size:11px">🔑</button>'
+          +'<button onclick="doDeleteUser(this)" data-u="'+u.username+'" data-n="'+u.displayName+'" class="act-btn" style="background:#dc2626;border-color:#b91c1c;color:#fff;font-size:11px">✕</button>'
+          +'</div>';
+      }).join('');
+      $('user-list').innerHTML=html||'<div class="prod-loading">ไม่มีผู้ใช้</div>';
+    }).catch(function(){ $('user-list').innerHTML='<div class="prod-loading">⚠️ โหลดไม่ได้</div>'; });
+}
+
+function doAddUser(){
+  var user=$('nu-user').value.trim();
+  var name=$('nu-name').value.trim()||user;
+  var pw=$('nu-pw').value.trim();
+  $('nu-err').style.display='none';
+  if(!user||!pw){ $('nu-err').textContent='กรุณากรอกให้ครบ'; $('nu-err').style.display='block'; return; }
+  fetch(GAS,{method:'POST',headers:{'Content-Type':'text/plain'},
+    body:JSON.stringify({action:'addUser',token:TOK,username:user,password:pw,displayName:name})})
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if(d.success){
+        hideModal('m-adduser');
+        $('nu-user').value=''; $('nu-name').value=''; $('nu-pw').value='';
+        flash('✅ เพิ่ม User "'+user+'" แล้ว');
+        loadUsers();
+      } else {
+        $('nu-err').textContent='❌ '+(d.error||'เกิดข้อผิดพลาด');
+        $('nu-err').style.display='block';
+      }
+    });
+}
+
+function openResetPw(el){
+  var username=el.dataset.u, displayName=el.dataset.n;
+  RESET_USER=username;
+  $('reset-sub').textContent=displayName+' (@'+username+')';
+  $('reset-pw').value='';
+  showModal('m-resetpw');
+}
+
+function doResetPw(){
+  var pw=$('reset-pw').value.trim();
+  if(!pw||!RESET_USER) return;
+  fetch(GAS,{method:'POST',headers:{'Content-Type':'text/plain'},
+    body:JSON.stringify({action:'resetPassword',token:TOK,username:RESET_USER,newPassword:pw})})
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      hideModal('m-resetpw');
+      flash(d.success?'✅ Reset รหัสผ่าน @'+RESET_USER+' แล้ว':'❌ '+(d.error||'?'));
+    });
+}
+
+function doDeleteUser(el){
+  var username=el.dataset.u, displayName=el.dataset.n;
+  if(!confirm('ลบ "'+displayName+'" (@'+username+') ออกจากระบบ?')) return;
+  fetch(GAS,{method:'POST',headers:{'Content-Type':'text/plain'},
+    body:JSON.stringify({action:'deleteUser',token:TOK,username:username})})
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      flash(d.success?'✅ ลบ @'+username+' แล้ว':'❌ '+(d.error||'?'));
+      loadUsers();
+    });
+}
+
+function changeAdminPw(){
+  var pw1=$('adm-new-pw1').value.trim();
+  var pw2=$('adm-new-pw2').value.trim();
+  var msg=$('adm-pw-msg');
+  if(!pw1||!pw2){ msg.style.color='#dc2626'; msg.textContent='❌ กรุณากรอกให้ครบ'; return; }
+  if(pw1!==pw2){ msg.style.color='#dc2626'; msg.textContent='❌ รหัสผ่านไม่ตรงกัน'; return; }
+  fetch(GAS,{method:'POST',headers:{'Content-Type':'text/plain'},
+    body:JSON.stringify({action:'changeAdminPassword',token:TOK,newPassword:pw1})})
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if(d.success){
+        msg.style.color='#16a34a'; msg.textContent='✅ เปลี่ยนรหัสผ่าน Admin แล้ว';
+        $('adm-new-pw1').value=''; $('adm-new-pw2').value='';
+      } else { msg.style.color='#dc2626'; msg.textContent='❌ เกิดข้อผิดพลาด'; }
+    });
+}
+
+function loadActivityLog(){
+  fetch(GAS+'?action=getActivityLog&token='+encodeURIComponent(TOK)+'&limit=100')
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if(!d.logs){ return; }
+      var html=d.logs.map(function(l){
+        var t=l.timestamp?new Date(l.timestamp).toLocaleString('th-TH'):'—';
+        return '<tr>'
+          +'<td style="padding:5px 10px;border-bottom:1px solid #f1f5f9;color:#64748b;white-space:nowrap">'+t+'</td>'
+          +'<td style="padding:5px 10px;border-bottom:1px solid #f1f5f9;font-weight:600">@'+l.username+'</td>'
+          +'<td style="padding:5px 10px;border-bottom:1px solid #f1f5f9">'+l.displayName+'</td>'
+          +'<td style="padding:5px 10px;border-bottom:1px solid #f1f5f9"><span style="background:#dbeafe;color:#1d4ed8;padding:1px 8px;border-radius:10px;font-size:11px">'+l.action+'</span></td>'
+          +'</tr>';
+      }).join('');
+      $('log-body').innerHTML=html||'<tr><td colspan="4" style="padding:16px;text-align:center;color:#94a3b8">ยังไม่มี Log</td></tr>';
+    });
 }
 
 function clickSwitch(){
@@ -913,10 +1115,11 @@ function setFilterAndGo(f){
   renderList();
 }
 function goPage(p){
-  $('page-dash').classList.toggle('on',p==='dash');
-  $('page-lic').classList.toggle('on',p==='lic');
-  $('t-dash').classList.toggle('on',p==='dash');
-  $('t-lic').classList.toggle('on',p==='lic');
+  ['dash','lic','users'].forEach(function(pg){
+    var el=$('page-'+pg); if(el) el.classList.toggle('on',p===pg);
+    var tab=$('t-'+pg); if(tab) tab.classList.toggle('on',p===pg);
+  });
+  if(p==='users'){ loadUsers(); loadActivityLog(); }
 }
 function setFilter(f,btn){
   CUR_F=f;
@@ -1422,6 +1625,7 @@ function savePDFUrls(){
         $('scr-login').style.display='flex';
       }
       $('lc-btn').onclick=doLogin;
+      $('lc-user').addEventListener('keypress',function(e){ if(e.key==='Enter') $('lc-pw').focus(); });
       $('lc-pw').addEventListener('keypress',function(e){ if(e.key==='Enter') doLogin(); });
     },200);
   },1300);
