@@ -516,7 +516,7 @@ body.dark .nav-flash{color:#34d399}
     <div class="ctrl">
       <div class="srch-wrap">
         <span class="srch-ico">🔍</span>
-        <input class="srch" id="srch" placeholder="ค้นหาเลขใบ, ผู้ผลิต, ประเทศ..." oninput="renderList()">
+        <input class="srch" id="srch" placeholder="ค้นหาเลขใบ, ผู้ผลิต, ประเทศ, ชื่อสินค้า, รหัสสินค้า..." oninput="renderList()">
       </div>
       <div class="fbtn-group">
         <button class="fbtn on" onclick="setFilter('all',this)">ทั้งหมด</button>
@@ -628,7 +628,7 @@ body.dark .nav-flash{color:#34d399}
 // ════════════════════════════════════════════
 // CONFIG
 // ════════════════════════════════════════════
-var GAS   = 'https://script.google.com/macros/s/AKfycbz-PWZaLBDzbeZ_wt166qveGHuM_qMmucia8fvyiPLTVa1jcFooWA3VtUihuqFDzhbT/exec';
+var GAS   = 'https://script.google.com/macros/s/AKfycbzK9Z9Lp8zYqd2ABQRSeX4mzLVhURq3ElzZqciFuZ2L0hKbHmUrx_mGMwUgfJ8BOGoV/exec';
 var DRIVE = 'https://drive.google.com/drive/folders/1pZN6e7oH-kMGOs8lNwWX2fCTf_RTQBvc';
 
 // localStorage keys — ใหม่ทั้งหมด ไม่ซ้ำกับเวอร์ชันเก่า
@@ -923,20 +923,68 @@ function setFilter(f,btn){
   document.querySelectorAll('.fbtn').forEach(function(b){ b.classList.toggle('on',b===btn); });
   renderList();
 }
+// cache ผลค้นหาสินค้า
+var PROD_KEYS = null, LAST_PROD_Q = '';
+
+function prodsMatchLocal(key, q){
+  var prods = ld('pd_'+key) || [];
+  for(var i=0;i<prods.length;i++){
+    var p=prods[i];
+    for(var j=0;j<p.length;j++){
+      if(p[j]&&String(p[j]).toLowerCase().includes(q)) return true;
+    }
+  }
+  return false;
+}
+
+var _srchTimer = null;
 function renderList(){
-  var q=($('srch').value||'').toLowerCase(), srt=$('srt').value;
+  var q=($('srch').value||'').toLowerCase().trim(), srt=$('srt').value;
+  
+  // ถ้า query เปลี่ยน ให้ค้นจาก GAS ใหม่ (debounce 400ms)
+  if(q && q !== LAST_PROD_Q){
+    PROD_KEYS = null;
+    LAST_PROD_Q = q;
+    clearTimeout(_srchTimer);
+    _srchTimer = setTimeout(function(){
+      fetch(GAS, {method:'POST', headers:{'Content-Type':'text/plain'},
+        body: JSON.stringify({action:'searchProds', token:TOK, q:q})})
+        .then(function(r){ return r.json(); })
+        .then(function(d){
+          PROD_KEYS = {};
+          (d.keys||[]).forEach(function(k){ PROD_KEYS[k]=true; });
+          _renderNow(q, srt);
+        }).catch(function(){
+          PROD_KEYS = {};
+          _renderNow(q, srt);
+        });
+    }, 400);
+    // แสดงผลเบื้องต้นจาก local ก่อน (ไม่รอ GAS)
+    _renderNow(q, srt);
+    return;
+  }
+  if(!q){ PROD_KEYS=null; LAST_PROD_Q=''; }
+  _renderNow(q, srt);
+}
+
+function _renderNow(q, srt){
   var list=LICS.filter(function(l){
     if(CUR_F!=='all'&&urg(l.e)!==CUR_F) return false;
-    if(q&&!l.k.toLowerCase().includes(q)
-       &&!l.m.toLowerCase().includes(q)
-       &&!(l.c||'').toLowerCase().includes(q)) return false;
-    return true;
+    if(!q) return true;
+    if(l.k.toLowerCase().includes(q)) return true;
+    if(l.m.toLowerCase().includes(q)) return true;
+    if((l.c||'').toLowerCase().includes(q)) return true;
+    // local cache ก่อน
+    if(prodsMatchLocal(l.k, q)) return true;
+    // ผลจาก GAS
+    if(PROD_KEYS && PROD_KEYS[l.k]) return true;
+    return false;
   }).sort(function(a,b){
-    if(srt==='exp') return (dLeft(a.e)??9999)-(dLeft(b.e)??9999);
+    if(srt==='exp') return (dLeft(a.e)||9999)-(dLeft(b.e)||9999);
     if(srt==='key') return a.k.localeCompare(b.k);
     return (a.m||'').localeCompare(b.m||'');
   });
-  $('cnt-lbl').textContent='แสดง '+list.length+' / '+LICS.length+' ใบ';
+  $('cnt-lbl').textContent='แสดง '+list.length+' / '+LICS.length+' ใบ'+(PROD_KEYS===null&&q?' (กำลังค้น...)':'');
   $('lic-list').innerHTML=list.map(licRow).join('');
 }
 
@@ -1369,6 +1417,146 @@ function savePDFUrls(){
       $('lc-pw').addEventListener('keypress',function(e){ if(e.key==='Enter') doLogin(); });
     },200);
   },1300);
+})();
+</script>
+
+<!-- 🐥 DUCK CURSOR -->
+<canvas id="duck-canvas" style="position:fixed;top:0;left:0;pointer-events:none;z-index:99999"></canvas>
+<script>
+(function(){
+  var canvas = document.getElementById('duck-canvas');
+  var ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  window.addEventListener('resize', function(){
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
+
+  var duck = { x: -100, y: -100, tx: -100, ty: -100, angle: 0, flip: false, step: 0, bobDir: 1, bob: 0 };
+  var mouse = { x: -100, y: -100 };
+
+  window.addEventListener('mousemove', function(e){ mouse.x = e.clientX; mouse.y = e.clientY; });
+
+  function drawDuck(x, y, angle, flip, bob, step){
+    ctx.save();
+    ctx.translate(x, y + bob);
+    ctx.rotate(angle);
+    if(flip) ctx.scale(-1, 1);
+
+    var s = 1.0; // scale
+    ctx.scale(s, s);
+
+    // Shadow
+    ctx.beginPath();
+    ctx.ellipse(0, 18, 14, 4, 0, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(0,0,0,0.15)';
+    ctx.fill();
+
+    // Body
+    ctx.beginPath();
+    ctx.ellipse(0, 8, 13, 10, -0.2, 0, Math.PI*2);
+    ctx.fillStyle = '#FFD700';
+    ctx.fill();
+    ctx.strokeStyle = '#B8860B';
+    ctx.lineWidth = 0.8;
+    ctx.stroke();
+
+    // Wing highlight
+    ctx.beginPath();
+    ctx.ellipse(-2, 7, 8, 6, -0.3, 0.2, Math.PI*1.4);
+    ctx.fillStyle = 'rgba(255,255,150,0.45)';
+    ctx.fill();
+
+    // Head
+    ctx.beginPath();
+    ctx.arc(8, -4, 7, 0, Math.PI*2);
+    ctx.fillStyle = '#FFD700';
+    ctx.fill();
+    ctx.strokeStyle = '#B8860B';
+    ctx.lineWidth = 0.8;
+    ctx.stroke();
+
+    // Eye
+    ctx.beginPath();
+    ctx.arc(11, -5.5, 1.6, 0, Math.PI*2);
+    ctx.fillStyle = '#1a1a1a';
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(11.6, -6.1, 0.5, 0, Math.PI*2);
+    ctx.fillStyle = '#fff';
+    ctx.fill();
+
+    // Beak
+    ctx.beginPath();
+    ctx.moveTo(16, -4);
+    ctx.lineTo(21, -3.5);
+    ctx.lineTo(21, -1.5);
+    ctx.lineTo(16, -2);
+    ctx.closePath();
+    ctx.fillStyle = '#FF8C00';
+    ctx.fill();
+    ctx.strokeStyle = '#cc6600';
+    ctx.lineWidth = 0.6;
+    ctx.stroke();
+
+    // Feet (walking animation)
+    var legSwing = Math.sin(step * 0.25) * 4;
+    // Left leg
+    ctx.beginPath();
+    ctx.moveTo(-3, 17);
+    ctx.lineTo(-3 + legSwing, 24);
+    ctx.lineTo(-3 + legSwing + 4, 24);
+    ctx.strokeStyle = '#FF8C00';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    // Right leg
+    ctx.beginPath();
+    ctx.moveTo(3, 17);
+    ctx.lineTo(3 - legSwing, 24);
+    ctx.lineTo(3 - legSwing + 4, 24);
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  var lastTime = 0;
+  function animate(ts){
+    var dt = Math.min(ts - lastTime, 50);
+    lastTime = ts;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    var dx = mouse.x - duck.x;
+    var dy = mouse.y - duck.y;
+    var dist = Math.sqrt(dx*dx + dy*dy);
+
+    var speed = Math.min(dist * 0.12, 9);
+
+    if(dist > 5){
+      duck.x += (dx/dist) * speed;
+      duck.y += (dy/dist) * speed;
+      duck.step += speed;
+      duck.flip = dx < 0;
+      duck.angle = Math.atan2(dy, dx) * 0.18; // gentle tilt
+      duck.bob += duck.bobDir * 0.4;
+      if(duck.bob > 2 || duck.bob < -2) duck.bobDir *= -1;
+    } else {
+      duck.step = 0;
+      duck.bob *= 0.85; // settle
+      duck.angle *= 0.9;
+    }
+
+    drawDuck(duck.x, duck.y, duck.angle, duck.flip, duck.bob, duck.step);
+    requestAnimationFrame(animate);
+  }
+
+  // Start duck at center
+  duck.x = window.innerWidth/2;
+  duck.y = window.innerHeight/2;
+  mouse.x = duck.x; mouse.y = duck.y;
+
+  requestAnimationFrame(animate);
 })();
 </script>
 </body>
