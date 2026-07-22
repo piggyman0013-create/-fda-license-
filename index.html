@@ -1425,8 +1425,14 @@ function parseExcel(file){
         if(expRaw instanceof Date){
           expIso=toIso(expRaw.getFullYear(),expRaw.getMonth()+1,expRaw.getDate());
         } else if(typeof expRaw==='string'&&expRaw.trim()){
-          var pd=new Date(expRaw);
-          if(!isNaN(pd)) expIso=toIso(pd.getFullYear(),pd.getMonth()+1,pd.getDate());
+          var s=expRaw.trim();
+          var dm=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{3,4})/); // D/M/Y แบบไฟล์ NEWCODE (HTML export)
+          if(dm){
+            expIso=toIso(+dm[3],+dm[2],+dm[1]); // yr, mo, day
+          } else {
+            var pd=new Date(s);
+            if(!isNaN(pd)) expIso=toIso(pd.getFullYear(),pd.getMonth()+1,pd.getDate());
+          }
         }
         var mfr=String(r[6]||'').trim(), ctry=String(r[7]||'').trim(), cat=String(r[3]||'').trim();
         if(!map[k]) map[k]={k:k,m:mfr,c:ctry,e:expIso,n:0,cat:cat,url:'',prods:[]};
