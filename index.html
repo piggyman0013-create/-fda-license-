@@ -1423,7 +1423,7 @@ function parseExcel(file){
           return yr+'-'+String(mo).padStart(2,'0')+'-'+String(d).padStart(2,'0');
         }
         if(expRaw instanceof Date){
-          expIso=toIso(expRaw.getFullYear(),expRaw.getMonth()+1,expRaw.getDate());
+          expIso=toIso(expRaw.getUTCFullYear(),expRaw.getUTCMonth()+1,expRaw.getUTCDate());
         } else if(typeof expRaw==='string'&&expRaw.trim()){
           var s=expRaw.trim();
           var dm=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{3,4})/); // D/M/Y แบบไฟล์ NEWCODE (HTML export)
